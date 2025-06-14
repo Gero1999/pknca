@@ -307,7 +307,7 @@ fit_half_life <- function(data, tlast, conc_units) {
   # } else {
   inverse_time_units <- NULL
   # }
-  
+
   # as.numeric is so that it works for units objects
   r_squared <- 1 - as.numeric(sum(fit$residuals^2))/as.numeric(sum((data$log_conc - mean(data$log_conc))^2))
   clast_pred <- exp(sum(fit$coefficients*c(1, as.numeric(tlast))))
@@ -470,7 +470,7 @@ get_halflife_points <- function(object) {
   # Insert a ROWID column so that we can reconstruct the order at the end
   rowid_col <- paste0(max(names(as.data.frame(as_PKNCAconc(object)))), "ROWID")
   object$data$conc$data[[rowid_col]] <- seq_len(nrow(object$data$conc$data))
-  
+
   # Find the concentrations and results that go together
   splitdata <- full_join_PKNCAdata(as_PKNCAdata(object), extra_conc_cols = rowid_col)
   splitresults_prep <- as.data.frame(object)
@@ -484,7 +484,7 @@ get_halflife_points <- function(object) {
       splitdata, splitresults,
       by = intersect(names(splitdata), names(splitresults))
     )
-  
+
   ret <- rep(NA, nrow(as.data.frame(as_PKNCAconc(object))))
   for (idx in seq_len(nrow(base_results))) {
     ret_current <-
