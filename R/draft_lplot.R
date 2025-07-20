@@ -1,193 +1,142 @@
 
+get_lambda_z_plot <- function(o_nca, add_annotations = TRUE) {
+  # Ensure result columns are present
   if (!"PPSTRES" %in% names(o_nca$result)) {
     o_nca$result$PPSTRES <- o_nca$result$PPORRES
+    if ("PPORRESU" %in% names(o_nca$result)) {
+      o_nca$result$PPSTRESU <- o_nca$result$PPORRESU
+    }
   }
 
-  groups <- getGroups(o_nca %>% dplyr::filter(PPTESTCD == "lambda.z")) %>%
-  unique()
+  # Get grouping structure for lambda.z
+  groups <- getGroups(o_nca %>% dplyr::filter(PPTESTCD == "lambda.z")) %>% unique()
+  plots <- vector("list", nrow(groups))
 
-for (i in 1:nrow(groups)) {
-  group <- groups[i, ]
-  group_vars <- setdiff(names(group), c("start", "end"))
-  df <- merge(o_nca$data$conc$data, group[, group_vars, drop = FALSE])
+  for (i in seq_len(nrow(groups))) {
+    group <- groups[i, ]
+    group_vars <- setdiff(names(group), c("start", "end"))
+    # Subset data for this group
+    df <- merge(o_nca$data$conc$data, group[, group_vars, drop = FALSE])
 
-  time_col <- o_nca$data$conc$columns$time
-  conc_col <- o_nca$data$conc$columns$conc
-  timeu_col <- o_nca$data$conc$columns$timeu
-  concu_col <- o_nca$data$conc$columns$concu
+    # Column names
+    time_col <- o_nca$data$conc$columns$time
+    conc_col <- o_nca$data$conc$columns$conc
+    timeu_col <- o_nca$data$conc$columns$timeu
+    concu_col <- o_nca$data$conc$columns$concu
+    exclude_hl_col <- o_nca$data$conc$columns$exclude_half.life
+    if (is.null(exclude_hl_col)) {
+      o_nca$data$conc$data[["exclude_half.life"]] <- FALSE
+      exclude_hl_col <- "exclude_half.life"
+    }
 
-  df[[time_col]] <- df[[time_col]] + group$start
-  df <- df[order(df[[time_col]]), ]
-  df[["IX"]] <- 1:nrow(df)
+    # Filter and order by time
+    df <- df[df[[time_col]] >= group$start & df[[time_col]] <= group$end, ]
+    df[["ROWID"]] <- seq_len(nrow(df))
+    df <- df[order(df[[time_col]]), ]
+    df$IX <- seq_len(nrow(df))
 
-  o_nca2 <- o_nca
-  o_nca2$data$conc$data <- df
-  o_nca2$result <- merge(o_nca2$result, group[, group_vars, drop = FALSE])
-  is_lz_used <- get_halflife_points(o_nca2)
-  df_fit <- df[is_lz_used, ]
-  df_fit$log10_conc <- log10(df_fit[[conc_col]])
-  fit <- lm(as.formula(paste0("log10(", conc_col, ")", "~", time_col)), data = df_fit)
-  tlast <- o_nca2$result$PPORRES[o_nca2$result$PPTESTCD == "tlast"]
-  half_life <- o_nca2$result$PPORRES[o_nca2$result$PPTESTCD == "half.life"]
-  adj.r.squared <- o_nca2$result$PPORRES[o_nca2$result$PPTESTCD == "adj.r.squared"]
-  span.ratio <- o_nca2$result$PPORRES[o_nca2$result$PPTESTCD == "span.ratio"]
-  lz_time_first <- o_nca2$result$PPORRES[o_nca2$result$PPTESTCD == "lambda.z.time.first"]
-  lz_time_last <- o_nca2$result$PPORRES[o_nca2$result$PPTESTCD == "lambda.z.time.last"]
-  time_span <- lz_time_last - lz_time_first
-  fit_line_data <- data.frame(
-    x = c(0, tlast),
-    y = predict(fit, data.frame(Time = c(0, tlast)))
-  )
+    # Prepare NCA object for this group
+    group_nca <- o_nca
+    group_nca$data$conc$data <- df
+    group_nca$result <- merge(group_nca$result, group[, group_vars, drop = FALSE])
+    is_lz_used <- get_halflife_points(group_nca)
+    df_fit <- df[is_lz_used, ]
 
-  x_var <- time_col
-  y_var <- conc_col
-  plot_data <- df
-  plot_data$color <- ifelse(is_lz_used, "green", "red")
-  title <- paste0(paste0(group_vars, ": "), group[, group_vars, drop = FALSE], collapse = ", ")
-  xlab <- if (!is.null(timeu_col)) paste0(time_col, " (", timeu_col, ")") else time_col
-  ylab <- if (!is.null(concu_col)) paste0(conc_col, " (", concu_col, ")") else conc_col
-  subtitle_text <- paste0(
-    "    R<sup>2</sup><sub>adj</sub>: ", adj.r.squared,
-    "    HL \u03BB<sub>z</sub> = ", half_life, " ",
-    lambda_res$PPSTRESU[lambda_res$PPTESTCD == "half.life"],
-    "    (T<sub>", df$IX[which(df[[time_col]] == lz_time_first)], "</sub> - T<sub>",
-    df$IX[which(df[[time_col]] == lz_time_last)], "</sub>)/2 = ", time_span / 2, " ",
-    lambda_res$PPSTRESU[lambda_res$PPTESTCD == "lambda.z.time.first"]
-  )
+    # Fit log-linear model to green points
+    fit <- lm(as.formula(paste0("log10(", conc_col,") ~ ", time_col)), df_fit)
 
-  # Create plot
-  p <- plot_ly(
-    data = plot_data,
-    x = ~plot_data[[x_var]],
-    y = ~plot_data[[y_var]],
-    type = "scatter",
-    mode = "markers",
-    marker = list(color = plot_data$color, size = 10),
-    text = ~paste0(
-      x_var, ": ", plot_data[[x_var]], "<br>",
-      y_var, ": ", signif(plot_data[[y_var]], 3)
-    ),
-    hoverinfo = "text",
-    showlegend = FALSE
-  ) %>%
-    add_lines(
-      data = fit_line_data,
-      x = ~x,
-      y = ~10**y,
-      line = list(color = "green", width = 2),
-      name = "Fit",
-      inherit = FALSE,
-      showlegend = TRUE
-    ) %>%
-    layout(
-      title = title,
-      xaxis = list(title = x_var),
-      yaxis = list(title = y_var, type = "log"),
-      annotations = 
+    # Extract NCA results for annotation
+    get_res <- function(testcd) group_nca$result$PPORRES[group_nca$result$PPTESTCD == testcd]
+    get_unit <- function(testcd) group_nca$result$PPSTRESU[group_nca$result$PPTESTCD == testcd]
+    tlast <- get_res("tlast")
+    half_life <- get_res("half.life")
+    adj.r.squared <- get_res("adj.r.squared")
+    lz_time_first <- get_res("lambda.z.time.first")
+    lz_time_last <- get_res("lambda.z.time.last")
+    time_span <- lz_time_last - lz_time_first
+
+    # Prepare fit line (on log scale, then back-transform)
+    fit_line_data <- data.frame(x = c(0, tlast))
+    colnames(fit_line_data) <- time_col
+    fit_line_data$y <- predict(fit, fit_line_data)
+
+    # Plot data
+    plot_data <- df
+    plot_data$color <- ifelse(is_lz_used, "green", "red")
+    title <- paste0(paste0(group_vars, ": "), group[, group_vars, drop = FALSE], collapse = ", ")
+    xlab <- if (!is.null(timeu_col)) paste0(time_col, " (", timeu_col, ")") else time_col
+    ylab <- if (!is.null(concu_col)) paste0(conc_col, " (", concu_col, ")") else conc_col
+    subtitle_text <- paste0(
+      "R<sup>2</sup><sub>adj</sub> = ", signif(adj.r.squared, 2),
+      "&#9;&#9;",
+      "ln(2)/ \u03BB<sub>z</sub> = ", signif(half_life, 2), " ", get_unit("half.life"),
+      "&#9;&#9;",
+      "(T<sub>", df$IX[which(df[[time_col]] == lz_time_first)],
+      "</sub> - T<sub>", df$IX[which(df[[time_col]] == lz_time_last)], "</sub>)/2 = ",
+      "&#9;&#9;",
+      signif(time_span / 2, 2), " ", get_unit("lambda.z.time.first")
     )
+
+    # Build plotly object
+    p <- plot_ly() %>%
+      add_lines(
+        data = fit_line_data,
+        x = ~get(time_col),
+        y = ~10^y,
+        line = list(color = "green", width = 2),
+        name = "Fit",
+        inherit = FALSE,
+        showlegend = TRUE
+      ) %>%
+      layout(
+        title = title,
+        xaxis = list(
+          title = xlab,
+          linecolor = "black",
+          gridcolor = "white",
+          zeroline = FALSE
+        ),
+        yaxis = list(
+          title = ylab,
+          type = "log",
+          tickformat = "f",
+          linecolor = "black",
+          gridcolor = "white",
+          zeroline = FALSE
+        ),
+        annotations = if (add_annotations) list(
+          text = subtitle_text,
+          showarrow = FALSE,
+          xref = "paper",
+          yref = "paper",
+          y = max(plot_data[[conc_col]], na.rm = TRUE)
+        ) else NULL
+      ) %>%
+      add_trace(
+        data = plot_data,
+        x = ~plot_data[[time_col]],
+        y = ~plot_data[[conc_col]],
+        text = ~paste0(
+          "(",
+          get(time_col),
+          ", ",
+          signif(get(conc_col), 3),
+          ")"
+        ),
+        hoverinfo = "text",
+        showlegend = FALSE,
+        type = "scatter",
+        mode = "markers",
+        marker = list(
+          color = plot_data$color,
+          size = 15,
+          symbol = ifelse(plot_data[[exclude_hl_col]], "x", "circle"),
+          size = 20
+        ),
+        customdata = ~plot_data[["ROWID"]] # Returns the row number in the object
+      )
+    plots[[i]] <- p
+    names(plots)[i] <- title
+  }
+  return(plots)
 }
-
-group_vars <- dplyr::group_vars(o_conc)
-df$groups_to_split <- as.character(interaction(df[, group_vars]))
-
-
-list_data <- split(df, df$groups_to_split)
-
-lapply(names(list_data), function(ndata) {
-  data <- list_data[[ndata]]
-  cell_vals <- unique(as.numeric(as.factor(data[[cell_var]])))
-
-  plot_ly(
-    data = data,
-    x = ~data[[col_var]],
-    y = ~data[[row_var]],
-    type = "scatter",
-    source = "scatter",
-    colors = colorRampPalette(c("black", "red3", "green4"))(length(cell_vals)),
-    text = ~paste(
-      paste0("<br>", row_var, ": ", data[[row_var]]),
-      paste0("<br>", col_var, ": ", data[[col_var]]),
-      apply(data[hover_var], 1, function(row) {
-        paste0("<br>", paste(paste0(names(row), ": ", row), collapse = "<br>"))
-      })
-    ),
-    hoverinfo = "text",
-    customdata = unique(data[[group_var]])
-  ) %>%
-    layout(
-      title = paste0(unique(data[[group_var]]), collapse = "\n"),
-      xaxis = list(title = col_var),
-      yaxis = list(title = row_var)
-    )
-})
-
-
-plot_green_red_scatter <- function(
-  plot_data,
-  x_var,
-  y_var,
-  logical_col,
-  title = "Scatter Plot"
-) {
-  library(plotly)
-  library(dplyr)
-  
-  # Prepare colors: green for TRUE, red for FALSE
-  plot_data <- plot_data %>%
-    mutate(
-      color = ifelse(.data[[logical_col]], "green", "red")
-    )
-
-  # Fit line only for green points
-  green_data <- plot_data %>% filter(.data[[logical_col]])
-  fit <- lm(green_data[[y_var]] ~ green_data[[x_var]], data = green_data)
-
-  # Extrapolate fit line across the full x range of all data
-  x_seq <- seq(min(plot_data[[x_var]], na.rm = TRUE),
-               max(plot_data[[x_var]], na.rm = TRUE),
-               length.out = 100)
-  fit_line <- data.frame(
-    x = x_seq,
-    y = predict(fit, newdata = data.frame(n = 1:length(x_seq)) %>% mutate(!!x_var := x_seq) )
-  )
-  names(fit_line) <- c(x_var, y_var)
-
-  # Create plot
-  p <- plot_ly(
-    data = plot_data,
-    x = ~plot_data[[x_var]],
-    y = ~plot_data[[y_var]],
-    type = "scatter",
-    mode = "markers",
-    marker = list(color = plot_data$color, size = 10),
-    text = ~paste0(
-      x_var, ": ", plot_data[[x_var]], "<br>",
-      y_var, ": ", signif(plot_data[[y_var]], 3)
-    ),
-    hoverinfo = "text",
-    showlegend = FALSE
-  ) %>%
-    add_lines(
-      data = fit_line,
-      x = ~plot_data[[x_var]],
-      y = ~plot_data[[y_var]],
-      line = list(color = "green", width = 2),
-      name = "Fit (green points only)",
-      inherit = FALSE,
-      showlegend = TRUE
-    ) %>%
-    layout(
-      title = title,
-      xaxis = list(title = x_var),
-      yaxis = list(title = y_var)
-    )
-
-  return(p)
-}
-plot_green_red_scatter(
-  plot_data = mtcars,
-  x_var = "mpg",
-  y_var = "cyl",
-  logical_col = "logic",
-  title = "Green/Red Scatter Plot with Fit Line"
-)
