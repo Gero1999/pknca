@@ -1,5 +1,5 @@
 
-get_lambda_z_plot <- function(o_nca, add_annotations = TRUE) {
+get_halflife_plot <- function(o_nca, add_annotations = TRUE) {
   # Ensure result columns are present
   if (!"PPSTRES" %in% names(o_nca$result)) {
     o_nca$result$PPSTRES <- o_nca$result$PPORRES
@@ -78,8 +78,8 @@ get_lambda_z_plot <- function(o_nca, add_annotations = TRUE) {
     )
 
     # Build plotly object
-    p <- plot_ly() %>%
-      add_lines(
+    p <- plotly::plot_ly() %>%
+      plotly::add_lines(
         data = fit_line_data,
         x = ~get(time_col),
         y = ~10^y,
@@ -88,7 +88,7 @@ get_lambda_z_plot <- function(o_nca, add_annotations = TRUE) {
         inherit = FALSE,
         showlegend = TRUE
       ) %>%
-      layout(
+      plotly::layout(
         title = title,
         xaxis = list(
           title = xlab,
@@ -112,7 +112,7 @@ get_lambda_z_plot <- function(o_nca, add_annotations = TRUE) {
           y = max(plot_data[[conc_col]], na.rm = TRUE)
         ) else NULL
       ) %>%
-      add_trace(
+      plotly::add_trace(
         data = plot_data,
         x = ~plot_data[[time_col]],
         y = ~plot_data[[conc_col]],
