@@ -31,6 +31,8 @@
 #'   [clean.conc.na()] for usage instructions.)
 #' @param impute_method The imputation method (function or list of PKNCA_impute
 #'   functions) to apply after cleaning BLQ values
+#' @param conc.group,time.group Optional group-level concentration and time data
+#'   for imputation functions that require it (e.g., PKNCA_impute_method_start_predose)
 #' @param check Run [assert_conc_time()], [clean.conc.blq()], and
 #'   [clean.conc.na()]?
 #' @param fun_linear The function to use for integration of the linear part of
@@ -72,6 +74,8 @@ pk.calc.auxc <- function(conc, time, interval=c(0, Inf),
                          conc.blq=NULL,
                          conc.na=NULL,
                          impute_method=NA_character_,
+                         conc.group=NULL,
+                         time.group=NULL,
                          check=TRUE,
                          fun_linear, fun_log, fun_inf) {
   # Check the inputs
@@ -92,6 +96,8 @@ pk.calc.auxc <- function(conc, time, interval=c(0, Inf),
         impute_args <- as.list(data)
         impute_args$start <- interval[1]
         impute_args$end <- interval[2]
+        if (!is.null(conc.group)) impute_args$conc.group <- conc.group
+        if (!is.null(time.group)) impute_args$time.group <- time.group
         impute_args$options <- options
         data <- do.call(current_fun_nm, args=impute_args)
       }

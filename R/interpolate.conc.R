@@ -30,6 +30,8 @@
 #' @param conc.na How to handle NA concentrations.  (See [clean.conc.na()])
 #' @param impute_method The imputation method (function or list of PKNCA_impute
 #'   functions) to apply after cleaning BLQ values
+#' @param conc.group,time.group Optional group-level concentration and time data
+#'   for imputation functions that require it (e.g., PKNCA_impute_method_start_predose)
 #' @param route.dose What is the route of administration ("intravascular" or
 #'   "extravascular").  See the details for how this parameter is used.
 #' @param duration.dose What is the duration of administration? See the details
@@ -86,6 +88,8 @@ interp.extrap.conc <- function(conc, time, time.out,
                                conc.blq = NULL,
                                conc.na = NULL,
                                impute_method=NA_character_,
+                               conc.group=NULL,
+                               time.group=NULL,
                                check = TRUE) {
   # Defunct inputs
   if (!missing(interp.method)) {
@@ -114,6 +118,8 @@ interp.extrap.conc <- function(conc, time, time.out,
         # For interpolation/extrapolation, we use the time.out range
         impute_args$start <- min(c(data$time, time.out), na.rm = TRUE)
         impute_args$end <- max(c(data$time, time.out), na.rm = TRUE)
+        if (!is.null(conc.group)) impute_args$conc.group <- conc.group
+        if (!is.null(time.group)) impute_args$time.group <- time.group
         impute_args$options <- options
         data <- do.call(current_fun_nm, args=impute_args)
       }
@@ -170,6 +176,8 @@ interpolate.conc <- function(conc, time, time.out,
                              conc.blq=NULL,
                              conc.na=NULL,
                              impute_method=NA_character_,
+                             conc.group=NULL,
+                             time.group=NULL,
                              conc.origin=0,
                              ...,
                              check=TRUE) {
@@ -200,6 +208,8 @@ interpolate.conc <- function(conc, time, time.out,
         impute_args <- as.list(data)
         impute_args$start <- min(c(data$time, time.out), na.rm = TRUE)
         impute_args$end <- max(c(data$time, time.out), na.rm = TRUE)
+        if (!is.null(conc.group)) impute_args$conc.group <- conc.group
+        if (!is.null(time.group)) impute_args$time.group <- time.group
         impute_args$options <- options
         data <- do.call(current_fun_nm, args=impute_args)
       }
@@ -268,6 +278,8 @@ extrapolate.conc <- function(conc, time, time.out,
                              conc.na=NULL,
                              conc.blq=NULL,
                              impute_method=NA_character_,
+                             conc.group=NULL,
+                             time.group=NULL,
                              ...,
                              check=TRUE) {
   if (!missing(extrap.method)) {
@@ -291,6 +303,8 @@ extrapolate.conc <- function(conc, time, time.out,
         impute_args <- as.list(data)
         impute_args$start <- min(c(data$time, time.out), na.rm = TRUE)
         impute_args$end <- max(c(data$time, time.out), na.rm = TRUE)
+        if (!is.null(conc.group)) impute_args$conc.group <- conc.group
+        if (!is.null(time.group)) impute_args$time.group <- time.group
         impute_args$options <- options
         data <- do.call(current_fun_nm, args=impute_args)
       }
@@ -374,6 +388,8 @@ interp.extrap.conc.dose <- function(conc, time,
                                     conc.blq = NULL,
                                     conc.na = NULL,
                                     impute_method=NA_character_,
+                                    conc.group=NULL,
+                                    time.group=NULL,
                                     ...,
                                     check = TRUE) {
   # Check inputs
@@ -394,6 +410,8 @@ interp.extrap.conc.dose <- function(conc, time,
         impute_args <- as.list(data_conc)
         impute_args$start <- min(c(data_conc$time, time.out), na.rm = TRUE)
         impute_args$end <- max(c(data_conc$time, time.out), na.rm = TRUE)
+        if (!is.null(conc.group)) impute_args$conc.group <- conc.group
+        if (!is.null(time.group)) impute_args$time.group <- time.group
         impute_args$options <- options
         data_conc <- do.call(current_fun_nm, args=impute_args)
       }

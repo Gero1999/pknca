@@ -449,6 +449,10 @@ pk.nca.interval <- function(conc, time, volume, duration.conc,
           call_args[[arg_formal]] <- options
         } else if (arg_mapped == "impute_method") {
           call_args[[arg_formal]] <- impute_method
+        } else if (arg_mapped == "conc.group") {
+          call_args[[arg_formal]] <- conc.group
+        } else if (arg_mapped == "time.group") {
+          call_args[[arg_formal]] <- time.group
         } else if (any(mask_arg <- ret$PPTESTCD %in% arg_mapped)) {
           call_args[[arg_formal]] <- ret$PPORRES[mask_arg]
           exclude_from_argument <-
