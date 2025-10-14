@@ -44,6 +44,10 @@
 #'   adding another point.
 #' @param conc.blq See [clean.conc.blq()]
 #' @param conc.na See [clean.conc.na()]
+#' @param impute_method The imputation method (function or list of PKNCA_impute
+#'   functions) to apply after cleaning BLQ values
+#' @param conc.group,time.group Optional group-level concentration and time data
+#'   for imputation functions that require it (e.g., PKNCA_impute_method_start_predose)
 #' @param check Run [assert_conc_time()],
 #'   [clean.conc.blq()], and [clean.conc.na()]?
 #' @param first.tmax See [pk.calc.tmax()].
@@ -85,6 +89,9 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
                               adj.r.squared.factor=NULL,
                               conc.blq=NULL,
                               conc.na=NULL,
+                              impute_method=NA_character_,
+                              conc.group=NULL,
+                              time.group=NULL,
                               first.tmax=NULL,
                               allow.tmax.in.half.life=NULL,
                               check=TRUE) {
@@ -116,6 +123,22 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
   if (check) {
     assert_conc_time(conc = conc, time = time)
     data <- clean.conc.blq(conc, time, conc.blq=conc.blq, conc.na=conc.na)
+    # Apply imputation after clean.conc.blq
+    if (!all(is.na(impute_method))) {
+      impute_funs <- PKNCA_impute_fun_list(impute_method)
+      stopifnot(length(impute_funs) == 1)
+      for (current_fun_nm in impute_funs[[1]]) {
+        impute_args <- as.list(data)
+        # For half-life, we need start and end which may not be available yet
+        # So we'll use the time range
+        impute_args$start <- min(data$time, na.rm = TRUE)
+        impute_args$end <- max(data$time, na.rm = TRUE)
+        if (!is.null(conc.group)) impute_args$conc.group <- conc.group
+        if (!is.null(time.group)) impute_args$time.group <- time.group
+        impute_args$options <- options
+        data <- do.call(current_fun_nm, args=impute_args)
+      }
+    }
   } else {
     data <- data.frame(conc, time)
   }
