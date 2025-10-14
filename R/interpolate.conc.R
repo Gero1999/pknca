@@ -28,6 +28,8 @@
 #' @param conc.blq How to handle BLQ values. (See [clean.conc.blq()] for usage
 #'   instructions.)
 #' @param conc.na How to handle NA concentrations.  (See [clean.conc.na()])
+#' @param impute_method The imputation method (function or list of PKNCA_impute
+#'   functions) to apply after cleaning BLQ values
 #' @param route.dose What is the route of administration ("intravascular" or
 #'   "extravascular").  See the details for how this parameter is used.
 #' @param duration.dose What is the duration of administration? See the details
@@ -83,6 +85,7 @@ interp.extrap.conc <- function(conc, time, time.out,
                                ...,
                                conc.blq = NULL,
                                conc.na = NULL,
+                               impute_method=NA_character_,
                                check = TRUE) {
   # Defunct inputs
   if (!missing(interp.method)) {
@@ -102,6 +105,19 @@ interp.extrap.conc <- function(conc, time, time.out,
         options = options,
         check=FALSE
       )
+    # Apply imputation after clean.conc.blq
+    if (!all(is.na(impute_method))) {
+      impute_funs <- PKNCA_impute_fun_list(impute_method)
+      stopifnot(length(impute_funs) == 1)
+      for (current_fun_nm in impute_funs[[1]]) {
+        impute_args <- as.list(data)
+        # For interpolation/extrapolation, we use the time.out range
+        impute_args$start <- min(c(data$time, time.out), na.rm = TRUE)
+        impute_args$end <- max(c(data$time, time.out), na.rm = TRUE)
+        impute_args$options <- options
+        data <- do.call(current_fun_nm, args=impute_args)
+      }
+    }
   } else {
     data <- data.frame(conc, time)
   }
@@ -153,6 +169,7 @@ interpolate.conc <- function(conc, time, time.out,
                              interp.method,
                              conc.blq=NULL,
                              conc.na=NULL,
+                             impute_method=NA_character_,
                              conc.origin=0,
                              ...,
                              check=TRUE) {
@@ -175,6 +192,18 @@ interpolate.conc <- function(conc, time, time.out,
         options = options,
         check=FALSE
       )
+    # Apply imputation after clean.conc.blq
+    if (!all(is.na(impute_method))) {
+      impute_funs <- PKNCA_impute_fun_list(impute_method)
+      stopifnot(length(impute_funs) == 1)
+      for (current_fun_nm in impute_funs[[1]]) {
+        impute_args <- as.list(data)
+        impute_args$start <- min(c(data$time, time.out), na.rm = TRUE)
+        impute_args$end <- max(c(data$time, time.out), na.rm = TRUE)
+        impute_args$options <- options
+        data <- do.call(current_fun_nm, args=impute_args)
+      }
+    }
   } else {
     data <- data.frame(conc, time)
   }
@@ -238,6 +267,7 @@ extrapolate.conc <- function(conc, time, time.out,
                              options=list(),
                              conc.na=NULL,
                              conc.blq=NULL,
+                             impute_method=NA_character_,
                              ...,
                              check=TRUE) {
   if (!missing(extrap.method)) {
@@ -253,6 +283,18 @@ extrapolate.conc <- function(conc, time, time.out,
         options = options,
         check = FALSE
       )
+    # Apply imputation after clean.conc.blq
+    if (!all(is.na(impute_method))) {
+      impute_funs <- PKNCA_impute_fun_list(impute_method)
+      stopifnot(length(impute_funs) == 1)
+      for (current_fun_nm in impute_funs[[1]]) {
+        impute_args <- as.list(data)
+        impute_args$start <- min(c(data$time, time.out), na.rm = TRUE)
+        impute_args$end <- max(c(data$time, time.out), na.rm = TRUE)
+        impute_args$options <- options
+        data <- do.call(current_fun_nm, args=impute_args)
+      }
+    }
   } else {
     data <- data.frame(conc, time)
   }
@@ -331,6 +373,7 @@ interp.extrap.conc.dose <- function(conc, time,
                                     options = list(),
                                     conc.blq = NULL,
                                     conc.na = NULL,
+                                    impute_method=NA_character_,
                                     ...,
                                     check = TRUE) {
   # Check inputs
@@ -343,6 +386,18 @@ interp.extrap.conc.dose <- function(conc, time,
         options = options,
         check=FALSE
       )
+    # Apply imputation after clean.conc.blq
+    if (!all(is.na(impute_method))) {
+      impute_funs <- PKNCA_impute_fun_list(impute_method)
+      stopifnot(length(impute_funs) == 1)
+      for (current_fun_nm in impute_funs[[1]]) {
+        impute_args <- as.list(data_conc)
+        impute_args$start <- min(c(data_conc$time, time.out), na.rm = TRUE)
+        impute_args$end <- max(c(data_conc$time, time.out), na.rm = TRUE)
+        impute_args$options <- options
+        data_conc <- do.call(current_fun_nm, args=impute_args)
+      }
+    }
   } else {
     data_conc <- data.frame(conc, time)
   }

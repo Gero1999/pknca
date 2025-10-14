@@ -363,22 +363,6 @@ pk.nca.interval <- function(conc, time, volume, duration.conc,
   if (nrow(interval) != 1) {
     stop("Please report a bug.  Interval must be a one-row data.frame")
   }
-  if (!all(is.na(impute_method))) {
-    impute_funs <- PKNCA_impute_fun_list(impute_method)
-    stopifnot(length(impute_funs) == 1)
-    impute_data <- data.frame(conc=conc, time=time)
-    for (current_fun_nm in impute_funs[[1]]) {
-      impute_args <- as.list(impute_data)
-      impute_args$start <- interval$start[1]
-      impute_args$end <- interval$end[1]
-      impute_args$conc.group <- conc.group
-      impute_args$time.group <- time.group
-      impute_args$options <- options
-      impute_data <- do.call(current_fun_nm, args=impute_args)
-    }
-    conc <- impute_data$conc
-    time <- impute_data$time
-  }
   # Prepare the return value using SDTM names
   ret <- data.frame(PPTESTCD=NA, PPORRES=NA)[-1,]
   # Determine exactly what needs to be calculated in what order. Start with the
@@ -463,6 +447,8 @@ pk.nca.interval <- function(conc, time, volume, duration.conc,
           call_args[[arg_formal]] <- interval[[arg_mapped]]
         } else if (arg_mapped == "options") {
           call_args[[arg_formal]] <- options
+        } else if (arg_mapped == "impute_method") {
+          call_args[[arg_formal]] <- impute_method
         } else if (any(mask_arg <- ret$PPTESTCD %in% arg_mapped)) {
           call_args[[arg_formal]] <- ret$PPORRES[mask_arg]
           exclude_from_argument <-
