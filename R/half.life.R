@@ -548,3 +548,47 @@ get_halflife_points_single <- function(conc, results, time_start, time_end, rowi
   }
   ret
 }
+
+
+#' Determine the fit equation used for half-life calculation
+#' @param object A PKNCAresults object
+#' @return An ordered list with the fit equation by concentration-time group
+
+get_halflife_fit <- function(object) {
+  group_cols <- dplyr::group_vars(object)
+  conc_col <- object$conc$columns$conc
+  time_col <- object$conc$columns$time
+
+  # Prepare an object with all plot information
+  o_nca <- pk.nca(object)
+  o_data <- object$data
+  wide_output <- as.data.frame(o_nca, out_format = "wide")
+  wide_output <- wide_output %>%
+    dplyr::select(any_of(c(
+      group_cols, "start", "end"
+      )))
+  wide_output <- unique(wide_output)
+
+  object$conc$data$is.hl.point <- get_halflife_points(object)
+  d_conc_list <- merge(
+    object$conc$data[, c(group_cols, time_col, conc_col, "is.hl.point")],
+    wide_output,
+    all.x = TRUE,
+    by = group_cols
+  ) %>%
+    dplyr::filter(.[[time_col]] >= start & .[[time_col]] <= end) %>%
+    dplyr::filter(is.hl.point & !is.na(is.hl.point)) %>%
+    split(.[, c(group_cols, "start", "end")])
+
+  fits_list <- list()
+  for (grp in names(d_conc_list)) {
+    data <- d_conc_list[[grp]]
+    data$time <- as.numeric(data[[time_col]])
+    data$log_conc <- log(data[[conc_col]])
+    fits_list[[grp]]$fit <- stats::.lm.fit(
+      x=cbind(1, data$time), y=data$log_conc
+    )
+    fits_list[[grp]]$data <- data
+  }
+  fits_list
+}

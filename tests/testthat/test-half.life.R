@@ -447,3 +447,16 @@ test_that("get_halflife_points", {
     info = "get_halflife_points uses lambda.z.time.last, not tlast"
   )
 })
+
+testthat("get_halflife_fit", {
+  d_conc <- data.frame(
+    conc = log(7:1),
+    time = c(0, 1, 2, 3, 4, 5, 6),
+    exclude_hl = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE),
+    subject = 1
+  )
+  o_conc <- PKNCAconc(d_conc, formula = conc ~ time | subject, exclude_half.life = "exclude_hl")
+  o_data <- PKNCAdata(o_conc, intervals = data.frame(start = 0, end = Inf, half.life = TRUE))
+  o_nca <- suppressMessages(pk.nca(o_data))
+  hl_fit <- suppressMessages(get_halflife_fit(o_nca))
+})
