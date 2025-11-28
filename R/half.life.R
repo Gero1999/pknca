@@ -574,24 +574,26 @@ get_halflife_points_single <- function(conc, results, time_start, time_end, rowi
   ret
 }
 
-
 #' Determine the fit equation used for half-life calculation
-#' @param object A PKNCAresults object
+#' @param object A PKNCAdata object
 #' @return An ordered list with the fit equation by concentration-time group
 
 get_halflife_fit <- function(object) {
+  UseMethod("get_halflife_fit")
+}
+
+get_halflife_fit.PKNCAdata <- function(object) {
   group_cols <- dplyr::group_vars(object)
   conc_col <- object$conc$columns$conc
-  time_col <- object$conc$columns$time
+  time_col <- getIndepVar(as_PKNCAconc(object))
 
   # Prepare an object with all plot information
   o_nca <- pk.nca(object)
-  o_data <- object$data
   wide_output <- as.data.frame(o_nca, out_format = "wide")
   wide_output <- wide_output %>%
     dplyr::select(any_of(c(
-      group_cols, "start", "end"
-      )))
+      group_cols, "start", "end", get.parameter.deps("half.life")
+    )))
   wide_output <- unique(wide_output)
 
   object$conc$data$is.hl.point <- get_halflife_points(object)
@@ -617,3 +619,36 @@ get_halflife_fit <- function(object) {
   }
   fits_list
 }
+
+get_halflife_fit.PKNCAresults <- function(object) {
+  o_data <- as_PKNCAdata(object)
+  get_halflife_fit(o_data)
+}
+
+
+get_hl_fit <- function(object) {
+  UseMethod("get_hl_fit")
+}
+
+get_hl_fit.PKNCAresults <- function(object) {
+  o_data <- as_PKNCAdata(object)
+  o_data$conc$data$ROWID <- seq_len(nrow(o_nca$conc$data))
+  o_nca <- pk.nca(o_data)
+
+  hl_dep_params <- c("half.life" ,get.parameter.deps("half.life"))
+  hl_dep_params <- intersect(names(o_data$intervals), hl_dep_params)
+  rows_to_keep <- rowSums(o_data$intervals[, hl_dep_params, drop = FALSE]) > 0
+  fit_int <- o_data$intervals[rows_to_keep, c(group_vars(o_data), "start", "end", hl_dep_params), drop = FALSE]
+
+  d_conc <- o_data$conc$data
+  o_data_tmp <- o_data
+  for (i in nrow(fit_int)) {
+    o_data_tmp$intervals <- fit_int[i, , drop = FALSE]
+    get_halflife_points_single(
+      conc = d_conc,
+      results = o_nca$result,
+      time_start = fit_int$start[i],
+      time_end = fit_int$end[i],
+      rowid_col = "ROWID"
+    )
+  }
