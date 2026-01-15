@@ -1,0 +1,86 @@
+---
+title: "Parameters Available in PKNCA"
+author: "PKNCA Developers"
+output:
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{Parameters Available in PKNCA}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE)
+library(PKNCA)
+library(knitr)
+```
+
+# Parameters Available for Calculation in an Interval
+
+The following table lists all parameters available for calculation in a PKNCA interval, along with their formulas, unit types, descriptions, and the function used for calculation.
+
+```{r parameters-available, echo=FALSE}
+interval_spec <- get.interval.cols()
+interval_spec <- interval_spec[sort(names(interval_spec))]
+
+get_function_for_calc <- function(x) {
+  if (is.na(x$FUN)) {
+    if (is.null(x$depends)) {
+      "(none)"
+    } else {
+      paste("See the parameter name", x$depends)
+    }
+  } else {
+    x$FUN
+  }
+}
+
+get_formula <- function(x) {
+  if (is.null(x$formula) || x$formula == "") {
+    ""
+  } else {
+    x$formula
+  }
+}
+
+param_table <- data.frame(
+  `Parameter Name`=names(interval_spec),
+  `Formula` = vapply(
+    X = interval_spec,
+    FUN = get_formula,
+    FUN.VALUE = ""
+  ),
+  `Unit Type`=vapply(X = interval_spec, FUN = "[[", "unit_type", FUN.VALUE = ""),
+  `Parameter Description`=vapply(X = interval_spec, FUN = "[[", "desc", FUN.VALUE = ""),
+  `Function for Calculation`=vapply(X = interval_spec, FUN = get_function_for_calc, FUN.VALUE = ""),
+  check.names=FALSE,
+  stringsAsFactors=FALSE
+)
+
+# param_table$Formula =  '$r^2_{adj} = 1 - (1 - r^2) \\frac{n-1}{n-2} \\sum_{i=1}^9$'
+# param_table$Formula = "$T_{\\text{first}} = t_{i: C_i > 0, i = \\min}$"
+# param_table$Formula = as.character(param_table$Formula[[1]])
+#param_table$Formula = "$r^2_{adj} = 1 - (1 - r^2) \\frac{n-1}{n-2}$"
+
+
+kable(
+  param_table,
+  row.names=FALSE,
+  format = "html",
+  escape = FALSE
+)
+# 
+# rmarkdown::paged_table(
+#   param_table,
+#   options = list(pageLength = 25)
+# )
+# 
+# DT::datatable(
+#   param_table,
+#   options = list(pageLength = 25),
+#   rownames=FALSE,
+#   escape = FALSE
+# )
+```
