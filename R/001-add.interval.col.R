@@ -90,7 +90,8 @@ add.interval.col <- function(name,
                              formalsmap=list(),
                              datatype=c("interval",
                                "individual",
-                               "population")) {
+                               "population"),
+                             formula=NULL) {
   # Check inputs
   if (!is.character(name)) {
     stop("name must be a character string")
@@ -170,7 +171,8 @@ add.interval.col <- function(name,
       sparse=sparse,
       formalsmap=formalsmap,
       depends=depends,
-      datatype=datatype
+      datatype=datatype,
+      formula=formula
     )
   assign("interval.cols", current, envir=.PKNCAEnv)
 }
