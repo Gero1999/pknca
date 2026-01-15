@@ -105,7 +105,7 @@ pk.calc.auxc <- function(conc, time, interval=c(0, Inf),
   }
   auc.type <- match.arg(auc.type)
   interval <- assert_intervaltime_single(interval = interval)
-  if (auc.type %in% "AUCinf" & is.finite(interval[2])) {
+  if (auc.type %in% "AUCinf" && is.finite(interval[2])) {
     warning("Requesting AUCinf when the end of the interval is not Inf")
   }
 
@@ -318,7 +318,8 @@ add.interval.col("aucinf.obs",
                  unit_type="auc",
                  pretty_name="AUCinf,obs",
                  desc="The area under the concentration time curve from the beginning of the interval to infinity with extrapolation to infinity from the observed Clast",
-                 depends=c("lambda.z", "clast.obs"))
+                 depends=c("lambda.z", "clast.obs"),
+                 formula="$AUC_{\\infty,\\text{obs}} = AUC_{0-\\text{last}} + \\frac{C_{\\text{last,obs}}}{\\lambda_z}$")
 
 add.interval.col("aucinf.pred",
                  FUN="pk.calc.auc.inf.pred",
@@ -326,22 +327,24 @@ add.interval.col("aucinf.pred",
                  unit_type="auc",
                  pretty_name="AUCinf,pred",
                  desc="The area under the concentration time curve from the beginning of the interval to infinity with extrapolation to infinity from the predicted Clast",
-                 depends=c("lambda.z", "clast.pred"))
+                 depends=c("lambda.z", "clast.pred"),
+                 formula="$AUC_{\\infty,\\text{pred}} = AUC_{0-\\text{last}} + \\frac{C_{\\text{last,pred}}}{\\lambda_z}$")
 
 add.interval.col("auclast",
                  FUN="pk.calc.auc.last",
                  values=c(FALSE, TRUE),
                  unit_type="auc",
                  pretty_name="AUClast",
-                 desc="The area under the concentration time curve from the beginning of the interval to the last concentration above the limit of quantification")
+                 desc="The area under the concentration time curve from the beginning of the interval to the last concentration above the limit of quantification",
+                 formula="$AUC_{\\text{last}} = \\int_{0}^{T_{\\text{last}}} C(t) dt$")
 
 add.interval.col("aucall",
                  FUN="pk.calc.auc.all",
                  values=c(FALSE, TRUE),
                  unit_type="auc",
                  pretty_name="AUCall",
-                 desc="The area under the concentration time curve from the beginning of the interval to the last concentration above the limit of quantification plus the triangle from that last concentration to 0 at the first concentration below the limit of quantification"
-)
+                 desc="The area under the concentration time curve from the beginning of the interval to the last concentration above the limit of quantification plus the triangle from that last concentration to 0 at the first concentration below the limit of quantification",
+                 formula="$AUC_{\\text{all}} = \\int_{0}^{T_{\\text{end}}} C(t) dt$")
 
 add.interval.col("aumcinf.obs",
                  FUN="pk.calc.aumc.inf.obs",
@@ -349,7 +352,8 @@ add.interval.col("aumcinf.obs",
                  unit_type="aumc",
                  pretty_name="AUMC,inf,obs",
                  desc="The area under the concentration time moment curve from the beginning of the interval to infinity with extrapolation to infinity from the observed Clast",
-                 depends=c("lambda.z", "clast.obs"))
+                 depends=c("lambda.z", "clast.obs"),
+                 formula="$AUMC_{\\infty,\\text{obs}} = AUMC_{0-\\text{last}} + \\frac{C_{\\text{last,obs}} T_{\\text{last}}}{\\lambda_z} + \\frac{C_{\\text{last,obs}}}{\\lambda_z^2}$")
 
 add.interval.col("aumcinf.pred",
                  FUN="pk.calc.aumc.inf.pred",
@@ -357,21 +361,24 @@ add.interval.col("aumcinf.pred",
                  unit_type="aumc",
                  pretty_name="AUMC,inf,pred",
                  desc="The area under the concentration time moment curve from the beginning of the interval to infinity with extrapolation to infinity from the predicted Clast",
-                 depends=c("lambda.z", "clast.pred"))
+                 depends=c("lambda.z", "clast.pred"),
+                 formula="$AUMC_{\\infty,\\text{pred}} = AUMC_{0-\\text{last}} + \\frac{C_{\\text{last,pred}} T_{\\text{last}}}{\\lambda_z} + \\frac{C_{\\text{last,pred}}}{\\lambda_z^2}$")
 
 add.interval.col("aumclast",
                  FUN="pk.calc.aumc.last",
                  values=c(FALSE, TRUE),
                  unit_type="aumc",
                  pretty_name="AUMC,last",
-                 desc="The area under the concentration time moment curve from the beginning of the interval to the last concentration above the limit of quantification")
+                 desc="The area under the concentration time moment curve from the beginning of the interval to the last concentration above the limit of quantification",
+                 formula="$AUMC_{\\text{last}} = \\int_{0}^{T_{\\text{last}}} C(t) t dt$")
 
 add.interval.col("aumcall",
                  FUN="pk.calc.aumc.all",
                  values=c(FALSE, TRUE),
                  unit_type="aumc",
                  pretty_name="AUMC,all",
-                 desc="The area under the concentration time moment curve from the beginning of the interval to the last concentration above the limit of quantification plus the moment of the triangle from that last concentration to 0 at the first concentration below the limit of quantification")
+                 desc="The area under the concentration time moment curve from the beginning of the interval to the last concentration above the limit of quantification plus the moment of the triangle from that last concentration to 0 at the first concentration below the limit of quantification",
+                 formula="$AUMC_{\\text{all}} = \\int_{0}^{T_{\\text{end}}} C(t) t dt$")
 
 PKNCA.set.summary(
   name=

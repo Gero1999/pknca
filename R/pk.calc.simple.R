@@ -30,7 +30,7 @@ pk.calc.cmax <- function(conc, check=TRUE) {
   if (check) {
     assert_conc(conc = conc)
   }
-  if (length(conc) == 0 | all(is.na(conc))) {
+  if (length(conc) == 0 || all(is.na(conc))) {
     NA
   } else {
     max(conc, na.rm=TRUE)
@@ -43,7 +43,8 @@ add.interval.col("cmax",
                  unit_type="conc",
                  pretty_name="Cmax",
                  desc="Maximum observed concentration",
-                 depends=NULL)
+                 depends=NULL,
+                 formula="$C_{\\max} = \\max_i C_i$")
 PKNCA.set.summary(
   name="cmax",
   description="geometric mean and geometric coefficient of variation",
@@ -62,7 +63,7 @@ pk.calc.cmin <- function(conc, check=TRUE) {
   if (check) {
     assert_conc(conc=conc)
   }
-  if (length(conc) == 0 | all(is.na(conc))) {
+  if (length(conc) == 0 || all(is.na(conc))) {
     NA
   } else {
     min(conc, na.rm=TRUE)
@@ -75,7 +76,8 @@ add.interval.col("cmin",
                  unit_type="conc",
                  pretty_name="Cmin",
                  desc="Minimum observed concentration",
-                 depends=NULL)
+                 depends=NULL,
+                 formula="$C_{\\min} = \\min_i C_i$")
 PKNCA.set.summary(
   name="cmin",
   description="geometric mean and geometric coefficient of variation",
@@ -115,7 +117,7 @@ pk.calc.tmax <- function(conc, time,
   if (check) {
     assert_conc_time(conc = conc, time = time)
   }
-  if (length(conc) == 0 | all(conc %in% c(NA, 0))) {
+  if (length(conc) == 0 || all(conc %in% c(NA, 0))) {
     NA
   } else {
     ret <- time[conc %in% pk.calc.cmax(conc, check=FALSE)]
@@ -133,7 +135,8 @@ add.interval.col("tmax",
                  unit_type="time",
                  pretty_name="Tmax",
                  desc="Time of the maximum observed concentration",
-                 depends=NULL)
+                 depends=NULL,
+                 formula="$T_{\\max} = t_{i: C_i = C_{\\max}}$")
 PKNCA.set.summary(
   name="tmax",
   description="median and range",
@@ -167,7 +170,8 @@ add.interval.col("tlast",
                  unit_type="time",
                  pretty_name="Tlast",
                  desc="Time of the last concentration observed above the limit of quantification",
-                 depends=NULL)
+                 depends=NULL,
+                 formula="$T_{\\text{last}} = t_{i: C_i > 0, i = \\max}$")
 PKNCA.set.summary(
   name="tlast",
   description="median and range",
@@ -195,7 +199,8 @@ add.interval.col("tfirst",
                  unit_type="time",
                  pretty_name="Tfirst",
                  desc="Time of the first concentration above the limit of quantification",
-                 depends=NULL)
+                 depends=NULL,
+                 formula="$T_{\\text{first}} = t_{i: C_i > 0, i = \\min}$")
 PKNCA.set.summary(
   name="tfirst",
   description="median and range",
@@ -240,7 +245,8 @@ add.interval.col("clast.obs",
                  unit_type="conc",
                  pretty_name="Clast",
                  desc="The last concentration observed above the limit of quantification",
-                 depends=NULL)
+                 depends=NULL,
+                 formula="$C_{\\text{last,obs}} = C_{i: t_i = T_{\\text{last}}}$")
 PKNCA.set.summary(
   name="clast.obs",
   description="geometric mean and geometric coefficient of variation",
@@ -266,7 +272,8 @@ add.interval.col("thalf.eff.obs",
                  unit_type="time",
                  pretty_name="Effective half-life (based on MRT,obs)",
                  formalsmap=list(mrt="mrt.obs"),
-                 depends="mrt.obs")
+                 depends="mrt.obs",
+                 formula="$t_{1/2,\\text{eff}} = \\ln(2) \\cdot MRT$")
 PKNCA.set.summary(
   name="thalf.eff.obs",
   description="geometric mean and geometric coefficient of variation",
@@ -322,7 +329,8 @@ add.interval.col("thalf.eff.iv.pred",
                  pretty_name="Effective half-life (for IV dosing, based on MRT,pred)",
                  desc="The effective half-life (as determined from the intravenous MRTpred)",
                  formalsmap=list(mrt="mrt.iv.pred"),
-                 depends="mrt.iv.pred")
+                 depends="mrt.iv.pred",
+                 formula="$t_{1/2,\\text{eff}} = \\ln(2) \\cdot MRT_{\\text{iv,pred}}$")
 PKNCA.set.summary(
   name="thalf.eff.iv.pred",
   description="geometric mean and geometric coefficient of variation",
@@ -336,7 +344,8 @@ add.interval.col("thalf.eff.iv.last",
                  pretty_name="Effective half-life (for IV dosing, based on MRTlast)",
                  desc="The effective half-life (as determined from the intravenous MRTlast)",
                  formalsmap=list(mrt="mrt.iv.last"),
-                 depends="mrt.iv.last")
+                 depends="mrt.iv.last",
+                 formula="$t_{1/2,\\text{eff}} = \\ln(2) \\cdot MRT_{\\text{iv,last}}$")
 PKNCA.set.summary(
   name="thalf.eff.iv.last",
   description="geometric mean and geometric coefficient of variation",
@@ -358,20 +367,17 @@ PKNCA.set.summary(
 pk.calc.aucpext <- function(auclast, aucinf) {
   scalar_auclast <- length(auclast) == 1
   scalar_aucinf <- length(aucinf) == 1
-  if (scalar_auclast | scalar_aucinf) {
+  if (scalar_auclast || scalar_aucinf) {
     # no length checking needs to occur
-  } else if ((!scalar_auclast & !scalar_aucinf) &
+  } else if ((!scalar_auclast && !scalar_aucinf) &&
              length(auclast) != length(aucinf)) {
     stop("auclast and aucinf must either be a scalar or the same length.")
   }
   ret <- rep(NA_real_, max(c(length(auclast), length(aucinf))))
   mask_na <-
-    is.na(auclast) |
-    is.na(aucinf)
+    is.na(auclast) | is.na(aucinf)
   mask_negative <-
-    !mask_na &
-    (aucinf <= 0 |
-       auclast <= 0)
+    (!mask_na) & ((aucinf <= 0) | (auclast <= 0))
   mask_greater <-
     !mask_na &
     (auclast >= aucinf)
@@ -399,7 +405,8 @@ add.interval.col("aucpext.obs",
                  pretty_name="AUCpext (based on AUCinf,obs)",
                  desc="Percent of the AUCinf that is extrapolated after Tlast calculated from the observed Clast",
                  formalsmap=list(aucinf="aucinf.obs"),
-                 depends=c("auclast", "aucinf.obs"))
+                 depends=c("auclast", "aucinf.obs"),
+                 formula="$\\%AUC_{\\text{ext}} = 100 \\cdot \\left(1 - \\frac{AUC_{\\text{last}}}{AUC_{\\infty}}\\right)$")
 PKNCA.set.summary(
   name="aucpext.obs",
   description="arithmetic mean and standard deviation",
@@ -413,7 +420,8 @@ add.interval.col("aucpext.pred",
                  pretty_name="AUCpext (based on AUCinf,pred)",
                  desc="Percent of the AUCinf that is extrapolated after Tlast calculated from the predicted Clast",
                  formalsmap=list(aucinf="aucinf.pred"),
-                 depends=c("auclast", "aucinf.pred"))
+                 depends=c("auclast", "aucinf.pred"),
+                 formula="$\\%AUC_{\\text{ext}} = 100 \\cdot \\left(1 - \\frac{AUC_{\\text{last}}}{AUC_{\\infty}}\\right)$")
 PKNCA.set.summary(
   name="aucpext.pred",
   description="arithmetic mean and standard deviation",
@@ -439,7 +447,8 @@ add.interval.col("kel.obs",
                  pretty_name="Kel (based on AUCinf,obs)",
                  desc="Elimination rate (as calculated from the MRT with observed Clast)",
                  formalsmap=list(mrt="mrt.obs"),
-                 depends="mrt.obs")
+                 depends="mrt.obs",
+                 formula="$k_{el} = \\frac{1}{MRT}$")
 
 add.interval.col("kel.pred",
                  FUN="pk.calc.kel",
@@ -448,7 +457,8 @@ add.interval.col("kel.pred",
                  pretty_name="Kel (based on AUCinf,pred)",
                  desc="Elimination rate (as calculated from the MRT with predicted Clast)",
                  formalsmap=list(mrt="mrt.pred"),
-                 depends="mrt.pred")
+                 depends="mrt.pred",
+                 formula="$k_{el} = \\frac{1}{MRT}$")
 
 add.interval.col("kel.last",
                  FUN="pk.calc.kel",
@@ -457,7 +467,8 @@ add.interval.col("kel.last",
                  pretty_name="Kel (based on AUClast)",
                  desc="Elimination rate (as calculated from the MRT using AUClast)",
                  formalsmap=list(mrt="mrt.last"),
-                 depends="mrt.last")
+                 depends="mrt.last",
+                 formula="$k_{el} = \\frac{1}{MRT}$")
 
 add.interval.col("kel.iv.obs",
                  FUN="pk.calc.kel",
@@ -466,7 +477,8 @@ add.interval.col("kel.iv.obs",
                  pretty_name="Kel (for IV dosing, based on AUCinf,obs)",
                  desc="Elimination rate (as calculated from the intravenous MRTobs)",
                  formalsmap=list(mrt="mrt.iv.obs"),
-                 depends="mrt.iv.obs")
+                 depends="mrt.iv.obs",
+                 formula="$k_{el} = \\frac{1}{MRT_{\\text{iv}}}$")
 
 add.interval.col("kel.iv.pred",
                  FUN="pk.calc.kel",
@@ -475,7 +487,8 @@ add.interval.col("kel.iv.pred",
                  pretty_name="Kel (for IV dosing, based on AUCinf,pred)",
                  desc="Elimination rate (as calculated from the intravenous MRTpred)",
                  formalsmap=list(mrt="mrt.iv.pred"),
-                 depends="mrt.iv.pred")
+                 depends="mrt.iv.pred",
+                 formula="$k_{el} = \\frac{1}{MRT_{\\text{iv}}}$")
 
 add.interval.col("kel.iv.last",
                  FUN="pk.calc.kel",
@@ -484,7 +497,8 @@ add.interval.col("kel.iv.last",
                  pretty_name="Kel (for IV dosing, based on AUClast)",
                  desc="Elimination rate (as calculated from the intravenous MRTlast)",
                  formalsmap=list(mrt="mrt.iv.last"),
-                 depends="mrt.iv.last")
+                 depends="mrt.iv.last",
+                 formula="$k_{el} = \\frac{1}{MRT_{\\text{iv.last}}}$")
 add.interval.col("kel.all",
                  FUN = "pk.calc.kel",
                  values = c(FALSE, TRUE),
@@ -492,7 +506,8 @@ add.interval.col("kel.all",
                  pretty_name = "Kel (based on AUCall)",
                  desc = "Elimination rate (as calculated from the MRTall)",
                  formalsmap = list(mrt = "mrt.all"),
-                 depends = "mrt.all")
+                 depends = "mrt.all",
+                 formula="$k_{el} = \\frac{1}{MRT_{all}}$")
 
 add.interval.col("kel.int.all",
                  FUN = "pk.calc.kel",
@@ -501,7 +516,8 @@ add.interval.col("kel.int.all",
                  pretty_name = "Kel (based on AUCint.all)",
                  desc = "Elimination rate (as calculated from the MRTint.all)",
                  formalsmap = list(mrt = "mrt.int.all"),
-                 depends = "mrt.int.all")
+                 depends = "mrt.int.all",
+                 formula="$k_{el} = \\frac{1}{MRT_{int.all}}$")
 
 add.interval.col("kel.int.inf.obs",
                  FUN = "pk.calc.kel",
@@ -510,7 +526,8 @@ add.interval.col("kel.int.inf.obs",
                  pretty_name = "Kel (based on AUCint.inf.obs)",
                  desc = "Elimination rate (as calculated from the MRTint.inf.obs)",
                  formalsmap = list(mrt = "mrt.int.inf.obs"),
-                 depends = "mrt.int.inf.obs")
+                 depends = "mrt.int.inf.obs",
+                 formula="$k_{el} = \\frac{1}{MRT_{inf.obs}}$")
 
 add.interval.col("kel.int.inf.pred",
                  FUN = "pk.calc.kel",
@@ -546,7 +563,8 @@ add.interval.col("kel.ivint.all",
                  pretty_name = "Kel (IV dose interval, based on AUCint.all)",
                  desc = "Elimination rate (as calculated from the MRTivint.all)",
                  formalsmap = list(mrt = "mrt.ivint.all"),
-                 depends = "mrt.ivint.all")
+                 depends = "mrt.ivint.all",
+                 formula="$k_{el} = \\frac{1}{MRT_{\\text{iv,int.all}}}$")
 
 
 add.interval.col("kel.ivint.last",
@@ -556,7 +574,8 @@ add.interval.col("kel.ivint.last",
                  pretty_name = "Kel (IV dose interval, based on AUCint.last)",
                  desc = "Elimination rate (as calculated from the MRTivint.last)",
                  formalsmap = list(mrt = "mrt.ivint.last"),
-                 depends = "mrt.ivint.last")
+                 depends = "mrt.ivint.last",
+                 formula="$k_{el} = \\frac{1}{MRT_{\\text{iv,int.last}}}$")
 
 add.interval.col("kel.sparse.last",
                  FUN = "pk.calc.kel",
@@ -566,7 +585,8 @@ add.interval.col("kel.sparse.last",
                  desc = "Elimination rate (as calculated from the MRTsparse.last)",
                  sparse = TRUE,
                  formalsmap = list(mrt = "mrt.sparse.last"),
-                 depends = "mrt.sparse.last")
+                 depends = "mrt.sparse.last",
+                 formula="$k_{el} = \\frac{1}{MRT_{\\text{sparse.last}}}$")
 
 PKNCA.set.summary(
   name = c(
@@ -619,7 +639,8 @@ add.interval.col("cl.last",
                  pretty_name="CL (based on AUClast)",
                  desc="Clearance or observed oral clearance calculated to Clast",
                  formalsmap=list(auc="auclast"),
-                 depends="auclast")
+                 depends="auclast",
+                 formula="$CL = \\frac{Dose}{AUC_{last}}$")
 
 add.interval.col("cl.all",
                  FUN="pk.calc.cl",
@@ -628,7 +649,8 @@ add.interval.col("cl.all",
                  pretty_name="CL (based on AUCall)",
                  desc="Clearance or observed oral clearance calculated with AUCall",
                  formalsmap=list(auc="aucall"),
-                 depends="aucall")
+                 depends="aucall",
+                 formula="$CL = \\frac{Dose}{AUC_{all}}$")
 
 add.interval.col("cl.obs",
                  FUN="pk.calc.cl",
@@ -637,7 +659,8 @@ add.interval.col("cl.obs",
                  pretty_name="CL (based on AUCinf,obs)",
                  desc="Clearance or observed oral clearance calculated with observed Clast",
                  formalsmap=list(auc="aucinf.obs"),
-                 depends="aucinf.obs")
+                 depends="aucinf.obs",
+                 formula="$CL = \\frac{Dose}{AUC_{\\inf,obs}}$")
 
 add.interval.col("cl.pred",
                  FUN="pk.calc.cl",
@@ -673,7 +696,8 @@ add.interval.col("cl.int.inf.pred",
                  pretty_name = "CL (based on AUCint.inf.pred)",
                  desc = "Clearance or observed oral clearance calculated with AUCint.inf.pred",
                  formalsmap = list(auc = "aucint.inf.pred"),
-                 depends = "aucint.inf.pred")
+                 depends = "aucint.inf.pred",
+                 formula="$CL = \\frac{Dose}{AUC_{int,inf,pred}}$")
 
 add.interval.col("cl.int.last",
                  FUN = "pk.calc.cl",
@@ -682,7 +706,8 @@ add.interval.col("cl.int.last",
                  pretty_name = "CL (based on AUCint.last)",
                  desc = "Clearance or observed oral clearance calculated with AUCint.last",
                  formalsmap = list(auc = "aucint.last"),
-                 depends = "aucint.last")
+                 depends = "aucint.last",
+                 formula="$CL = \\frac{Dose}{AUC_{int,last}}$")
 
 add.interval.col("cl.iv.all",
                  FUN = "pk.calc.cl",
@@ -691,7 +716,8 @@ add.interval.col("cl.iv.all",
                  pretty_name = "CL (for IV dosing,  based on AUCall)",
                  desc = "Clearance for intravenous dosing calculated with AUCall",
                  formalsmap = list(auc = "aucivall"),
-                 depends = "aucivall")
+                 depends = "aucivall",
+                 formula="$CL_{iv} = \\frac{Dose_{iv}}{AUC_{iv,all}}$")
 
 add.interval.col("cl.iv.last",
                  FUN = "pk.calc.cl",
@@ -700,7 +726,8 @@ add.interval.col("cl.iv.last",
                  pretty_name = "CL (for IV dosing,  based on AUClast)",
                  desc = "Clearance for intravenous dosing calculated with AUClast",
                  formalsmap = list(auc = "aucivlast"),
-                 depends = "aucivlast")
+                 depends = "aucivlast",
+                 formula="$CL_{iv} = \\frac{Dose_{iv}}{AUC_{iv,last}}$")
 
 add.interval.col("cl.iv.obs",
                  FUN = "pk.calc.cl",
@@ -1049,7 +1076,7 @@ pk.calc.vz <- function(cl, lambda.z) {
   # Ensure that cl is either a scalar or the same length as AUC
   # (more complex repeating patterns while valid for general R are
   # likely errors here).
-  if (!(length(cl) %in% c(1, length(lambda.z))) |
+    if (!(length(cl) %in% c(1, length(lambda.z))) ||
       !(length(lambda.z) %in% c(1, length(cl))))
     stop("'cl' and 'lambda.z' must be the same length")
   cl/lambda.z
