@@ -88,6 +88,7 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
                               first.tmax=NULL,
                               allow.tmax.in.half.life=NULL,
                               check=TRUE) {
+                              return.fit=FALSE) {
   # Check inputs
   min.hl.points <-
     PKNCA.choose.option(
@@ -182,7 +183,10 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
   }
   if (manually.selected.points) {
     if (nrow(data) > 0) {
-      fit <- fit_half_life(data=data, tlast=ret$tlast, conc_units=conc_units)
+      fit <- fit_half_life(data=data, tlast=ret$tlast, conc_units=conc_units, return.fit=return.fit)
+      if (isTRUE(return.fit)) {
+        return(fit)
+      }
       ret[,ret_replacements] <- fit[,ret_replacements]
       if (ret$half.life <= 0) {
         attr(ret, "exclude") <- "Negative half-life estimated with manually-selected points"
@@ -224,8 +228,12 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
               time=half_lives_for_selection$lambda.z.time.first[1:i]
             ),
           tlast=ret$tlast,
-          conc_units=conc_units
+          conc_units=conc_units,
+          return.fit=return.fit
         )
+      if (isTRUE(return.fit)) {
+        return(fit)
+      }
       half_lives_for_selection[i,names(fit)] <- fit
     }
     # Find the best model
@@ -287,8 +295,11 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
 #'   "adj.r.squared", "PROB", "lambda.z", "clast.pred",
 #'   "lambda.z.n.points", "half.life", "span.ratio"
 #' @seealso [pk.calc.half.life()]
-fit_half_life <- function(data, tlast, conc_units) {
+fit_half_life <- function(data, tlast, conc_units, return.fit=FALSE) {
   fit <- stats::.lm.fit(x=cbind(1, data$time), y=data$log_conc)
+  if (isTRUE(return.fit)) {
+    return(fit)
+  }
   # unit handling
   # if (inherits(tlast, "units")) {
   #   time_units <- units(tlast)
@@ -586,36 +597,43 @@ get_halflife_fit.PKNCAdata <- function(object) {
   group_cols <- dplyr::group_vars(object)
   conc_col <- object$conc$columns$conc
   time_col <- getIndepVar(as_PKNCAconc(object))
+  hl_params <- c("half.life", get.parameter.deps("half.life"))
 
-  # Prepare an object with all plot information
-  o_nca <- pk.nca(object)
-  wide_output <- as.data.frame(o_nca, out_format = "wide")
-  wide_output <- wide_output %>%
-    dplyr::select(any_of(c(
-      group_cols, "start", "end", get.parameter.deps("half.life")
-    )))
-  wide_output <- unique(wide_output)
-
-  object$conc$data$is.hl.point <- get_halflife_points(object)
-  d_conc_list <- merge(
-    object$conc$data[, c(group_cols, time_col, conc_col, "is.hl.point")],
-    wide_output,
-    all.x = TRUE,
-    by = group_cols
-  ) %>%
-    dplyr::filter(.[[time_col]] >= start & .[[time_col]] <= end) %>%
-    dplyr::filter(is.hl.point & !is.na(is.hl.point)) %>%
-    split(.[, c(group_cols, "start", "end")])
+  intervals <- object$intervals %>%
+    dplyr::select(dplyr::any_of(c(group_cols, "start", "end", hl_params))) %>%
+    dplyr::mutate(INTID = dplyr::row_number()) %>%
+    dplyr::filter(if_any(dplyr::all_of(hl_params), ~ . == TRUE)) %>%
+    dplyr::mutate(half.life = TRUE) %>%
+    dplyr::select(any_of(c(group_cols, "start", "end", "half.life", "INTID")))
 
   fits_list <- list()
-  for (grp in names(d_conc_list)) {
-    data <- d_conc_list[[grp]]
-    data$time <- as.numeric(data[[time_col]])
-    data$log_conc <- log(data[[conc_col]])
-    fits_list[[grp]]$fit <- stats::.lm.fit(
-      x=cbind(1, data$time), y=data$log_conc
-    )
-    fits_list[[grp]]$data <- data
+  # For each interval, extract the data and call pk.calc.half.life with return.fit=TRUE
+  for (i in seq_len(nrow(intervals))) {
+    interval <- intervals[i, ]
+    # Subset concentration data for this group/interval
+    group_filter <- TRUE
+    if (length(group_cols) > 0) {
+      for (col in group_cols) {
+        group_filter <- group_filter & (object$conc$data[[col]] == interval[[col]])
+      }
+    }
+    time_filter <- object$conc$data[[time_col]] >= interval$start & object$conc$data[[time_col]] <= interval$end
+    data_sub <- object$conc$data[group_filter & time_filter, ]
+    if (nrow(data_sub) > 0) {
+      fit <- pk.calc.half.life(
+        conc = data_sub[[conc_col]],
+        time = data_sub[[time_col]],
+        tmax = if ("tmax" %in% names(interval)) interval$tmax else NULL,
+        tlast = if ("tlast" %in% names(interval)) interval$tlast else NULL,
+        options = object$options,
+        manually.selected.points = TRUE,
+        return.fit = TRUE,
+        check = FALSE
+      )
+      fits_list[[i]] <- fit
+    } else {
+      fits_list[[i]] <- NULL
+    }
   }
   fits_list
 }
