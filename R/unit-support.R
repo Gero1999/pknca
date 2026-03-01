@@ -210,7 +210,7 @@ pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) 
 
   groups_units_tbl <- merge(d_concu, d_doseu, all.x = TRUE) %>%
     dplyr::mutate(dplyr::across(dplyr::everything(), ~ as.character(.))) %>%
-    dplyr::grouped_df(vars = group_conc_cols) %>%
+    dplyr::grouped_df(data = ., vars = group_conc_cols) %>%
     tidyr::fill(dplyr::all_of(all_unit_cols), .direction = "downup") %>%
     dplyr::ungroup() %>%
     unique()
