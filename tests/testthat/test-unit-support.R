@@ -430,9 +430,11 @@ test_that("pknca_units_table for PKNCAdata", {
   d_conc$concu_col[1] <- "pg/L"  # Introduce inconsistency
   o_conc <- PKNCAconc(d_conc, conc ~ time | treatment + specimen + subject / analyte, concu = "concu_col")
   o_dose <- PKNCAdose(d_dose, dose ~ time | treatment + subject)
-  expect_error(
-    PKNCAdata(o_conc, o_dose),
-    regexp = "Units should be uniform at least across concentration groups.*"
+  err <- tryCatch(PKNCAdata(o_conc, o_dose), error = identity)
+  expect_s3_class(err, "error")
+  expect_match(
+    conditionMessage(err),
+    "Units should be uniform at least across concentration groups.*concu_col="
   )
 })
 

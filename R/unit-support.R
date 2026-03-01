@@ -174,7 +174,6 @@ pknca_units_table.default <- function(concu, doseu, amountu, timeu,
 #' @rdname pknca_units_table
 #' @importFrom dplyr across any_of bind_rows case_when filter group_by mutate n select ungroup group_vars
 #' @importFrom tidyr fill unnest
-#' @importFrom rlang syms
 #' @export
 pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) {
 
@@ -185,7 +184,10 @@ pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) 
   # PKNCAdose can optionally be no present, being unit undefining
   if (is.null(o_dose) || all(is.na(o_dose))) o_dose <- o_conc
 
-  # If needed, ensure that the PKNCA objects have the required unit columns
+  # If needed, ensure that the PKNCA objects have the required unit columns.
+  # pknca_set_units() is not applicable here because this path needs concrete
+  # data columns for joins/fill operations, while unit values may be stored in
+  # object$units without corresponding columns.
   o_conc <- ensure_column_unit_exists(o_conc, c("concu", "timeu", "amountu"))
   o_dose <- ensure_column_unit_exists(o_dose, c("doseu"))
 
@@ -208,21 +210,36 @@ pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) 
 
   groups_units_tbl <- merge(d_concu, d_doseu, all.x = TRUE) %>%
     dplyr::mutate(dplyr::across(dplyr::everything(), ~ as.character(.))) %>%
-    dplyr::group_by(!!!rlang::syms(group_conc_cols)) %>%
-    tidyr::fill(!!!rlang::syms(all_unit_cols), .direction = "downup") %>%
+    dplyr::grouped_df(vars = group_conc_cols) %>%
+    tidyr::fill(dplyr::all_of(all_unit_cols), .direction = "downup") %>%
     dplyr::ungroup() %>%
     unique()
 
   # Check that at least for each concentration group units are uniform
-  mismatching_units_groups <- groups_units_tbl %>%
-    dplyr::add_count(!!!rlang::syms(group_conc_cols), name = "n") %>%
-    dplyr::filter(n > 1) %>%
-    dplyr::select(-n)
+  mask_duplicated_groups <- duplicated(groups_units_tbl[group_conc_cols]) |
+    duplicated(groups_units_tbl[group_conc_cols], fromLast = TRUE)
+  mismatching_units_groups <- groups_units_tbl[mask_duplicated_groups, , drop = FALSE]
   if (nrow(mismatching_units_groups) > 0) {
+    mismatching_units_groups_msg <- vapply(
+      seq_len(nrow(mismatching_units_groups)),
+      FUN.VALUE = character(1),
+      FUN = function(row_idx) {
+        do.call(
+          paste,
+          c(
+            lapply(
+              X = names(mismatching_units_groups),
+              FUN = function(x) paste(x, mismatching_units_groups[[x]][row_idx], sep = "=")
+            ),
+            sep = ", "
+          )
+        )
+      }
+    )
     stop(
       "Units should be uniform at least across concentration groups. ",
       "Review the units for the next group(s):\n",
-      paste(utils::capture.output(print(mismatching_units_groups)), collapse = "\n")
+      paste(mismatching_units_groups_msg, collapse = "\n")
     )
   }
 
@@ -588,7 +605,6 @@ ensure_column_unit_exists <- function(pknca_obj, unit_name) {
 #' @param strata_cols Column names in df whose unique combination defines the strata.
 #' @returns A data frame containing the strata columns and their minimal set of grouping columns.
 #' @importFrom dplyr mutate select any_of
-#' @importFrom rlang syms
 #' @importFrom utils combn
 #' @keywords Internal
 select_minimal_grouping_cols <- function(df, strata_cols) {
@@ -596,9 +612,7 @@ select_minimal_grouping_cols <- function(df, strata_cols) {
   if (length(strata_cols) == 0) return(df)
 
   # Obtain the comb_vals values of the target column(s)
-  strata_vals <- df %>%
-    mutate(strata_cols_comb = paste(!!!rlang::syms(strata_cols), sep = "_")) %>%
-    .[["strata_cols_comb"]]
+  strata_vals <- do.call(paste, c(df[strata_cols], sep = "_"))
   
   # If the target column(s) only has one level, there are no relevant columns
   if (length(unique(strata_vals)) == 1) {
@@ -631,6 +645,6 @@ select_minimal_grouping_cols <- function(df, strata_cols) {
 
 # Add globalVariables for NSE/dplyr/rlang/tidyr usage
 utils::globalVariables(c(
-  "group_vars", "select", "any_of", "across", "everything", "add_count", "syms", "rowwise", "unnest", "pull",
-  "n", "pknca_units_tbl", "PPORRESU", "PPTESTCD", "PPSTRESU", "conversion_factor", "strata_cols_comb"
+  "group_vars", "select", "any_of", "across", "everything", "rowwise", "unnest", "pull",
+  "pknca_units_tbl", "PPORRESU", "PPTESTCD", "PPSTRESU", "conversion_factor"
 ))
