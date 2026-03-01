@@ -173,7 +173,7 @@ pknca_units_table.default <- function(concu, doseu, amountu, timeu,
 #'
 #' @rdname pknca_units_table
 #' @importFrom dplyr across any_of bind_rows case_when filter group_by mutate n select ungroup group_vars
-#' @importFrom tidyr fill unnest
+#' @importFrom tidyr fill
 #' @export
 pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) {
 
@@ -247,28 +247,30 @@ pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) 
   units.are.all.na <- all(is.na(groups_units_tbl[,all_unit_cols]))
   if (units.are.all.na) return(NULL)
 
-  groups_units_tbl %>%
-    select_minimal_grouping_cols(all_unit_cols) %>%
-    unique() %>%
-    dplyr::rowwise() %>%
-    dplyr::mutate(
-      pknca_units_tbl = list(
-        pknca_units_table(
-          concu = !!rlang::sym(concu_col),
-          doseu = !!rlang::sym(doseu_col),
-          amountu = !!rlang::sym(amountu_col),
-          timeu = !!rlang::sym(timeu_col),
-          concu_pref = o_conc$units$concu_pref[1],
-          doseu_pref = o_dose$units$doseu_pref[1],
-          amountu_pref = o_conc$units$amountu_pref[1],
-          timeu_pref = o_conc$units$timeu_pref[1],
-          conversions = conversions
-        )
-      )
-    ) %>%
-    tidyr::unnest(cols = c(pknca_units_tbl)) %>%
-    dplyr::select(-dplyr::any_of(all_unit_cols)) %>%
-    as.data.frame()
+  groups_units_tbl <- unique(select_minimal_grouping_cols(groups_units_tbl, all_unit_cols))
+  groups_cols <- setdiff(names(groups_units_tbl), all_unit_cols)
+
+  ret <- vector(mode = "list", length = nrow(groups_units_tbl))
+  for (i in seq_len(nrow(groups_units_tbl))) {
+    pknca_units_tbl_i <- pknca_units_table(
+      concu = groups_units_tbl[[concu_col]][i],
+      doseu = groups_units_tbl[[doseu_col]][i],
+      amountu = groups_units_tbl[[amountu_col]][i],
+      timeu = groups_units_tbl[[timeu_col]][i],
+      concu_pref = o_conc$units$concu_pref[1],
+      doseu_pref = o_dose$units$doseu_pref[1],
+      amountu_pref = o_conc$units$amountu_pref[1],
+      timeu_pref = o_conc$units$timeu_pref[1],
+      conversions = conversions
+    )
+    if (length(groups_cols) > 0) {
+      ret[[i]] <- cbind(groups_units_tbl[i, groups_cols, drop = FALSE], pknca_units_tbl_i)
+    } else {
+      ret[[i]] <- pknca_units_tbl_i
+    }
+  }
+
+  as.data.frame(dplyr::bind_rows(ret))
 }
 
 pknca_units_table_unitless <- function() {
@@ -642,9 +644,3 @@ select_minimal_grouping_cols <- function(df, strata_cols) {
   }
   df[strata_cols]
 }
-
-# Add globalVariables for NSE/dplyr/rlang/tidyr usage
-utils::globalVariables(c(
-  "group_vars", "select", "any_of", "across", "everything", "rowwise", "unnest", "pull",
-  "pknca_units_tbl", "PPORRESU", "PPTESTCD", "PPSTRESU", "conversion_factor"
-))
