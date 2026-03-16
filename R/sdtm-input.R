@@ -126,4 +126,4 @@ ex_to_PKNCAdose <- function(
   PKNCAdose_args <- PKNCAdose_args[!sapply(PKNCAdose_args, is.null)]
   do.call(PKNCA::PKNCAdose, PKNCAdose_args)
 }
-o_dose <- ex_to_PKNCAdose(ex)
+

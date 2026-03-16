@@ -79,7 +79,6 @@ ex_example <- data.frame(
   EPOCH     = "TREATMENT",
   stringsAsFactors = FALSE
 )
-usethis::use_data(ex_example, overwrite = TRUE)
 
 # Process SDTM EX
 library(PKNCA)
