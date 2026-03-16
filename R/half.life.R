@@ -119,11 +119,6 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
   } else {
     data <- data.frame(conc, time)
   }
-  # if (inherits(data$conc, "units")) {
-  #   conc_units <- units(data$conc)
-  # } else {
-  conc_units <- NULL
-  #}
   data$log_conc <- log(data$conc)
   # Filter out points with 0 concentration. as.numeric() to handle units objects
   data <- data[as.numeric(data$conc) > 0,]
@@ -180,9 +175,14 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
     # as.numeric is for units handling
     dfK <- data[as.numeric(data$time) > as.numeric(ret$tmax), ]
   }
+  # When all concentrations are the same (non-zero) value cannot compute half-life (#503)
+  if (isTRUE(sd(data$log_conc[is.finite(data$log_conc)], na.rm = TRUE) == 0)) {
+    attr(ret, "exclude") <- "No point variability in concentrations for half-life calculation"
+    return(ret)
+  }
   if (manually.selected.points) {
     if (nrow(data) > 0) {
-      fit <- fit_half_life(data=data, tlast=ret$tlast, conc_units=conc_units)
+      fit <- fit_half_life(data=data, tlast=ret$tlast)
       ret[,ret_replacements] <- fit[,ret_replacements]
       if (ret$half.life <= 0) {
         attr(ret, "exclude") <- "Negative half-life estimated with manually-selected points"
@@ -219,12 +219,10 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
         fit_half_life(
           data=
             data.frame(
-              # pass in the conc so that we can use its units, if applicable
               log_conc=half_lives_for_selection$log_conc[1:i],
               time=half_lives_for_selection$lambda.z.time.first[1:i]
             ),
-          tlast=ret$tlast,
-          conc_units=conc_units
+          tlast=ret$tlast
         )
       half_lives_for_selection[i,names(fit)] <- fit
     }
@@ -266,6 +264,7 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
       class = "pknca_halflife_too_few_points"
     )
   }
+
   # Drop the inputs of tmax and tlast, if given.
   if (!missing(tmax))
     ret$tmax <- NULL
@@ -282,39 +281,17 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
 #'   and "time"
 #' @param tlast The time of last observed concentration above the limit
 #'   of quantification.
-#' @param conc_units NULL or the units to set for concentration measures
 #' @return A data.frame with one row and columns named "r.squared",
 #'   "adj.r.squared", "PROB", "lambda.z", "clast.pred",
 #'   "lambda.z.n.points", "half.life", "span.ratio"
 #' @seealso [pk.calc.half.life()]
-fit_half_life <- function(data, tlast, conc_units) {
+fit_half_life <- function(data, tlast) {
   fit <- stats::.lm.fit(x=cbind(1, data$time), y=data$log_conc)
-  # unit handling
-  # if (inherits(tlast, "units")) {
-  #   time_units <- units(tlast)
-  # } else if (inherits(tlast, "mixed_units")) {
-  #   time_units <- units(units::as_units(tlast))
-  # } else {
-  time_units <- NULL
-  # }
-  # if (!is.null(time_units)) {
-  #   inverse_time_units <- time_units
-  #   inverse_time_units$numerator <- time_units$denominator
-  #   inverse_time_units$denominator <- time_units$numerator
-  # } else {
-  inverse_time_units <- NULL
-  # }
 
   # as.numeric is so that it works for units objects
   r_squared <- 1 - as.numeric(sum(fit$residuals^2))/as.numeric(sum((data$log_conc - mean(data$log_conc))^2))
   clast_pred <- exp(sum(fit$coefficients*c(1, as.numeric(tlast))))
-  # if (!is.null(conc_units)) {
-  #   clast_pred <- units::set_units(clast_pred, conc_units, mode="standard")
-  # }
   lambda_z <- -fit$coefficients[2]
-  # if (!is.null(inverse_time_units)) {
-  #   lambda_z <- units::set_units(lambda_z, inverse_time_units, mode="standard")
-  # }
   ret <-
     data.frame(
       r.squared=r_squared,
