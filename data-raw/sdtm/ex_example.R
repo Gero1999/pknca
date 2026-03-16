@@ -80,3 +80,7 @@ ex_example <- data.frame(
   stringsAsFactors = FALSE
 )
 usethis::use_data(ex_example, overwrite = TRUE)
+
+# Process SDTM EX
+library(PKNCA)
+ex_to_PKNCAdose(ex)
