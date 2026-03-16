@@ -145,9 +145,10 @@
   first.tmax=function(x, default=FALSE, description=FALSE) {
     if (description)
       return(paste(
-        "If there is more than one concentration equal to Cmax, which time",
-        "should be selected for Tmax?  If 'TRUE', the first will be selected.",
-        "If 'FALSE', the last will be selected."))
+        "If there is more than one time point with the maximum value (Cmax or ERmax),",
+        "which time should be selected for Tmax/ERTmax?  If 'TRUE', the first will be selected.",
+        "If 'FALSE', the last will be selected."
+      ))
     if (default)
       return(TRUE)
     if (length(x) != 1)
