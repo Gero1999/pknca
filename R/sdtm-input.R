@@ -1,3 +1,30 @@
+#' Convert an EX (Exposure) SDTM domain to a PKNCAdose object
+#'
+#' Transforms a CDISC SDTM EX domain data frame into a \code{PKNCAdose} object
+#' suitable for NCA analysis with PKNCA. Handles date-time parsing, duration
+#' derivation, elapsed time derivation, route mapping, and relative time
+#' computation.
+#'
+#' @param ex A data.frame containing the EX (Exposure) SDTM domain
+#' @param USUBJID Column name for the unique subject identifier
+#' @param EXTRT Column name for the treatment name
+#' @param EXSTDTC Column name for the start date/time of treatment (ISO 8601)
+#' @param EXDUR Column name for the duration of treatment. If the column is
+#'   absent, it is derived from \code{EXSTDTC} and \code{EXENDTC}.
+#' @param EXENDTC Column name for the end date/time of treatment (ISO 8601).
+#'   Used to derive \code{EXDUR} when not available.
+#' @param EXELTM Column name for the planned elapsed time since first dose.
+#'   If absent, derived from \code{EXSTDTC} and \code{EXRFTDTC}.
+#' @param EXTPTNUM Column name for the planned time point number
+#' @param EXRFTDTC Column name for the reference date/time (ISO 8601).
+#'   Used to derive \code{EXELTM} when not available.
+#' @param EXDOSE Column name for the dose per administration
+#' @param EXDOSU Column name for the dose units
+#' @param EXROUTE Column name for the route of administration
+#' @return A \code{PKNCAdose} object
+#' @importFrom dplyr mutate group_by ungroup coalesce
+#' @importFrom rlang sym
+#' @export
 ex_to_PKNCAdose <- function(
   ex,
   USUBJID = "USUBJID",
