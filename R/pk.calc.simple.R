@@ -98,9 +98,9 @@ PKNCA.set.summary(
 #'
 #' @inheritParams assert_conc_time
 #' @inheritParams PKNCA.choose.option
-#' @param first.tmax If there is more than time that matches the maximum
-#'   concentration, should the first be considered as Tmax?  If not, then the
-#'   last is considered Tmax.
+#' @param first.tmax If there is more than one time point with the maximum value (Cmax or ERmax),
+#'   which time should be selected for Tmax/ERTmax?  If 'TRUE', the first will be selected. If not, then the
+#'   last is considered Tmax/ERTmax.
 #' @param check Run [assert_conc_time()]?
 #' @returns The time of the maximum concentration
 #' @examples
