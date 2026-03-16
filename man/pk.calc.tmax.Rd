@@ -14,9 +14,9 @@ pk.calc.tmax(conc, time, options = list(), first.tmax = NULL, check = TRUE)
 \item{options}{List of changes to the default PKNCA options (see
 \code{PKNCA.options()})}
 
-\item{first.tmax}{If there is more than time that matches the maximum
-concentration, should the first be considered as Tmax?  If not, then the
-last is considered Tmax.}
+\item{first.tmax}{If there is more than one time point with the maximum value (Cmax or ERmax),
+which time should be selected for Tmax/ERTmax?  If 'TRUE', the first will be selected. If not, then the
+last is considered Tmax/ERTmax.}
 
 \item{check}{Run \code{\link[=assert_conc_time]{assert_conc_time()}}?}
 }
