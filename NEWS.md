@@ -6,6 +6,23 @@ the dosing including dose amount and route.
 
 # Development version
 
+## Bug Fixes
+
+* `normalize.data.frame()` no longer triggers a dplyr deprecation warning
+  (`Using 'by = character()' to perform a cross join was deprecated in dplyr 1.1.0`)
+  when called with ungrouped data (i.e., no common group columns between `object`
+  and `norm_table`). `dplyr::cross_join()` is now used explicitly for this case.
+
+## Improvements
+
+* `normalize.data.frame()` now validates that `norm_table` contains exactly one
+  row when used with ungrouped data, giving a clear error message instead of
+  silently producing incorrect results.
+
+* `normalize.data.frame()` now uses `dplyr::inner_join()` instead of `merge()` 
+  for grouped joins, preserving left-table row order. Missing group validation 
+  ensures no rows are silently dropped.
+
 ## Breaking changes
 
 * Both include and excluding half-life points may not be done for the same interval (#406)
