@@ -26,7 +26,8 @@ local({
       pretty_name=paste(current_pretty_name, "(dose-normalized)"),
       desc=paste("Dose normalized", n),
       formalsmap=list(parameter=n),
-      depends=c(n)
+      depends=c(n),
+      formula="$X_{dn} = \\frac{X}{Dose}$"
     )
     PKNCA.set.summary(
       name=paste(n, "dn", sep="."),

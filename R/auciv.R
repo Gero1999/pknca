@@ -51,7 +51,8 @@ add.interval.col(
   depends = c("auclast", "c0"),
   desc = "The AUClast calculated with back-extrapolation for intravenous dosing using extrapolated C0",
   sparse = FALSE,
-  formalsmap = list(auc="auclast")
+  formalsmap = list(auc="auclast"),
+  formula="$AUC_{\\text{iv}} = AUC + AUC(C_0, t_1) - AUC(C(0), t_1)$"
 )
 
 add.interval.col(
@@ -62,7 +63,8 @@ add.interval.col(
   depends = c("aucall", "c0"),
   desc = "The AUCall calculated with back-extrapolation for intravenous dosing using extrapolated C0",
   sparse = FALSE,
-  formalsmap = list(auc="aucall")
+  formalsmap = list(auc="aucall"),
+  formula="$AUC_{\\text{iv}} = AUC + AUC(C_0, t_1) - AUC(C(0), t_1)$"
 )
 
 add.interval.col(
@@ -73,7 +75,8 @@ add.interval.col(
   depends = c("aucint.last", "c0"),
   desc = "The AUCint,last calculated with back-extrapolation for intravenous dosing using extrapolated C0",
   sparse = FALSE,
-  formalsmap = list(auc="aucint.last")
+  formalsmap = list(auc="aucint.last"),
+  formula="$AUC_{\\text{iv}} = AUC + AUC(C_0, t_1) - AUC(C(0), t_1)$"
 )
 
 add.interval.col(
@@ -84,7 +87,8 @@ add.interval.col(
   depends = c("aucint.all", "c0"),
   desc = "The AUCint,all calculated with back-extrapolation for intravenous dosing using extrapolated C0",
   sparse = FALSE,
-  formalsmap = list(auc="aucint.all")
+  formalsmap = list(auc="aucint.all"),
+  formula="$AUC_{\\text{iv}} = AUC + AUC(C_0, t_1) - AUC(C(0), t_1)$"
 )
 
 add.interval.col(
@@ -95,7 +99,8 @@ add.interval.col(
   depends = c("aucinf.obs", "c0"),
   desc = "The AUCinf,obs calculated with back-extrapolation for intravenous dosing using extrapolated C0",
   sparse = FALSE,
-  formalsmap = list(auc="aucinf.obs")
+  formalsmap = list(auc="aucinf.obs"),
+  formula="$AUC_{\\text{iv}} = AUC + AUC(C_0, t_1) - AUC(C(0), t_1)$"
 )
 
 add.interval.col(
@@ -106,7 +111,8 @@ add.interval.col(
   depends = c("aucinf.pred", "c0"),
   desc = "The  calculated with back-extrapolation for intravenous dosing using extrapolated C0",
   sparse = FALSE,
-  formalsmap = list(auc="aucinf.pred")
+  formalsmap = list(auc="aucinf.pred"),
+  formula="$AUC_{\\text{iv}} = AUC + AUC(C_0, t_1) - AUC(C(0), t_1)$"
 )
 
 PKNCA.set.summary(
@@ -134,7 +140,8 @@ add.interval.col(
   depends = c("auclast", "aucivlast"),
   desc = "The back-extrapolation percent for intravenous dosing based on AUClast",
   sparse = FALSE,
-  formalsmap = list(auc="auclast", auciv="aucivlast")
+  formalsmap = list(auc="auclast", auciv="aucivlast"),
+  formula="$\\%AUC_{\\text{bext}} = 100 \\cdot \\left(1 - \\frac{AUC}{AUC_{\\text{iv}}}\\right)$"
 )
 
 add.interval.col(
@@ -145,7 +152,8 @@ add.interval.col(
   depends = c("aucall", "aucivall"),
   desc = "The back-extrapolation percent for intravenous dosing based on AUCall",
   sparse = FALSE,
-  formalsmap = list(auc="aucall", auciv="aucivall")
+  formalsmap = list(auc="aucall", auciv="aucivall"),
+  formula="$\\%AUC_{\\text{bext}} = 100 \\cdot \\left(1 - \\frac{AUC}{AUC_{\\text{iv}}}\\right)$"
 )
 
 add.interval.col(
@@ -156,7 +164,8 @@ add.interval.col(
   depends = c("aucint.last", "aucivint.last"),
   desc = "The back-extrapolation percent for intravenous dosing based on AUCint,last",
   sparse = FALSE,
-  formalsmap = list(auc="aucint.last", auciv="aucivint.last")
+  formalsmap = list(auc="aucint.last", auciv="aucivint.last"),
+  formula="$\\%AUC_{\\text{bext}} = 100 \\cdot \\left(1 - \\frac{AUC}{AUC_{\\text{iv}}}\\right)$"
 )
 
 add.interval.col(
@@ -167,7 +176,8 @@ add.interval.col(
   depends = c("aucint.all", "aucivint.all"),
   desc = "The back-extrapolation percent for intravenous dosing based on AUCint,all",
   sparse = FALSE,
-  formalsmap = list(auc="aucint.all", auciv="aucivint.all")
+  formalsmap = list(auc="aucint.all", auciv="aucivint.all"),
+  formula="$\\%AUC_{\\text{bext}} = 100 \\cdot \\left(1 - \\frac{AUC}{AUC_{\\text{iv}}}\\right)$"
 )
 
 add.interval.col(
@@ -178,7 +188,8 @@ add.interval.col(
   depends = c("aucinf.obs", "aucivinf.obs"),
   desc = "The back-extrapolation percent for intravenous dosing based on AUCinf,obs",
   sparse = FALSE,
-  formalsmap = list(auc="aucinf.obs", auciv="aucivinf.obs")
+  formalsmap = list(auc="aucinf.obs", auciv="aucivinf.obs"),
+  formula="$\\%AUC_{\\text{bext}} = 100 \\cdot \\left(1 - \\frac{AUC}{AUC_{\\text{iv}}}\\right)$"
 )
 
 add.interval.col(
@@ -189,7 +200,8 @@ add.interval.col(
   depends = c("aucinf.pred", "aucivinf.pred"),
   desc = "The back-extrapolation percent for intravenous dosing based on AUCinf,pred",
   sparse = FALSE,
-  formalsmap = list(auc="aucinf.pred", auciv="aucivinf.pred")
+  formalsmap = list(auc="aucinf.pred", auciv="aucivinf.pred"),
+  formula="$\\%AUC_{\\text{bext}} = 100 \\cdot \\left(1 - \\frac{AUC}{AUC_{\\text{iv}}}\\right)$"
 )
 
 PKNCA.set.summary(
@@ -217,13 +229,13 @@ pk.calc.aumciv <- function(conc, time, c0, aumc, ..., options = list(), check = 
   } else {
     data <- data.frame(conc = conc, time = time)
   }
-  
+
   if (!(0 %in% time)) {
     return(structure(NA_real_, exclude = "No time 0 in data"))
   } else if (is.na(c0)) {
     return(structure(NA_real_, exclude = "c0 is not calculated"))
   }
-  
+
   # AUMC for first interval using measured concentrations
   aumc_first <- pk.calc.aumc.last(
     conc = data$conc[1:2],
@@ -231,7 +243,7 @@ pk.calc.aumciv <- function(conc, time, c0, aumc, ..., options = list(), check = 
     ...,
     check = FALSE
   )
-  
+
   # AUMC for first interval using extrapolated c0
   aumc_second <- pk.calc.aumc.last(
     conc = c(c0, data$conc[2]),
@@ -239,7 +251,7 @@ pk.calc.aumciv <- function(conc, time, c0, aumc, ..., options = list(), check = 
     ...,
     check = FALSE
   )
-  
+
   aumc_final <- aumc + aumc_second - aumc_first
   aumc_final
 }
@@ -253,7 +265,8 @@ add.interval.col(
   depends = c("aumclast", "c0"),
   desc = "AUMClast with back-extrapolation using extrapolated C0 for IV dosing",
   sparse = FALSE,
-  formalsmap = list(aumc = "aumclast")
+  formalsmap = list(aumc = "aumclast"),
+  formula="$AUMC_{\\text{iv}} = AUMC + AUMC(C_0, t_1) - AUMC(C(0), t_1)$"
 )
 
 add.interval.col(
@@ -264,7 +277,8 @@ add.interval.col(
   depends = c("aumcall", "c0"),
   desc = "AUMCall with back-extrapolation using extrapolated C0 for IV dosing",
   sparse = FALSE,
-  formalsmap = list(aumc = "aumcall")
+  formalsmap = list(aumc = "aumcall"),
+  formula="$AUMC_{\\text{iv}} = AUMC + AUMC(C_0, t_1) - AUMC(C(0), t_1)$"
 )
 
 add.interval.col(
@@ -275,7 +289,8 @@ add.interval.col(
   depends = c("aumcint.last", "c0"),
   desc = "The AUMCint,last calculated with back-extrapolation for intravenous dosing using extrapolated C0",
   sparse = FALSE,
-  formalsmap = list(aumc = "aumcint.last")
+  formalsmap = list(aumc = "aumcint.last"),
+  formula="$AUMC_{\\text{iv}} = AUMC + AUMC(C_0, t_1) - AUMC(C(0), t_1)$"
 )
 
 add.interval.col(
@@ -286,7 +301,8 @@ add.interval.col(
   depends = c("aumcint.all", "c0"),
   desc = "The AUMCint,all calculated with back-extrapolation for intravenous dosing using extrapolated C0",
   sparse = FALSE,
-  formalsmap = list(aumc = "aumcint.all")
+  formalsmap = list(aumc = "aumcint.all"),
+  formula="$AUMC_{\\text{iv}} = AUMC + AUMC(C_0, t_1) - AUMC(C(0), t_1)$"
 )
 
 add.interval.col(
@@ -297,7 +313,8 @@ add.interval.col(
   depends = c("aumcinf.obs", "c0"),
   desc = "AUMCinf,obs with back-extrapolation using extrapolated C0",
   sparse = FALSE,
-  formalsmap = list(aumc = "aumcinf.obs")
+  formalsmap = list(aumc = "aumcinf.obs"),
+  formula="$AUMC_{\\text{iv}} = AUMC + AUMC(C_0, t_1) - AUMC(C(0), t_1)$"
 )
 
 add.interval.col(
@@ -308,7 +325,8 @@ add.interval.col(
   depends = c("aumcinf.pred", "c0"),
   desc = "AUMCinf,pred with back-extrapolation using extrapolated C0",
   sparse = FALSE,
-  formalsmap = list(aumc = "aumcinf.pred")
+  formalsmap = list(aumc = "aumcinf.pred"),
+  formula="$AUMC_{\\text{iv}} = AUMC + AUMC(C_0, t_1) - AUMC(C(0), t_1)$"
 )
 
 

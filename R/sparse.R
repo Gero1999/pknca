@@ -352,7 +352,8 @@ add.interval.col(
   values=c(FALSE, TRUE),
   unit_type="auc",
   pretty_name="Sparse AUClast",
-  desc="For sparse PK sampling, the area under the concentration time curve from the beginning of the interval to the last concentration above the limit of quantification"
+  desc="For sparse PK sampling, the area under the concentration time curve from the beginning of the interval to the last concentration above the limit of quantification",
+  formula="$AUC_{\\text{sparse}} = \\sum_k \\frac{\\bar{C}_k + \\bar{C}_{k+1}}{2} \\Delta t_k$"
 )
 PKNCA.set.summary(
   name="sparse_auclast",
@@ -368,7 +369,8 @@ add.interval.col(
   unit_type="auc",
   pretty_name="Sparse AUClast standard error",
   desc="For sparse PK sampling, the standard error of the area under the concentration time curve from the beginning of the interval to the last concentration above the limit of quantification",
-  depends="sparse_auclast"
+  depends="sparse_auclast",
+  formula="$SE(AUC_{\\text{sparse}})$"
 )
 PKNCA.set.summary(
   name="sparse_auc_se",
@@ -384,7 +386,8 @@ add.interval.col(
   unit_type="count",
   pretty_name="Sparse AUClast degrees of freedom",
   desc="For sparse PK sampling, the standard error degrees of freedom of the area under the concentration time curve from the beginning of the interval to the last concentration above the limit of quantification",
-  depends="sparse_auclast"
+  depends="sparse_auclast",
+  formula="$df(AUC_{\\text{sparse}})$"
 )
 PKNCA.set.summary(
   name="sparse_auc_df",
@@ -436,21 +439,21 @@ var_sparse_aumc <- function(sparse_pk) {
     moment_sparse_pk[[idx]]$conc <- 
       moment_sparse_pk[[idx]]$conc * moment_sparse_pk[[idx]]$time
   }
-  
+
   covariance <- cov_holder(moment_sparse_pk)
   var_aumc <- 0
   weights <- sparse_pk_attribute(sparse_pk, "weight")
   # number of subjects at a given time point
   n <- rep(0, length(sparse_pk))
   df <- 0
-  
+
   for (idx1 in seq_along(sparse_pk)) {
     n_idx1 <- length(unique(sparse_pk[[idx1]]$subject))
     n[idx1] <- n_idx1
     var_aumc <-
       var_aumc +
       weights[idx1]^2 * covariance[idx1, idx1] / n_idx1
-    
+
     for (idx2 in seq_len(idx1 - 1)) {
       n_idx2 <- length(unique(sparse_pk[[idx2]]$subject))
       n_both <- length(unique(intersect(sparse_pk[[idx1]]$subject, sparse_pk[[idx2]]$subject)))
@@ -459,12 +462,12 @@ var_sparse_aumc <- function(sparse_pk) {
         2 * weights[idx1] * weights[idx2] * n_both * covariance[idx1, idx2] / (n_idx1 * n_idx2)
     }
   }
-  
+
   # df based on equation 6a of Nedelman et al 1995
   df <-
     sum(weights^2 * diag(covariance) / n)^2 /
     sum(weights^4 * diag(covariance)^2 / (n^2 * (n - 1)))
-  
+
   if (sum(covariance[lower.tri(covariance)] != 0) > 0) {
     rlang::warn(
       message = "Cannot yet calculate sparse degrees of freedom for multiple samples per subject",
@@ -472,7 +475,7 @@ var_sparse_aumc <- function(sparse_pk) {
     )
     df <- NA_real_
   }
-  
+
   attr(var_aumc, "df") <- df
   var_aumc
 }
@@ -497,7 +500,7 @@ pk.calc.sparse_aumc <- function(conc, time, subject,
   sparse_pk_wt <- sparse_auc_weight_linear(sparse_pk)
   sparse_pk_mean <- sparse_mean(sparse_pk = sparse_pk_wt, 
                                 sparse_mean_method = "arithmetic mean, <=50% BLQ")
-  
+
   aumc <-
     pk.calc.aumc(
       conc = sparse_pk_attribute(sparse_pk_mean, "mean"),
@@ -505,9 +508,9 @@ pk.calc.sparse_aumc <- function(conc, time, subject,
       auc.type = auc.type,
       method = "linear"
     )
-  
+
   var_aumc <- var_sparse_aumc(sparse_pk_mean)
-  
+
   data.frame(
     sparse_aumc = aumc,
     sparse_aumc_se = sqrt(as.numeric(var_aumc)),
@@ -542,7 +545,8 @@ add.interval.col(
   values = c(FALSE, TRUE),
   unit_type = "aumc",
   pretty_name = "Sparse AUMClast",
-  desc = "For sparse PK sampling, the area under the moment curve from the beginning of the interval to the last concentration above the limit of quantification"
+  desc = "For sparse PK sampling, the area under the moment curve from the beginning of the interval to the last concentration above the limit of quantification",
+  formula="$AUMC_{\\text{sparse}} = \\sum_k \\frac{\\bar{C}_k t_k + \\bar{C}_{k+1} t_{k+1}}{2} \\Delta t_k$"
 )
 PKNCA.set.summary(
   name = "sparse_aumclast",
@@ -558,7 +562,8 @@ add.interval.col(
   unit_type = "aumc",
   pretty_name = "Sparse AUMC standard error",
   desc = "For sparse PK sampling, the standard error of the area under the moment curve",
-  depends = "sparse_aumclast"
+  depends = "sparse_aumclast",
+  formula="$SE(AUMC_{\\text{sparse}})$"
 )
 PKNCA.set.summary(
   name = "sparse_aumc_se",
@@ -574,7 +579,8 @@ add.interval.col(
   unit_type = "count",
   pretty_name = "Sparse AUMC degrees of freedom",
   desc = "For sparse PK sampling, the degrees of freedom for the AUMC variance estimate",
-  depends = "sparse_aumclast"
+  depends = "sparse_aumclast",
+  formula="$df(AUMC_{\\text{sparse}})$"
 )
 PKNCA.set.summary(
   name = "sparse_aumc_df",
