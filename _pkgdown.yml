@@ -2,3 +2,16 @@ url: http://humanpred.github.io/pknca/
 template:
   bootstrap: 5
 
+navbar:
+  structure:
+    left:  [intro, reference, parameters, articles, news]
+  components:
+    parameters:
+      text: Parameters Available
+      href: articles/parameters-available.html
+
+articles:
+  - title: internal
+    navbar: ~
+    contents:
+    - starts_with("v")
