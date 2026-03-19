@@ -1,4 +1,4 @@
-# Generate vignettes/v100-parameters-available.Rmd
+# Generate vignettes/parameters-available.Rmd
 #
 # Run from the package root:
 #   Rscript data-raw/write_param_table_md.R
@@ -116,7 +116,7 @@ param_table[["Also Uses This Function"]] <- vapply(
 # Write the .Rmd
 # ---------------------------------------------------------------------------
 
-outfile <- file.path("vignettes", "v100-parameters-available.Rmd")
+outfile <- file.path("vignettes", "parameters-available.Rmd")
 
 write_rmd_header(outfile, title = "Parameters Available in PKNCA")
 
