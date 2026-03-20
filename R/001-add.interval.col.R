@@ -23,6 +23,9 @@ assign("interval.cols", list(), envir=.PKNCAEnv)
 #'   to NCA parameter names.  See the details for information on use of
 #'   `formalsmap`.
 #' @param datatype The type of data used for the calculation
+#' @param formula Character value providing a LaTeX expression to identify how the
+#' calculation of the parameter is performed. It is an optional argument merely
+#' used for documentation.
 #' @returns NULL (Calling this function has a side effect of changing the
 #'   available intervals for calculations)
 #'
