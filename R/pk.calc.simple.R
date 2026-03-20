@@ -620,6 +620,14 @@ add.interval.col("kel.sparse.last",
                  formula="$k_{el,\\text{sparse,last}} = \\frac{1}{MRT_{\\text{sparse,last}}}$")
 
 PKNCA.set.summary(
+  name = c("kel.all", "kel.int.all", "kel.int.inf.obs", "kel.int.inf.pred",
+           "kel.int.last", "kel.iv.all", "kel.ivint.all", "kel.ivint.last",
+           "kel.sparse.last"),
+  description = "geometric mean and geometric coefficient of variation",
+  point = business.geomean,
+  spread = business.geocv
+)
+PKNCA.set.summary(
   name="kel.iv.last",
   description="geometric mean and geometric coefficient of variation",
   point=business.geomean,
@@ -824,6 +832,14 @@ add.interval.col("cl.sparse.last",
                  formula="$CL_{\\text{sparse,last}} = \\frac{Dose}{AUC_{\\text{sparse,last}}}$")
 
 PKNCA.set.summary(
+  name = c("cl.int.all", "cl.int.inf.obs", "cl.int.inf.pred", "cl.int.last",
+           "cl.iv.all", "cl.iv.last", "cl.iv.obs", "cl.iv.pred",
+           "cl.ivint.all", "cl.ivint.last", "cl.sparse.last"),
+  description = "geometric mean and geometric coefficient of variation",
+  point = business.geomean,
+  spread = business.geocv
+)
+PKNCA.set.summary(
   name="cl.pred",
   description="geometric mean and geometric coefficient of variation",
   point=business.geomean,
@@ -986,6 +1002,13 @@ add.interval.col("mrt.sparse.last",
                  formula="$MRT_{\\text{sparse,last}} = \\frac{AUMC_{\\text{sparse,last}}}{AUC_{\\text{sparse,last}}}$")
 
 PKNCA.set.summary(
+  name = c("mrt.all", "mrt.int.all", "mrt.int.inf.obs", "mrt.int.inf.pred",
+           "mrt.int.last", "mrt.sparse.last"),
+  description = "geometric mean and geometric coefficient of variation",
+  point = business.geomean,
+  spread = business.geocv
+)
+PKNCA.set.summary(
   name="mrt.last",
   description="geometric mean and geometric coefficient of variation",
   point=business.geomean,
@@ -1073,6 +1096,12 @@ add.interval.col("mrt.ivint.last",
                  depends = c("aucivint.last", "aumcivint.last"),
                  formula="$MRT_{\\text{iv,int,last}} = \\frac{AUMC_{\\text{iv,int,last}}}{AUC_{\\text{iv,int,last}}} - \\frac{T_{\\text{inf}}}{2}$")
 
+PKNCA.set.summary(
+  name = c("mrt.iv.all", "mrt.ivint.all", "mrt.ivint.last"),
+  description = "geometric mean and geometric coefficient of variation",
+  point = business.geomean,
+  spread = business.geocv
+)
 PKNCA.set.summary(
   name="mrt.iv.last",
   description="geometric mean and geometric coefficient of variation",
@@ -1309,6 +1338,15 @@ add.interval.col("vz.sparse.last",
                  formula="$V_{z,\\text{sparse,last}} = \\frac{CL_{\\text{sparse,last}}}{\\lambda_z}$")
 
 PKNCA.set.summary(
+  name = c("vz.all", "vz.int.all", "vz.int.inf.obs", "vz.int.inf.pred",
+           "vz.int.last", "vz.iv.all", "vz.iv.last", "vz.iv.obs",
+           "vz.iv.pred", "vz.ivint.all", "vz.ivint.last", "vz.last",
+           "vz.sparse.last"),
+  description = "geometric mean and geometric coefficient of variation",
+  point = business.geomean,
+  spread = business.geocv
+)
+PKNCA.set.summary(
   name="vz.pred",
   description="geometric mean and geometric coefficient of variation",
   point=business.geomean,
@@ -1533,6 +1571,14 @@ add.interval.col("vss.sparse.last",
                  depends = c("cl.sparse.last", "mrt.sparse.last"),
                  formula="$V_{ss,\\text{sparse,last}} = CL_{\\text{sparse,last}} \\cdot MRT_{\\text{sparse,last}}$")
 
+PKNCA.set.summary(
+  name = c("vss.all", "vss.int.all", "vss.int.inf.obs", "vss.int.inf.pred",
+           "vss.int.last", "vss.iv.all", "vss.ivint.all", "vss.ivint.last",
+           "vss.sparse.last"),
+  description = "geometric mean and geometric coefficient of variation",
+  point = business.geomean,
+  spread = business.geocv
+)
 PKNCA.set.summary(
   name="vss.md.pred",
   description="geometric mean and geometric coefficient of variation",

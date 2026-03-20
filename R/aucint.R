@@ -529,7 +529,7 @@ pk.calc.aumcint <- function(conc, time,
     interval_method[which(time_interp == extrap_times) - 1] <- "log"
   }
   ret <-
-    aumc_integrate(
+    auc_integrate(
       conc = conc_interp, time = time_interp,
       clast = clast, tlast = tlast, lambda.z = lambda.z,
       interval_method = interval_method,
