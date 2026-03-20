@@ -100,9 +100,9 @@ PKNCA.set.summary(
 #'
 #' @inheritParams assert_conc_time
 #' @inheritParams PKNCA.choose.option
-#' @param first.tmax If there is more than time that matches the maximum
-#'   concentration, should the first be considered as Tmax?  If not, then the
-#'   last is considered Tmax.
+#' @param first.tmax If there is more than one time point with the maximum value (Cmax or ERmax),
+#'   which time should be selected for Tmax/ERTmax?  If 'TRUE', the first will be selected. If not, then the
+#'   last is considered Tmax/ERTmax.
 #' @param check Run [assert_conc_time()]?
 #' @returns The time of the maximum concentration
 #' @examples
@@ -452,7 +452,12 @@ add.interval.col("kel.obs",
                  formalsmap=list(mrt="mrt.obs"),
                  depends="mrt.obs",
                  formula="$k_{el,\\text{obs}} = \\frac{1}{MRT_{\\text{obs}}}$")
-
+PKNCA.set.summary(
+  name="kel.obs",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("kel.pred",
                  FUN="pk.calc.kel",
                  values=c(FALSE, TRUE),
@@ -462,7 +467,12 @@ add.interval.col("kel.pred",
                  formalsmap=list(mrt="mrt.pred"),
                  depends="mrt.pred",
                  formula="$k_{el,\\text{pred}} = \\frac{1}{MRT_{\\text{pred}}}$")
-
+PKNCA.set.summary(
+  name="kel.pred",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("kel.last",
                  FUN="pk.calc.kel",
                  values=c(FALSE, TRUE),
@@ -472,7 +482,12 @@ add.interval.col("kel.last",
                  formalsmap=list(mrt="mrt.last"),
                  depends="mrt.last",
                  formula="$k_{el,\\text{last}} = \\frac{1}{MRT_{\\text{last}}}$")
-
+PKNCA.set.summary(
+  name="kel.last",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("kel.iv.obs",
                  FUN="pk.calc.kel",
                  values=c(FALSE, TRUE),
@@ -482,7 +497,12 @@ add.interval.col("kel.iv.obs",
                  formalsmap=list(mrt="mrt.iv.obs"),
                  depends="mrt.iv.obs",
                  formula="$k_{el,\\text{iv,obs}} = \\frac{1}{MRT_{\\text{iv,obs}}}$")
-
+PKNCA.set.summary(
+  name="kel.iv.obs",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("kel.iv.pred",
                  FUN="pk.calc.kel",
                  values=c(FALSE, TRUE),
@@ -492,7 +512,12 @@ add.interval.col("kel.iv.pred",
                  formalsmap=list(mrt="mrt.iv.pred"),
                  depends="mrt.iv.pred",
                  formula="$k_{el,\\text{iv,pred}} = \\frac{1}{MRT_{\\text{iv,pred}}}$")
-
+PKNCA.set.summary(
+  name="kel.iv.pred",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("kel.iv.last",
                  FUN="pk.calc.kel",
                  values=c(FALSE, TRUE),
@@ -595,16 +620,10 @@ add.interval.col("kel.sparse.last",
                  formula="$k_{el,\\text{sparse,last}} = \\frac{1}{MRT_{\\text{sparse,last}}}$")
 
 PKNCA.set.summary(
-  name = c(
-    # Elimination rate constant (kel)
-    "kel.obs", "kel.pred", "kel.last", "kel.iv.obs", "kel.iv.pred", "kel.iv.last",
-    "kel.all", "kel.int.all", "kel.int.inf.obs", "kel.int.inf.pred", "kel.int.last",
-    "kel.iv.all", "kel.ivint.all", "kel.ivint.last",
-    "kel.sparse.last"
-  ),
-  description = "geometric mean and geometric coefficient of variation",
-  point = business.geomean,
-  spread = business.geocv
+  name="kel.iv.last",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
 )
 
 #' Calculate the (observed oral) clearance
@@ -647,7 +666,12 @@ add.interval.col("cl.last",
                  formalsmap=list(auc="auclast"),
                  depends="auclast",
                  formula="$CL_{\\text{last}} = \\frac{Dose}{AUC_{\\text{last}}}$")
-
+PKNCA.set.summary(
+  name="cl.last",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("cl.all",
                  FUN="pk.calc.cl",
                  values=c(FALSE, TRUE),
@@ -657,7 +681,12 @@ add.interval.col("cl.all",
                  formalsmap=list(auc="aucall"),
                  depends="aucall",
                  formula="$CL_{\\text{all}} = \\frac{Dose}{AUC_{\\text{all}}}$")
-
+PKNCA.set.summary(
+  name="cl.all",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("cl.obs",
                  FUN="pk.calc.cl",
                  values=c(FALSE, TRUE),
@@ -667,7 +696,12 @@ add.interval.col("cl.obs",
                  formalsmap=list(auc="aucinf.obs"),
                  depends="aucinf.obs",
                  formula="$CL_{\\text{obs}} = \\frac{Dose}{AUC_{\\infty,\\text{obs}}}$")
-
+PKNCA.set.summary(
+  name="cl.obs",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("cl.pred",
                  FUN="pk.calc.cl",
                  values=c(FALSE, TRUE),
@@ -790,17 +824,10 @@ add.interval.col("cl.sparse.last",
                  formula="$CL_{\\text{sparse,last}} = \\frac{Dose}{AUC_{\\text{sparse,last}}}$")
 
 PKNCA.set.summary(
-  name = c(
-    # Clearance (observed, predicted, last, all, interpolated, IV, etc.)
-    "cl.last","cl.all", "cl.obs", "cl.pred",
-    "cl.int.all", "cl.int.inf.obs", "cl.int.inf.pred", "cl.int.last",
-    "cl.iv.all", "cl.iv.last", "cl.iv.obs", "cl.iv.pred",
-    "cl.ivint.all", "cl.ivint.last",
-    "cl.sparse.last"
-  ),
-  description = "geometric mean and geometric coefficient of variation",
-  point = business.geomean,
-  spread = business.geocv
+  name="cl.pred",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
 )
 
 #' Calculate the absolute (or relative) bioavailability
@@ -866,7 +893,12 @@ add.interval.col("mrt.obs",
                  formalsmap=list(auc="aucinf.obs", aumc="aumcinf.obs"),
                  depends=c("aucinf.obs", "aumcinf.obs"),
                  formula="$MRT_{\\text{obs}} = \\frac{AUMC_{\\infty,\\text{obs}}}{AUC_{\\infty,\\text{obs}}}$")
-
+PKNCA.set.summary(
+  name="mrt.obs",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("mrt.pred",
                  FUN="pk.calc.mrt",
                  values=c(FALSE, TRUE),
@@ -876,7 +908,12 @@ add.interval.col("mrt.pred",
                  formalsmap=list(auc="aucinf.pred", aumc="aumcinf.pred"),
                  depends=c("aucinf.pred", "aumcinf.pred"),
                  formula="$MRT_{\\text{pred}} = \\frac{AUMC_{\\infty,\\text{pred}}}{AUC_{\\infty,\\text{pred}}}$")
-
+PKNCA.set.summary(
+  name="mrt.pred",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("mrt.last",
                  FUN="pk.calc.mrt",
                  values=c(FALSE, TRUE),
@@ -949,15 +986,10 @@ add.interval.col("mrt.sparse.last",
                  formula="$MRT_{\\text{sparse,last}} = \\frac{AUMC_{\\text{sparse,last}}}{AUC_{\\text{sparse,last}}}$")
 
 PKNCA.set.summary(
-  name = c(
-    # Mean residence time (MRT)
-    "mrt.obs", "mrt.pred", "mrt.last", "mrt.last", "mrt.all",
-    "mrt.int.all", "mrt.int.inf.obs", "mrt.int.inf.pred", "mrt.int.last",
-    "mrt.sparse.last"
-  ),
-  description = "geometric mean and geometric coefficient of variation",
-  point = business.geomean,
-  spread = business.geocv
+  name="mrt.last",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
 )
 
 #' @describeIn pk.calc.mrt MRT for an IV infusion
@@ -980,7 +1012,12 @@ add.interval.col("mrt.iv.obs",
                  formalsmap=list(auc="aucinf.obs", aumc="aumcinf.obs"),
                  depends=c("aucinf.obs", "aumcinf.obs"),
                  formula="$MRT_{\\text{iv,obs}} = \\frac{AUMC_{\\infty,\\text{obs}}}{AUC_{\\infty,\\text{obs}}} - \\frac{T_{\\text{inf}}}{2}$")
-
+PKNCA.set.summary(
+  name="mrt.iv.obs",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("mrt.iv.pred",
                  FUN="pk.calc.mrt.iv",
                  values=c(FALSE, TRUE),
@@ -990,7 +1027,12 @@ add.interval.col("mrt.iv.pred",
                  formalsmap=list(auc="aucinf.pred", aumc="aumcinf.pred"),
                  depends=c("aucinf.pred", "aumcinf.pred"),
                  formula="$MRT_{\\text{iv,pred}} = \\frac{AUMC_{\\infty,\\text{pred}}}{AUC_{\\infty,\\text{pred}}} - \\frac{T_{\\text{inf}}}{2}$")
-
+PKNCA.set.summary(
+  name="mrt.iv.pred",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("mrt.iv.last",
                  FUN="pk.calc.mrt.iv",
                  values=c(FALSE, TRUE),
@@ -1032,14 +1074,10 @@ add.interval.col("mrt.ivint.last",
                  formula="$MRT_{\\text{iv,int,last}} = \\frac{AUMC_{\\text{iv,int,last}}}{AUC_{\\text{iv,int,last}}} - \\frac{T_{\\text{inf}}}{2}$")
 
 PKNCA.set.summary(
-  name = c(
-    # Mean residence time (MRT)
-    "mrt.iv.obs", "mrt.iv.pred", "mrt.iv.last",
-    "mrt.iv.all", "mrt.ivint.all", "mrt.ivint.last"
-  ),
-  description = "geometric mean and geometric coefficient of variation",
-  point = business.geomean,
-  spread = business.geocv
+  name="mrt.iv.last",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
 )
 
 #' Calculate the mean residence time (MRT) for multiple-dose data with nonlinear
@@ -1123,7 +1161,12 @@ add.interval.col("vz.obs",
                  formalsmap=list(cl="cl.obs"),
                  depends=c("cl.obs", "lambda.z"),
                  formula="$V_{z,\\text{obs}} = \\frac{CL_{\\text{obs}}}{\\lambda_z}$")
-
+PKNCA.set.summary(
+  name="vz.obs",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("vz.pred",
                  FUN="pk.calc.vz",
                  values=c(FALSE, TRUE),
@@ -1266,16 +1309,10 @@ add.interval.col("vz.sparse.last",
                  formula="$V_{z,\\text{sparse,last}} = \\frac{CL_{\\text{sparse,last}}}{\\lambda_z}$")
 
 PKNCA.set.summary(
-  name = c(
-    # Volume of distribution (Vz)
-    "vz.obs", "vz.pred",
-    "vz.all", "vz.int.all", "vz.int.inf.obs", "vz.int.inf.pred",
-    "vz.int.last", "vz.iv.all", "vz.iv.last", "vz.iv.obs", "vz.iv.pred",
-    "vz.ivint.all", "vz.ivint.last", "vz.last", "vz.sparse.last"
-  ),
-  description = "geometric mean and geometric coefficient of variation",
-  point = business.geomean,
-  spread = business.geocv
+  name="vz.pred",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
 )
 
 #' Calculate the steady-state volume of distribution (Vss)
@@ -1298,6 +1335,12 @@ add.interval.col("vss.obs",
                  formalsmap=list(cl="cl.obs", mrt="mrt.obs"),
                  depends=c("cl.obs", "mrt.obs"),
                  formula="$V_{ss,\\text{obs}} = CL_{\\text{obs}} \\cdot MRT_{\\text{obs}}$")
+PKNCA.set.summary(
+  name="vss.obs",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 
 add.interval.col("vss.pred",
                  FUN="pk.calc.vss",
@@ -1308,7 +1351,12 @@ add.interval.col("vss.pred",
                  formalsmap=list(cl="cl.pred", mrt="mrt.pred"),
                  depends=c("cl.pred", "mrt.pred"),
                  formula="$V_{ss,\\text{pred}} = CL_{\\text{pred}} \\cdot MRT_{\\text{pred}}$")
-
+PKNCA.set.summary(
+  name="vss.pred",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("vss.last",
                  FUN="pk.calc.vss",
                  values=c(FALSE, TRUE),
@@ -1318,7 +1366,12 @@ add.interval.col("vss.last",
                  formalsmap=list(cl="cl.last", mrt="mrt.last"),
                  depends=c("cl.last", "mrt.last"),
                  formula="$V_{ss,\\text{last}} = CL_{\\text{last}} \\cdot MRT_{\\text{last}}$")
-
+PKNCA.set.summary(
+  name="vss.last",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("vss.iv.obs",
                  FUN="pk.calc.vss",
                  values=c(FALSE, TRUE),
@@ -1328,7 +1381,12 @@ add.interval.col("vss.iv.obs",
                  formalsmap=list(cl="cl.obs", mrt="mrt.iv.obs"),
                  depends=c("cl.obs", "mrt.iv.obs"),
                  formula="$V_{ss,\\text{iv,obs}} = CL_{\\text{obs}} \\cdot MRT_{\\text{iv,obs}}$")
-
+PKNCA.set.summary(
+  name="vss.iv.obs",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("vss.iv.pred",
                  FUN="pk.calc.vss",
                  values=c(FALSE, TRUE),
@@ -1338,7 +1396,12 @@ add.interval.col("vss.iv.pred",
                  formalsmap=list(cl="cl.pred", mrt="mrt.iv.pred"),
                  depends=c("cl.pred", "mrt.iv.pred"),
                  formula="$V_{ss,\\text{iv,pred}} = CL_{\\text{pred}} \\cdot MRT_{\\text{iv,pred}}$")
-
+PKNCA.set.summary(
+  name="vss.iv.pred",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("vss.iv.last",
                  FUN="pk.calc.vss",
                  values=c(FALSE, TRUE),
@@ -1348,7 +1411,12 @@ add.interval.col("vss.iv.last",
                  formalsmap=list(cl="cl.last", mrt="mrt.iv.last"),
                  depends=c("cl.last", "mrt.iv.last"),
                  formula="$V_{ss,\\text{iv,last}} = CL_{\\text{last}} \\cdot MRT_{\\text{iv,last}}$")
-
+PKNCA.set.summary(
+  name="vss.iv.last",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("vss.md.obs",
                  FUN="pk.calc.vss",
                  values=c(FALSE, TRUE),
@@ -1358,7 +1426,12 @@ add.interval.col("vss.md.obs",
                  formalsmap=list(cl="cl.last", mrt="mrt.md.obs"),
                  depends=c("cl.last", "mrt.md.obs"),
                  formula="$V_{ss,\\text{md,obs}} = CL_{\\text{last}} \\cdot MRT_{\\text{md,obs}}$")
-
+PKNCA.set.summary(
+  name="vss.md.obs",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
+)
 add.interval.col("vss.md.pred",
                  FUN="pk.calc.vss",
                  values=c(FALSE, TRUE),
@@ -1461,16 +1534,10 @@ add.interval.col("vss.sparse.last",
                  formula="$V_{ss,\\text{sparse,last}} = CL_{\\text{sparse,last}} \\cdot MRT_{\\text{sparse,last}}$")
 
 PKNCA.set.summary(
-  name = c(
-    # Volume of distribution at steady state (Vss)
-    "vss.obs", "vss.pred", "vss.last", "vss.iv.obs", "vss.iv.pred", "vss.iv.last",
-    "vss.md.obs", "vss.md.pred", "vss.all",
-    "vss.int.all", "vss.int.inf.obs", "vss.int.inf.pred", "vss.int.last",
-    "vss.iv.all", "vss.ivint.all", "vss.ivint.last", "vss.sparse.last"
-  ),
-  description = "geometric mean and geometric coefficient of variation",
-  point = business.geomean,
-  spread = business.geocv
+  name="vss.md.pred",
+  description="geometric mean and geometric coefficient of variation",
+  point=business.geomean,
+  spread=business.geocv
 )
 
 #' Calculate the average concentration during an interval.

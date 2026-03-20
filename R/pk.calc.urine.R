@@ -38,7 +38,7 @@ pk.calc.ae <- function(conc, volume, check=TRUE) {
   message_all <- generate_missing_messages(conc, volume,
                                            name_a = "concentrations",
                                            name_b = "volumes")
-
+  
   ret <- sum(conc * volume)
   if (length(message_all) != 0) {
     message <- paste(message_all, collapse = "; ")
@@ -159,22 +159,23 @@ PKNCA.set.summary(
 #' @return The midpoint collection time of the last measurable excretion rate, or NA/0 if not available
 #' @export
 pk.calc.ertlst <- function(conc, volume, time, duration.conc, check = TRUE) {
-
+  
   # Generate messages about missing concentrations/volumes
   message_all <- generate_missing_messages(conc, volume,
                                            name_a = "concentrations",
                                            name_b = "volumes")
-
-  if (all(is.na(conc))) {
+  
+  er <- conc * volume / duration.conc
+  
+  if (all(is.na(er))) {
     ret <- NA_real_
-  } else if (all(conc %in% c(0, NA))) {
+  } else if (all(er %in% c(0, NA))) {
     ret <- 0
   } else {
-      midtime <- time + duration.conc / 2
     midtime <- time + duration.conc / 2
-    ret <- max(midtime[!(conc %in% c(NA, 0))])
+    ret <- max(midtime[!is.na(er) & er != 0])
   }
-
+  
   if (length(message_all) != 0) {
     message <- paste(message_all, collapse = "; ")
     ret <- structure(ret, exclude = message)
@@ -207,19 +208,23 @@ PKNCA.set.summary(
 #' @return The maximum excretion rate, or NA if not available
 #' @export
 pk.calc.ermax <- function(conc, volume, time, duration.conc, check = TRUE) {
-
+  
   # Generate messages about missing concentrations/volumes
   message_all <- generate_missing_messages(conc, volume,
                                            name_a = "concentrations",
                                            name_b = "volumes")
-
+  
   if (length(conc) == 0 || all(is.na(conc))) {
-    ret <- NA
+    ret <- NA_real_
   } else {
     er <- conc * volume / duration.conc
-    ret <- max(er, na.rm=TRUE)
+    if (all(is.na(er))) {
+      ret <- NA_real_
+    } else {
+      ret <- max(er, na.rm=TRUE)
+    }
   }
-
+  
   if (length(message_all) != 0) {
     message <- paste(message_all, collapse = "; ")
     ret <- structure(ret, exclude = message)
@@ -247,32 +252,34 @@ PKNCA.set.summary(
 #' @param volume The volume (or mass) of the sample
 #' @param time The starting time of the collection interval
 #' @param duration.conc The duration of the collection interval
+#' @param options List of changes to the default PKNCA options (see \code{PKNCA.options()})
 #' @param check Should the concentration and time data be checked?
 #' @param first.tmax If TRUE, return the first time of maximum excretion rate; otherwise, return the last
 #' @return The midpoint collection time of the maximum excretion rate, or NA if not available
 #' @export
-pk.calc.ertmax <- function(conc, volume, time, duration.conc, check = TRUE, first.tmax = NULL) {
-
+pk.calc.ertmax <- function(conc, volume, time, duration.conc, options = list(), check = TRUE, first.tmax = NULL) {
+  first.tmax <- PKNCA.choose.option(name="first.tmax", value=first.tmax, options=options)
+  
   # Generate messages about missing concentrations/volumes
   message_all <- generate_missing_messages(conc, volume,
                                            name_a = "concentrations",
                                            name_b = "volumes")
-
+  
   if (length(conc) == 0 || all(conc %in% c(NA, 0))) {
-    ret <- NA
+    ret <- NA_real_
   } else {
     er <- conc * volume / duration.conc
     ermax <- pk.calc.ermax(conc, volume, time, duration.conc, check = FALSE)
     midtime <- time + duration.conc / 2
     ret <- midtime[er %in% ermax]
-
+    
     if (first.tmax) {
       ret <- ret[1]
     } else {
       ret <- ret[length(ret)]
     }
   }
-
+  
   if (length(message_all) != 0) {
     message <- paste(message_all, collapse = "; ")
     ret <- structure(ret, exclude = message)
@@ -303,9 +310,9 @@ PKNCA.set.summary(
 # vector of human-readable messages describing the missingness that matches
 # the style used in the package (used previously in `pk.calc.ae`).
 generate_missing_messages <- function(a, b,
-                    name_a = deparse(substitute(a)),
-                    name_b = deparse(substitute(b))) {
-
+                                      name_a = deparse(substitute(a)),
+                                      name_b = deparse(substitute(b))) {
+  
   mask_a <- is.na(a)
   mask_b <- is.na(b)
   
