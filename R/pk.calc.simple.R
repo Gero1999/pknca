@@ -577,52 +577,10 @@ add.interval.col("kel.int.last",
                  depends = "mrt.int.last",
                  formula="$k_{el,\\text{int,last}} = \\frac{1}{MRT_{\\text{int,last}}}$")
 
-add.interval.col("kel.iv.all",
-                 FUN = "pk.calc.kel",
-                 values = c(FALSE, TRUE),
-                 unit_type = "inverse_time",
-                 pretty_name = "Kel (for IV dosing,  based on AUCall)",
-                 desc = "Elimination rate (as calculated from the MRTiv.all))",
-                 formalsmap = list(mrt = "mrt.iv.all"),
-                 depends = "mrt.iv.all",
-                 formula="$k_{el,\\text{iv,all}} = \\frac{1}{MRT_{\\text{iv,all}}}$")
-
-add.interval.col("kel.ivint.all",
-                 FUN = "pk.calc.kel",
-                 values = c(FALSE, TRUE),
-                 unit_type = "inverse_time",
-                 pretty_name = "Kel (IV dose interval, based on AUCint.all)",
-                 desc = "Elimination rate (as calculated from the MRTivint.all)",
-                 formalsmap = list(mrt = "mrt.ivint.all"),
-                 depends = "mrt.ivint.all",
-                 formula="$k_{el,\\text{iv,int,all}} = \\frac{1}{MRT_{\\text{iv,int,all}}}$")
-
-
-add.interval.col("kel.ivint.last",
-                 FUN = "pk.calc.kel",
-                 values = c(FALSE, TRUE),
-                 unit_type = "inverse_time",
-                 pretty_name = "Kel (IV dose interval, based on AUCint.last)",
-                 desc = "Elimination rate (as calculated from the MRTivint.last)",
-                 formalsmap = list(mrt = "mrt.ivint.last"),
-                 depends = "mrt.ivint.last",
-                 formula="$k_{el,\\text{iv,int,last}} = \\frac{1}{MRT_{\\text{iv,int,last}}}$")
-
-add.interval.col("kel.sparse.last",
-                 FUN = "pk.calc.kel",
-                 values = c(FALSE, TRUE),
-                 unit_type = "inverse_time",
-                 pretty_name = "Kel (for sparse data, based on AUClast)",
-                 desc = "Elimination rate (as calculated from the MRTsparse.last)",
-                 sparse = TRUE,
-                 formalsmap = list(mrt = "mrt.sparse.last"),
-                 depends = "mrt.sparse.last",
-                 formula="$k_{el,\\text{sparse,last}} = \\frac{1}{MRT_{\\text{sparse,last}}}$")
 
 PKNCA.set.summary(
   name = c("kel.all", "kel.int.all", "kel.int.inf.obs", "kel.int.inf.pred",
-           "kel.int.last", "kel.iv.all", "kel.ivint.all", "kel.ivint.last",
-           "kel.sparse.last"),
+           "kel.int.last"),
   description = "geometric mean and geometric coefficient of variation",
   point = business.geomean,
   spread = business.geocv
@@ -990,20 +948,9 @@ add.interval.col("mrt.int.last",
                  depends = c("aucint.last", "aumcint.last"),
                  formula="$MRT_{\\text{int,last}} = \\frac{AUMC_{\\text{int,last}}}{AUC_{\\text{int,last}}}$")
 
-add.interval.col("mrt.sparse.last",
-                 FUN = "pk.calc.mrt",
-                 values = c(FALSE, TRUE),
-                 unit_type = "time",
-                 pretty_name = "MRT (for sparse data, based on AUClast)",
-                 desc = "Mean residence time from sparse sampling",
-                 sparse = TRUE,
-                 formalsmap = list(auc = "sparse_auclast", aumc = "sparse_aumclast"),
-                 depends = c("sparse_auclast", "sparse_aumclast"),
-                 formula="$MRT_{\\text{sparse,last}} = \\frac{AUMC_{\\text{sparse,last}}}{AUC_{\\text{sparse,last}}}$")
-
 PKNCA.set.summary(
   name = c("mrt.all", "mrt.int.all", "mrt.int.inf.obs", "mrt.int.inf.pred",
-           "mrt.int.last", "mrt.sparse.last"),
+           "mrt.int.last"),
   description = "geometric mean and geometric coefficient of variation",
   point = business.geomean,
   spread = business.geocv
@@ -1065,43 +1012,6 @@ add.interval.col("mrt.iv.last",
                  formalsmap=list(auc="auclast", aumc="aumclast"),
                  depends=c("auclast", "aumclast"),
                  formula="$MRT_{\\text{iv,last}} = \\frac{AUMC_{\\text{last}}}{AUC_{\\text{last}}} - \\frac{T_{\\text{inf}}}{2}$")
-
-add.interval.col("mrt.iv.all",
-                 FUN = "pk.calc.mrt.iv",
-                 values = c(FALSE, TRUE),
-                 unit_type = "time",
-                 pretty_name = "MRT (for IV dosing, based on AUCall)",
-                 desc = "Mean residence time for IV dosing calculated with AUCall/AUMCall",
-                 formalsmap = list(auc = "aucivall", aumc = "aumcivall"),
-                 depends = c("aucivall", "aumcivall"),
-                 formula="$MRT_{\\text{iv,all}} = \\frac{AUMC_{\\text{iv,all}}}{AUC_{\\text{iv,all}}} - \\frac{T_{\\text{inf}}}{2}$")
-
-add.interval.col("mrt.ivint.all",
-                 FUN = "pk.calc.mrt.iv",
-                 values = c(FALSE, TRUE),
-                 unit_type = "time",
-                 pretty_name = "MRT (IV dose interval, based on AUCint.all)",
-                 desc = "Mean residence time for IV interval calculated with AUCint.all/AUMCint.all",
-                 formalsmap = list(auc = "aucivint.all", aumc = "aumcivint.all"),
-                 depends = c("aucivint.all", "aumcivint.all"),
-                 formula="$MRT_{\\text{iv,int,all}} = \\frac{AUMC_{\\text{iv,int,all}}}{AUC_{\\text{iv,int,all}}} - \\frac{T_{\\text{inf}}}{2}$")
-
-add.interval.col("mrt.ivint.last",
-                 FUN = "pk.calc.mrt.iv",
-                 values = c(FALSE, TRUE),
-                 unit_type = "time",
-                 pretty_name = "MRT (IV dose interval, based on AUCint.last)",
-                 desc = "Mean residence time for IV interval calculated with AUCint.last/AUMCint.last",
-                 formalsmap = list(auc = "aucivint.last", aumc = "aumcivint.last"),
-                 depends = c("aucivint.last", "aumcivint.last"),
-                 formula="$MRT_{\\text{iv,int,last}} = \\frac{AUMC_{\\text{iv,int,last}}}{AUC_{\\text{iv,int,last}}} - \\frac{T_{\\text{inf}}}{2}$")
-
-PKNCA.set.summary(
-  name = c("mrt.iv.all", "mrt.ivint.all", "mrt.ivint.last"),
-  description = "geometric mean and geometric coefficient of variation",
-  point = business.geomean,
-  spread = business.geocv
-)
 PKNCA.set.summary(
   name="mrt.iv.last",
   description="geometric mean and geometric coefficient of variation",
@@ -1530,51 +1440,9 @@ add.interval.col("vss.int.last",
                  depends = c("cl.int.last", "mrt.int.last"),
                  formula="$V_{ss,\\text{int,last}} = CL_{\\text{int,last}} \\cdot MRT_{\\text{int,last}}$")
 
-add.interval.col("vss.iv.all",
-                 FUN = "pk.calc.vss",
-                 values = c(FALSE, TRUE),
-                 unit_type = "volume",
-                 pretty_name = "Vss (for IV dosing,  based on AUCall)",
-                 desc = "Steady-state volume of distribution for IV dosing using AUCall",
-                 formalsmap = list(cl = "cl.iv.all", mrt = "mrt.iv.all"),
-                 depends = c("cl.iv.all", "mrt.iv.all"),
-                 formula="$V_{ss,\\text{iv,all}} = CL_{\\text{iv,all}} \\cdot MRT_{\\text{iv,all}}$")
-
-add.interval.col("vss.ivint.all",
-                 FUN = "pk.calc.vss",
-                 values = c(FALSE, TRUE),
-                 unit_type = "volume",
-                 pretty_name = "Vss (IV dose interval, based on AUCint.all)",
-                 desc = "Steady-state volume of distribution for IV interval using AUCint.all",
-                 formalsmap = list(cl = "cl.ivint.all", mrt = "mrt.ivint.all"),
-                 depends = c("cl.ivint.all", "mrt.ivint.all"),
-                 formula="$V_{ss,\\text{iv,int,all}} = CL_{\\text{iv,int,all}} \\cdot MRT_{\\text{iv,int,all}}$")
-
-add.interval.col("vss.ivint.last",
-                 FUN = "pk.calc.vss",
-                 values = c(FALSE, TRUE),
-                 unit_type = "volume",
-                 pretty_name = "Vss (IV dose interval, based on AUCint.last)",
-                 desc = "Steady-state volume of distribution for IV interval using AUCint.last",
-                 formalsmap = list(cl = "cl.ivint.last", mrt = "mrt.ivint.last"),
-                 depends = c("cl.ivint.last", "mrt.ivint.last"),
-                 formula="$V_{ss,\\text{iv,int,last}} = CL_{\\text{iv,int,last}} \\cdot MRT_{\\text{iv,int,last}}$")
-
-add.interval.col("vss.sparse.last",
-                 FUN = "pk.calc.vss",
-                 values = c(FALSE, TRUE),
-                 unit_type = "volume",
-                 pretty_name = "Vss (for sparse data, based on AUClast)",
-                 desc = "Steady-state volume of distribution from sparse sampling",
-                 sparse = TRUE,
-                 formalsmap = list(cl = "cl.sparse.last", mrt = "mrt.sparse.last"),
-                 depends = c("cl.sparse.last", "mrt.sparse.last"),
-                 formula="$V_{ss,\\text{sparse,last}} = CL_{\\text{sparse,last}} \\cdot MRT_{\\text{sparse,last}}$")
-
 PKNCA.set.summary(
   name = c("vss.all", "vss.int.all", "vss.int.inf.obs", "vss.int.inf.pred",
-           "vss.int.last", "vss.iv.all", "vss.ivint.all", "vss.ivint.last",
-           "vss.sparse.last"),
+           "vss.int.last"),
   description = "geometric mean and geometric coefficient of variation",
   point = business.geomean,
   spread = business.geocv

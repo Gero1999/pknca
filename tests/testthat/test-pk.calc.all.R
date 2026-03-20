@@ -771,6 +771,7 @@ test_that("pk.nca can be run for each parameter independently (#473)", {
 
   non_pknca_covered_params <- c(
     "f", "time_above", "mrt.md.obs", "mrt.md.pred",
+    "cl.sparse.last", "vz.sparse.last",
     "vss.md.obs", "vss.md.pred", "ceoi"
   )
   all_params <- setdiff(names(get.interval.cols()), c("start", "end", non_pknca_covered_params))
