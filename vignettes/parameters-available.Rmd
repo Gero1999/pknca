@@ -11,12 +11,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-# Parameters Available for Calculation in an Interval
-
-The following table lists all parameters available for calculation in a
-PKNCA interval, along with their formulas, unit types, descriptions, and
-the function used for calculation.
-
 | Parameter | Formula | Unit Type | Description | Function | Also Uses This Function |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | adj.r.squared | $r^2_{adj} = 1 - (1 - r^2) \frac{n-1}{n-2}$ | unitless | The adjusted r^2 value of the half-life calculation | See: half.life |  |
@@ -218,4 +212,3 @@ the function used for calculation.
 | vz.obs | $V_{z,\text{obs}} = \frac{CL_{\text{obs}}}{\lambda_z}$ | volume | The terminal volume of distribution using observed Clast | pk.calc.vz | vz.all, vz.int.all, vz.int.inf.obs, vz.int.inf.pred, vz.int.last, vz.iv.all, vz.iv.last, vz.iv.obs, vz.iv.pred, vz.ivint.all, vz.ivint.last, vz.last, vz.pred, vz.sparse.last |
 | vz.pred | $V_{z,\text{pred}} = \frac{CL_{\text{pred}}}{\lambda_z}$ | volume | The terminal volume of distribution using predicted Clast | pk.calc.vz | vz.all, vz.int.all, vz.int.inf.obs, vz.int.inf.pred, vz.int.last, vz.iv.all, vz.iv.last, vz.iv.obs, vz.iv.pred, vz.ivint.all, vz.ivint.last, vz.last, vz.obs, vz.sparse.last |
 | vz.sparse.last | $V_{z,\text{sparse,last}} = \frac{CL_{\text{sparse,last}}}{\lambda_z}$ | volume | Terminal volume of distribution from sparse sampling | pk.calc.vz | vz.all, vz.int.all, vz.int.inf.obs, vz.int.inf.pred, vz.int.last, vz.iv.all, vz.iv.last, vz.iv.obs, vz.iv.pred, vz.ivint.all, vz.ivint.last, vz.last, vz.obs, vz.pred |
-

@@ -117,23 +117,6 @@ param_table[["Also Uses This Function"]] <- vapply(
 # ---------------------------------------------------------------------------
 
 outfile <- file.path("vignettes", "parameters-available.Rmd")
-
 write_rmd_header(outfile, title = "Parameters Available in PKNCA")
-
-cat(
-  "# Parameters Available for Calculation in an Interval",
-  "",
-  "The following table lists all parameters available for calculation in a",
-  "PKNCA interval, along with their formulas, unit types, descriptions, and",
-  "the function used for calculation.",
-  "",
-  sep = "\n",
-  file = outfile,
-  append = TRUE
-)
-
 write_md_table(param_table, con = outfile)
-
-cat("\n", file = outfile, append = TRUE)
-
 message("Done: ", outfile)
