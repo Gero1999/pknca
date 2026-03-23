@@ -18,13 +18,9 @@ normalize.PKNCAresults <- function(object, norm_table, parameters, suffix) {
   object
 }
 
-utils::globalVariables(c(
-  "PPTESTCD", "PPORRES", "PPORRESU",
-  "PPSTRES",  "PPSTRESU", "normalization", "unit"
-))
-
 #' @export
 normalize.data.frame <- function(object, norm_table, parameters, suffix) {
+  
   # Identify common columns for grouping
   common_colnames <- setdiff(
     intersect(names(object), names(norm_table)),
@@ -33,6 +29,7 @@ normalize.data.frame <- function(object, norm_table, parameters, suffix) {
   
   # ---- Validate norm_table ----
   if (length(common_colnames) > 0) {
+    
     # Check for missing groups
     missing_groups <- dplyr::anti_join(norm_table, object, by = common_colnames)
     if (nrow(missing_groups) > 0) {
@@ -46,61 +43,56 @@ normalize.data.frame <- function(object, norm_table, parameters, suffix) {
         df_error_string
       )
     }
+    
     # Check for duplicate groups
     if (any(duplicated(norm_table[, common_colnames, drop = FALSE]))) {
       stop("The normalization table contains duplicate groups.")
     }
+    
   } else {
-    # Ungrouped: norm_table must be exactly one row
+    # Ungrouped case
     if (nrow(norm_table) != 1) {
       stop("Normalization table must be a single row for ungrouped data.")
     }
   }
   
-  # ---- Filter relevant parameters ----
-  df <- object %>% dplyr::filter(PPTESTCD %in% parameters)
+  # ---- Filter relevant parameters (base R) ----
+  df <- object[object$PPTESTCD %in% parameters, , drop = FALSE]
   
   # ---- Join normalization values ----
   if (length(common_colnames) == 0) {
-    # Ungrouped: cartesian join (single norm row applies to all)
-    df <- dplyr::cross_join(df, norm_table)
+    # Cartesian join
+    df <- merge(df, norm_table, by = NULL)
   } else {
-    # Grouped: join by common columns
-    df <- df %>% dplyr::inner_join(norm_table, by = common_colnames)
+    df <- dplyr::inner_join(df, norm_table, by = common_colnames)
   }
   
-  # ---- Apply normalization ----
-  df <- df %>%
-    dplyr::mutate(
-      PPORRES  = PPORRES / normalization,
-      PPTESTCD = paste0(PPTESTCD, suffix)
-    )
+  # ---- Apply normalization (base R) ----
+  df$PPORRES <- df$PPORRES / df$normalization
+  df$PPTESTCD <- paste0(df$PPTESTCD, suffix)
   
   if ("PPORRESU" %in% names(df)) {
-    df <- df %>%
-      dplyr::mutate(
-        PPORRESU = sprintf("%s/%s",
-                           pknca_units_add_paren(PPORRESU),
-                           pknca_units_add_paren(unit))
-      )
+    df$PPORRESU <- sprintf(
+      "%s/%s",
+      pknca_units_add_paren(df$PPORRESU),
+      pknca_units_add_paren(df$unit)
+    )
   }
   
   if ("PPSTRES" %in% names(df)) {
-    df <- df %>%
-      dplyr::mutate(PPSTRES = PPSTRES / normalization)
+    df$PPSTRES <- df$PPSTRES / df$normalization
     
     if ("PPSTRESU" %in% names(df)) {
-      df <- df %>%
-        dplyr::mutate(
-          PPSTRESU = sprintf("%s/%s",
-                             pknca_units_add_paren(PPSTRESU),
-                             pknca_units_add_paren(unit))
-        )
+      df$PPSTRESU <- sprintf(
+        "%s/%s",
+        pknca_units_add_paren(df$PPSTRESU),
+        pknca_units_add_paren(df$unit)
+      )
     }
   }
   
   # ---- Return original column order ----
-  df %>% dplyr::select(dplyr::all_of(names(object)))
+  df[, names(object), drop = FALSE]
 }
 
 #' Internal function to normalize by a specified column

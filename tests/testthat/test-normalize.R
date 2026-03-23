@@ -35,7 +35,8 @@ test_that("normalize.PKNCAresults appends normalized parameters", {
 })
 
 test_that("normalize.data.frame errors for missing group", {
-  o_nca2 <- o_nca %>% filter(ID == 1)
+  o_nca2 <- o_nca
+  o_nca2$result <- o_nca$result[o_nca$result$ID == 1, , drop = FALSE]
   norm_table <- data.frame(ID = 2, normalization = 2, unit = "kg")
   expect_error(
     normalize(o_nca2$result, norm_table, parameters = "cmax", suffix = ".wn"),
@@ -47,7 +48,7 @@ test_that("normalize.data.frame errors for duplicate group", {
   df <- data.frame(ID = 1, PPTESTCD = "cmax", PPORRES = 10, PPORRESU = "ng/mL")
   norm_table <- data.frame(ID = c(1, 1), normalization = c(2, 3), unit = "kg")
   expect_error(
-    normalize(o_nca$result, norm_table, parameters = "cmax", suffix = ".wn"),
+    normalize(df, norm_table, parameters = "cmax", suffix = ".wn"),
     "The normalization table contains duplicate groups"
   )
 })
@@ -136,4 +137,3 @@ test_that("normalize_by_col errors for duplicate normalizations per PKNCAconc gr
     "There is at least one concentration group with multiple normalization values"
   )
 })
-
