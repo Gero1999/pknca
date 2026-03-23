@@ -212,18 +212,18 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
       )
     half_lives_for_selection <-
       half_lives_for_selection[order(-half_lives_for_selection$lambda.z.time.first), ]
+    # Pre-build the two-column data.frame that fit_half_life expects.  The rows
+    # are already in descending-time order (matching half_lives_for_selection).
+    # Subsetting a pre-built data.frame avoids constructing a new data.frame on
+    # every loop iteration.
+    dfK_for_fit <- data.frame(
+      log_conc = half_lives_for_selection$log_conc,
+      time     = half_lives_for_selection$lambda.z.time.first
+    )
     for(i in min.hl.points:nrow(half_lives_for_selection)) {
       # Fit the terminal slopes until the adjusted r-squared value
       # is not improving (or it only gets worse by a small factor).
-      fit <-
-        fit_half_life(
-          data=
-            data.frame(
-              log_conc=half_lives_for_selection$log_conc[1:i],
-              time=half_lives_for_selection$lambda.z.time.first[1:i]
-            ),
-          tlast=ret$tlast
-        )
+      fit <- fit_half_life(data=dfK_for_fit[seq_len(i), , drop=FALSE], tlast=ret$tlast)
       half_lives_for_selection[i,names(fit)] <- fit
     }
     # Find the best model
