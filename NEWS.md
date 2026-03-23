@@ -27,9 +27,8 @@ the dosing including dose amount and route.
   `clr.pred.dn` (#433)
 * `PKNCA.set.summary(reset = TRUE)` warns that it may break the use of
   `summary()` (#477)
-
+* Added new `tmin` parameter
 * New post-processing functions to normalize PKNCA result parameters based on any column in PKNCAconc data.frame (`normalize_by_col()`) or by using a custom normalization table (`normalize()`)
-
 * New excretion rate parameters: `ermax`  (Maximum excretion rate), `ertmax` (Midpoint time of maximum excretion rate) and `ertlst` (Time of last excretion rate measurement) (#433)
 
 ## Minor changes (unlikely to affect PKNCA use)
