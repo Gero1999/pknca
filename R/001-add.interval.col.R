@@ -26,6 +26,9 @@ assign("interval.cols", list(), envir=.PKNCAEnv)
 #' @param formula Character value providing a LaTeX expression to identify how the
 #' calculation of the parameter is performed. It is an optional argument merely
 #' used for documentation.
+#' @param formula_note Character value providing additional context about the
+#' formula (e.g. assumptions, method details). Displayed alongside the formula
+#' in documentation tables.
 #' @returns NULL (Calling this function has a side effect of changing the
 #'   available intervals for calculations)
 #'
@@ -92,9 +95,10 @@ add.interval.col <- function(name,
                              sparse=FALSE,
                              formalsmap=list(),
                              datatype=c("interval",
-                               "individual",
-                               "population"),
-                             formula=NULL) {
+                                        "individual",
+                                        "population"),
+                             formula=NULL,
+                             formula_note=NULL) {
   # Check inputs
   if (!is.character(name)) {
     stop("name must be a character string")
@@ -175,7 +179,8 @@ add.interval.col <- function(name,
       formalsmap=formalsmap,
       depends=depends,
       datatype=datatype,
-      formula=formula
+      formula=formula,
+      formula_note=formula_note
     )
   assign("interval.cols", current, envir=.PKNCAEnv)
 }

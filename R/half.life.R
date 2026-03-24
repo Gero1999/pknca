@@ -264,7 +264,7 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
       class = "pknca_halflife_too_few_points"
     )
   }
-
+  
   # Drop the inputs of tmax and tlast, if given.
   if (!missing(tmax))
     ret$tmax <- NULL
@@ -287,7 +287,7 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
 #' @seealso [pk.calc.half.life()]
 fit_half_life <- function(data, tlast) {
   fit <- stats::.lm.fit(x=cbind(1, data$time), y=data$log_conc)
-
+  
   # as.numeric is so that it works for units objects
   r_squared <- 1 - as.numeric(sum(fit$residuals^2))/as.numeric(sum((data$log_conc - mean(data$log_conc))^2))
   clast_pred <- exp(sum(fit$coefficients*c(1, as.numeric(tlast))))
@@ -330,7 +330,7 @@ add.interval.col("r.squared",
                  pretty_name="$r^2$",
                  desc="The r^2 value of the half-life calculation",
                  depends="half.life",
-                 formula="$r^2 = 1 - \\frac{\\sum (y_i - \\hat{y}_i)^2}{\\sum (y_i - \\bar{y})^2}$")
+                 formula="$r^2 = 1 - \\frac{\\sum_{i=t_{\\lambda_z,\\text{first}}}^{t_{\\lambda_z,\\text{last}}} (y_i - \\hat{y}_i)^2}{\\sum (y_i - \\bar{y})^2}$")
 PKNCA.set.summary(
   name="r.squared",
   description="arithmetic mean and standard deviation",
@@ -386,7 +386,7 @@ add.interval.col("lambda.z.time.first",
                  pretty_name="First time for $\\lambda_z$",
                  desc="The first time point used for the calculation of half-life",
                  depends="half.life",
-                 formula="$t_{\\text{first}}$")
+                 formula="$\\lambda_z t_{\\text{first}} = \\min\\left(t_{\\lambda_z}\\right)$")
 PKNCA.set.summary(
   name="lambda.z.time.first",
   description="median and range",
@@ -400,7 +400,7 @@ add.interval.col("lambda.z.time.last",
                  pretty_name="Last time for $\\lambda_z$",
                  desc="The last time point used for the calculation of half-life",
                  depends="half.life",
-                 formula="$t_{\\text{last}}$")
+                 formula="$\\lambda_z t_{\\text{last}} = \\max\\left(t_{\\lambda_z}\\right)$")
 PKNCA.set.summary(
   name="lambda.z.time.last",
   description="median and range",
@@ -428,7 +428,7 @@ add.interval.col("clast.pred",
                  pretty_name="Clast,pred",
                  desc="The concentration at Tlast as predicted by the half-life",
                  depends="half.life",
-                 formula="$C_{\\text{last,pred}} = e^{a + b t_{\\text{last}}}$")
+                 formula="$C_{\\text{last,pred}} = e^{\\text{intercept} - \\lambda_z \\cdot t_{\\text{last}}}$")
 PKNCA.set.summary(
   name="clast.pred",
   description="geometric mean and geometric coefficient of variation",
@@ -475,7 +475,7 @@ get_halflife_points.PKNCAresults <- function(object) {
   # Insert a ROWID column so that we can reconstruct the order at the end
   rowid_col <- paste0(max(names(as.data.frame(as_PKNCAconc(object)))), "ROWID")
   object$data$conc$data[[rowid_col]] <- seq_len(nrow(object$data$conc$data))
-
+  
   # Find the concentrations and results that go together
   splitdata <- full_join_PKNCAdata(as_PKNCAdata(object), extra_conc_cols = rowid_col)
   splitresults_prep <- as.data.frame(object)
@@ -489,7 +489,7 @@ get_halflife_points.PKNCAresults <- function(object) {
       splitdata, splitresults,
       by = intersect(names(splitdata), names(splitresults))
     )
-
+  
   ret <- rep(NA, nrow(as.data.frame(as_PKNCAconc(object))))
   for (idx in seq_len(nrow(base_results))) {
     ret_current <-
@@ -513,7 +513,7 @@ get_halflife_points.PKNCAresults <- function(object) {
 
 #' @export
 get_halflife_points.PKNCAdata <- function(object) {
-
+  
   # Keep only intervals with half-life calculations
   hl_dep_cols <- c("half.life" ,get.parameter.deps("half.life"))
   int_to_keep <- rowSums(object$intervals[, hl_dep_cols]) > 0
@@ -522,10 +522,10 @@ get_halflife_points.PKNCAdata <- function(object) {
   params_to_ignore <- setdiff(names(get.interval.cols()), c("half.life", "start", "end"))
   object$intervals[, params_to_ignore] <- FALSE
   object$intervals <- unique(object$intervals)
-
+  
   # Only calculate half.life for the results object
   o_nca <- pk.nca(object)
-
+  
   # Get the half-life points from the results object
   get_halflife_points(o_nca)
 }

@@ -90,7 +90,8 @@ add.interval.col("time_above",
                  unit_type="time",
                  pretty_name="Time above Concentration",
                  desc="Time above a given concentration",
-                 formula="$T_{\\text{above}} = \\sum \\Delta t_{i: C_i > C_{\\text{ref}}}$")
+                 formula="$T_{\\text{above}} = \\sum \\Delta t_{i: C_i \\geq C_{\\text{ref}}}$",
+                 formula_note="Crossing times interpolated using the AUC method (linear or log-linear)")
 PKNCA.set.summary(
   name="time_above",
   description="arithmetic mean and standard deviation",

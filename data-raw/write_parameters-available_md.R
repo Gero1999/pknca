@@ -17,9 +17,9 @@ devtools::load_all()
 write_md_table <- function(df, con, align = NULL) {
   if (!is.data.frame(df)) stop("df must be a data.frame")
   if (nrow(df) == 0) stop("df must have at least one row")
-  
+
   nc <- ncol(df)
-  
+
   if (is.null(align)) {
     align <- rep("l", nc)
   } else {
@@ -28,20 +28,20 @@ write_md_table <- function(df, con, align = NULL) {
   align_sep <- vapply(align, function(a) {
     switch(a, l = ":---", r = "---:", c = ":---:", "---")
   }, FUN.VALUE = "")
-  
+
   escape_pipe <- function(x) gsub("|", "\\|", x, fixed = TRUE)
-  
+
   make_row <- function(vals) {
     paste0("| ", paste(escape_pipe(vals), collapse = " | "), " |")
   }
-  
+
   lines <- character(nrow(df) + 2L)
   lines[1] <- make_row(colnames(df))
   lines[2] <- make_row(align_sep)
   for (i in seq_len(nrow(df))) {
     lines[i + 2L] <- make_row(vapply(df[i, ], as.character, FUN.VALUE = ""))
   }
-  
+
   cat(lines, file = con, sep = "\n", append = TRUE)
 }
 
@@ -81,6 +81,10 @@ get_formula <- function(x) {
   if (is.null(x$formula) || identical(x$formula, "")) "" else x$formula
 }
 
+get_formula_note <- function(x) {
+  if (is.null(x$formula_note) || identical(x$formula_note, "")) "" else x$formula_note
+}
+
 get_function_for_calc <- function(x) {
   if (is.na(x$FUN)) {
     if (is.null(x$depends)) "(none)" else paste("See:", x$depends)
@@ -90,11 +94,12 @@ get_function_for_calc <- function(x) {
 }
 
 param_table <- data.frame(
-  Parameter   = names(interval_spec),
-  Formula     = vapply(interval_spec, get_formula, FUN.VALUE = ""),
-  `Unit Type` = vapply(interval_spec, "[[", "unit_type", FUN.VALUE = ""),
-  Description = vapply(interval_spec, "[[", "desc", FUN.VALUE = ""),
-  Function    = vapply(interval_spec, get_function_for_calc, FUN.VALUE = ""),
+  Parameter      = names(interval_spec),
+  Formula        = vapply(interval_spec, get_formula, FUN.VALUE = ""),
+  `Formula Note` = vapply(interval_spec, get_formula_note, FUN.VALUE = ""),
+  `Unit Type`    = vapply(interval_spec, "[[", "unit_type", FUN.VALUE = ""),
+  Description    = vapply(interval_spec, "[[", "desc", FUN.VALUE = ""),
+  Function       = vapply(interval_spec, get_function_for_calc, FUN.VALUE = ""),
   check.names = FALSE,
   stringsAsFactors = FALSE
 )
