@@ -62,18 +62,10 @@ This document records potential bugs, logic issues, and edge cases identified du
 
 ---
 
-## 9. `stopifnot(!duplicated(...))` Behavior
+## 9. ~~`stopifnot(!duplicated(...))` Behavior~~ (Resolved)
 
 **File:** `R/unit-support.R`, line 131
-**Classification:** False positive — this is correct R behavior
-
-```r
-stopifnot(!duplicated(conversions$PPORRESU))
-```
-
-A review concern was raised that this might need `stopifnot(!any(duplicated(...)))`. However, `stopifnot()` accepts a vector and stops if **any** element is `FALSE`. So `stopifnot(!duplicated(x))` correctly stops if any element of `x` is duplicated. This is idiomatic and correct.
-
-**No action needed.** A comment clarifying this behavior would be useful for future maintainers unfamiliar with `stopifnot()`'s vector semantics.
+**Resolution:** Not a bug. `stopifnot()` accepts a vector and stops if **any** element is `FALSE`, so `stopifnot(!duplicated(x))` correctly stops if any element of `x` is duplicated. This is idiomatic and intentional R behavior; wrapping in `any()` would be redundant.
 
 ---
 
@@ -116,6 +108,6 @@ The default value `form = stats::formula(object)` is evaluated lazily when the a
 | 6 | `pk.calc.simple.R` `|` vs `||` | — | ~~Resolved~~ — `||`/`&&` applied throughout |
 | 7 | `auc_integrate.R` `%in% 0` pattern | — | ~~Resolved~~ — exact zero is correct; comment added |
 | 8 | `interpolate.conc.R` duplicate times | — | ~~Resolved~~ — false positive; `assert_conc_time()` prevents duplicates |
-| 9 | `unit-support.R` `stopifnot` vector | — | False positive — code is correct |
+| 9 | `unit-support.R` `stopifnot` vector | — | ~~Resolved~~ — false positive; idiomatic and intentional |
 | 10 | `pk.calc.simple.R` lambda.z = NA | Low | Needs test confirmation |
 | 11 | `class-PKNCAconc.R` lazy default | Low | Likely safe |
