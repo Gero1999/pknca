@@ -98,9 +98,9 @@ PKNCA.set.summary(
 #'
 #' @inheritParams assert_conc_time
 #' @inheritParams PKNCA.choose.option
-#' @param first.tmax If there is more than time that matches the maximum
-#'   concentration, should the first be considered as Tmax?  If not, then the
-#'   last is considered Tmax.
+#' @param first.tmax If there is more than one time point with the maximum value (Cmax or ERmax),
+#'   which time should be selected for Tmax/ERTmax?  If 'TRUE', the first will be selected. If not, then the
+#'   last is considered Tmax/ERTmax.
 #' @param check Run [assert_conc_time()]?
 #' @returns The time of the maximum concentration
 #' @examples
@@ -136,6 +136,64 @@ add.interval.col("tmax",
                  depends=NULL)
 PKNCA.set.summary(
   name="tmax",
+  description="median and range",
+  point=business.median,
+  spread=business.range
+)
+
+#' Determine time of minimum observed PK concentration
+#'
+#' Input restrictions are:
+#' \enumerate{
+#'   \item the `conc` and `time` must be the same length,
+#'   \item the `time` may have no NAs,
+#' }
+#' `NA` will be returned if:
+#' \enumerate{
+#'   \item the length of `conc` and `time` is 0
+#'   \item all `conc` is `NA`
+#' }
+#'
+#' @inheritParams assert_conc_time
+#' @inheritParams PKNCA.choose.option
+#' @param first.tmin If there is more than one time point with the minimum value (Cmin),
+#'   which time should be selected for Tmin?  If 'TRUE', the first will be selected. If not,
+#'   then the last is considered Tmin.
+#' @param check Run [assert_conc_time()]?
+#' @returns The time of the minimum concentration
+#' @examples
+#' conc_data <- Theoph[Theoph$Subject == 1,]
+#' pk.calc.tmin(conc = conc_data$conc, time = conc_data$Time)
+#' @export
+pk.calc.tmin <- function(conc, time,
+                         options=list(),
+                         first.tmin=NULL,
+                         check=TRUE) {
+  first.tmin <- PKNCA.choose.option(name="first.tmin", value=first.tmin, options=options)
+  if (check) {
+    assert_conc_time(conc = conc, time = time)
+  }
+  if (length(conc) == 0 | all(is.na(conc))) {
+    NA
+  } else {
+    ret <- time[conc %in% pk.calc.cmin(conc, check=FALSE)]
+    if (first.tmin) {
+      ret[1]
+    } else {
+      ret[length(ret)]
+    }
+  }
+}
+# Add the column to the interval specification
+add.interval.col("tmin",
+                 FUN="pk.calc.tmin",
+                 values=c(FALSE, TRUE),
+                 unit_type="time",
+                 pretty_name="Tmin",
+                 desc="Time of the minimum observed concentration",
+                 depends=NULL)
+PKNCA.set.summary(
+  name="tmin",
   description="median and range",
   point=business.median,
   spread=business.range

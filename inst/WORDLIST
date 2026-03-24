@@ -20,13 +20,14 @@ CMD
 Cav
 Ceoi
 Clast
+Cmax
 Cmin
 CodeFactor
 Codecov
 DL
-DOI
 Dixit
-Durations
+ERTmax
+ERmax
 Extrap
 Gabrielsson
 Hadley
@@ -68,6 +69,7 @@ TSS
 Theophylline
 Tlast
 Tmax
+Tmin
 Tss
 Vss
 Vz
@@ -94,17 +96,14 @@ clast
 clr
 cmax
 cmin
-coercible
 conc
 ctrough
-customizable
 dbplyr
 doBy
 doi
 dosetype
 dplyr
 dtplyr
-durations
 entration
 extrap
 extravascular
@@ -132,6 +131,7 @@ nca
 ng
 nlme
 noncompartmental
+normalizations
 parseFormula
 pharmacokinetic
 pharmacokinetics
@@ -139,7 +139,6 @@ pknca
 popind
 pred
 predose
-programmatically
 ptr
 roundString
 scriptable
@@ -153,8 +152,6 @@ signif
 signifString
 splitByData
 splitList
-src
-srcs
 summarization
 th
 thalf

@@ -145,9 +145,10 @@
   first.tmax=function(x, default=FALSE, description=FALSE) {
     if (description)
       return(paste(
-        "If there is more than one concentration equal to Cmax, which time",
-        "should be selected for Tmax?  If 'TRUE', the first will be selected.",
-        "If 'FALSE', the last will be selected."))
+        "If there is more than one time point with the maximum value (Cmax or ERmax),",
+        "which time should be selected for Tmax/ERTmax?  If 'TRUE', the first will be selected.",
+        "If 'FALSE', the last will be selected."
+      ))
     if (default)
       return(TRUE)
     if (length(x) != 1)
@@ -160,6 +161,29 @@
         stop("Could not convert first.tmax to a logical value")
       } else {
         warning("Converting first.tmax to a logical value: ", x)
+      }
+    }
+    x
+  },
+  first.tmin=function(x, default=FALSE, description=FALSE) {
+    if (description)
+      return(paste(
+        "If there is more than one time point with the minimum value (Cmin),",
+        "which time should be selected for Tmin?  If 'TRUE', the first will be selected.",
+        "If 'FALSE', the last will be selected."
+      ))
+    if (default)
+      return(TRUE)
+    if (length(x) != 1)
+      stop("first.tmin must be a scalar")
+    if (is.na(x))
+      stop("first.tmin may not be NA")
+    if (!is.logical(x)) {
+      x <- as.logical(x)
+      if (is.na(x)) {
+        stop("Could not convert first.tmin to a logical value")
+      } else {
+        warning("Converting first.tmin to a logical value: ", x)
       }
     }
     x
