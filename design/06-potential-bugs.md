@@ -8,26 +8,10 @@ This document records potential bugs, logic issues, and edge cases identified du
 
 ---
 
-## 1. Log Integration Division by Zero When conc.1 == conc.2
+## 1. ~~Log Integration Division by Zero When conc.1 == conc.2~~ (Resolved)
 
-**File:** `R/auc_integrate.R`, lines 7–8, 19–21
-**Classification:** Likely safe, but deserves a test
-
-```r
-aucintegrate_log <- function(conc.1, conc.2, time.1, time.2) {
-  (time.2-time.1) * (conc.2-conc.1)/log(conc.2/conc.1)
-}
-aumcintegrate_log <- function(conc.1, conc.2, time.1, time.2) {
-  ((time.2-time.1) * (conc.2*time.2-conc.1*time.1) / log(conc.2/conc.1)-
-     (time.2-time.1)^2 * (conc.2-conc.1) / (log(conc.2/conc.1)^2))
-}
-```
-
-When `conc.1 == conc.2`, `log(conc.2/conc.1) = log(1) = 0`, causing `0/0 = NaN` (since the numerator `conc.2 - conc.1` is also 0). Mathematically the limit of the log-trapezoidal formula when `conc.1 → conc.2` equals the linear trapezoidal formula result, but R will produce `NaN`.
-
-**Mitigation:** `choose_interval_method()` in `auc_integrate.R` assigns `"log"` to intervals only when concentrations are declining (`conc[idx_2] < conc[idx_1]`) in `lin up/log down` mode, or post-tmax in `lin-log` mode, guarded by `conc[idx_2] != 0`. For truly equal concentrations going into `aucintegrate_log`, this would require `conc.1 == conc.2` with neither being zero, which in the `lin up/log down` method would be treated as "up" (linear). So this path should not be reached in normal use.
-
-**Recommendation:** Add a guard or `stopifnot` to `aucintegrate_log` and `aumcintegrate_log` with a clear error message (e.g., `stopifnot(conc.1 != conc.2)`), or add a comment explaining why equal concentrations cannot reach this function. Add a test confirming the behavior when concentrations are equal.
+**File:** `R/auc_integrate.R`
+**Resolution:** Not a bug. `choose_interval_method()` only assigns `"log"` to strictly declining intervals where neither endpoint is zero, so `conc.1 == conc.2` cannot reach `aucintegrate_log()` or `aumcintegrate_log()`. A comment has been added to both functions documenting this precondition.
 
 ---
 
@@ -197,7 +181,7 @@ The default value `form = stats::formula(object)` is evaluated lazily when the a
 
 | # | File | Severity | Classification |
 |---|------|----------|----------------|
-| 1 | `auc_integrate.R` log division by zero | Medium | Likely safe — needs comment/test |
+| 1 | `auc_integrate.R` log division by zero | — | ~~Resolved~~ — comment added to source |
 | 2 | `auc_integrate.R` log of zero | Medium | Likely safe — needs comment |
 | 3 | `auc_integrate.R` floating point `==` | Low | Likely safe in practice |
 | 4 | `half.life.R` warning side effect in mask | Medium | Confirmed concern |

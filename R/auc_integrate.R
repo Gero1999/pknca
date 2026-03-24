@@ -5,6 +5,9 @@ aucintegrate_linear <- function(conc.1, conc.2, time.1, time.2) {
 }
 
 aucintegrate_log <- function(conc.1, conc.2, time.1, time.2) {
+  # conc.1 != conc.2 is guaranteed by choose_interval_method(), which only
+  # assigns "log" to intervals where concentrations are strictly declining and
+  # neither endpoint is zero.
   (time.2-time.1) * (conc.2-conc.1)/log(conc.2/conc.1)
 }
 
@@ -17,6 +20,9 @@ aumcintegrate_linear <- function(conc.1, conc.2, time.1, time.2) {
 }
 
 aumcintegrate_log <- function(conc.1, conc.2, time.1, time.2) {
+  # conc.1 != conc.2 is guaranteed by choose_interval_method(), which only
+  # assigns "log" to intervals where concentrations are strictly declining and
+  # neither endpoint is zero.
   ((time.2-time.1) * (conc.2*time.2-conc.1*time.1) / log(conc.2/conc.1)-
      (time.2-time.1)^2 * (conc.2-conc.1) / (log(conc.2/conc.1)^2))
 }
