@@ -168,7 +168,6 @@ pknca_units_table.default <- function(concu, doseu, amountu, timeu,
 }
 
 #' @rdname pknca_units_table
-#' @importFrom dplyr across any_of bind_rows cross_join mutate select group_vars
 #' @export
 pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) {
 
@@ -650,7 +649,6 @@ ensure_column_unit_exists <- function(pknca_obj, unit_name) {
 #' @param df A data frame.
 #' @param strata_cols Column names in df whose unique combination defines the strata.
 #' @returns A data frame containing the strata columns and their minimal set of grouping columns.
-#' @importFrom utils combn
 #' @keywords Internal
 select_minimal_grouping_cols <- function(df, strata_cols) {
   # If there is no strata_cols specified, simply return the original df
@@ -677,7 +675,7 @@ select_minimal_grouping_cols <- function(df, strata_cols) {
 
   # 3. Check combinations of columns to find minimal key combination to level group strata_cols
   for (n in seq_len(length(candidate_cols))) {
-    all_candidate_combs <- combn(candidate_cols, n, simplify = FALSE)
+    all_candidate_combs <- utils::combn(candidate_cols, n, simplify = FALSE)
     for (comb in all_candidate_combs) {
       comb_vals <- apply(df[, comb, drop = FALSE], 1, paste, collapse = "_")
       if (all(tapply(strata_vals, comb_vals, FUN = \(x) length(unique(x)) == 1))) {
