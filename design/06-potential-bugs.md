@@ -69,30 +69,17 @@ This document records potential bugs, logic issues, and edge cases identified du
 
 ---
 
-## 10. `pk.calc.aucinf.obs` When `lambda.z` Is NA
+## 10. ~~`pk.calc.aucinf.obs` When `lambda.z` Is NA~~ (Resolved)
 
-**File:** `R/pk.calc.simple.R`
-**Classification:** Likely safe, deserves confirmation
-
-If `lambda.z` is `NA` (no reliable terminal slope could be computed), `pk.calc.aucinf.obs()` should return `NA` rather than a calculated value. The `assert_lambdaz()` function checks that lambda.z is a positive number and allows missing values by default (`any.missing = TRUE`). The return behavior when `lambda.z = NA` should be tested explicitly.
-
-**Recommendation:** Confirm there is a test covering `pk.calc.aucinf.obs(auc = 100, clast.obs = 1, lambda.z = NA)` and that it returns `NA` gracefully.
+**File:** `R/auc.R`
+**Resolution:** Intended behavior. When `lambda.z = NA`, `assert_lambdaz()` allows the missing value (`any.missing = TRUE`), and `aucintegrate_inf()` propagates the NA through `clast / lambda.z`, returning `NA` for the extrapolated portion and thus `NA` for the overall AUCinf. A test covering `pk.calc.auc.inf.obs(..., lambda.z = NA)` has been added to `tests/testthat/test-auc.R` confirming this returns `NA_real_`.
 
 ---
 
-## 11. `getGroups.PKNCAconc()` Formula Default Argument
+## 11. ~~`getGroups.PKNCAconc()` Formula Default Argument~~ (Resolved)
 
 **File:** `R/class-PKNCAconc.R`, line 240
-**Classification:** Likely safe, subtle behavior
-
-```r
-getGroups.PKNCAconc <- function(object, form=stats::formula(object), level,
-                                data=as.data.frame(object), sep) {
-```
-
-The default value `form = stats::formula(object)` is evaluated lazily when the argument is first accessed. If `stats::formula.PKNCAconc()` depends on state that could be modified between function entry and first use of `form`, this could behave unexpectedly. In practice, `PKNCAconc` objects are immutable in normal use, so this is unlikely to manifest.
-
-**No action needed.** Noted for awareness.
+**Resolution:** Not a bug. `PKNCAconc` objects are immutable in normal use, so the lazy default `form = stats::formula(object)` will always evaluate to the same value. No change needed.
 
 ---
 
@@ -109,5 +96,5 @@ The default value `form = stats::formula(object)` is evaluated lazily when the a
 | 7 | `auc_integrate.R` `%in% 0` pattern | — | ~~Resolved~~ — exact zero is correct; comment added |
 | 8 | `interpolate.conc.R` duplicate times | — | ~~Resolved~~ — false positive; `assert_conc_time()` prevents duplicates |
 | 9 | `unit-support.R` `stopifnot` vector | — | ~~Resolved~~ — false positive; idiomatic and intentional |
-| 10 | `pk.calc.simple.R` lambda.z = NA | Low | Needs test confirmation |
-| 11 | `class-PKNCAconc.R` lazy default | Low | Likely safe |
+| 10 | `pk.calc.simple.R` lambda.z = NA | — | ~~Resolved~~ — intended; test added confirming NA return |
+| 11 | `class-PKNCAconc.R` lazy default | — | ~~Resolved~~ — false positive; PKNCAconc objects are immutable |
