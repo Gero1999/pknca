@@ -266,6 +266,10 @@ pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) 
       concu = groups_units_tbl[[concu_col]][i],
       amountu = groups_units_tbl[[amountu_col]][i],
       timeu = groups_units_tbl[[timeu_col]][i],
+      # Note: $units$concu_pref (and amountu_pref, timeu_pref) are only non-NULL
+      # when the original units were specified as scalar values rather than as a
+      # column name.  When units are column-based, preferred unit conversion is
+      # not supported through the _pref scalar mechanism and these will be NULL.
       concu_pref = o_conc$units$concu_pref[1],
       amountu_pref = o_conc$units$amountu_pref[1],
       timeu_pref = o_conc$units$timeu_pref[1],
@@ -273,6 +277,7 @@ pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) 
     )
     if (has_dose) {
       pknca_units_tbl_args$doseu <- groups_units_tbl[[doseu_col]][i]
+      # Same limitation applies to doseu_pref; see concu_pref note above.
       pknca_units_tbl_args$doseu_pref <- o_dose$units$doseu_pref[1]
     }
     pknca_units_tbl_i <- do.call(pknca_units_table, pknca_units_tbl_args)
