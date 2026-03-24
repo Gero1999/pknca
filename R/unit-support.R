@@ -58,7 +58,6 @@ pknca_units_table <- function(concu, ...) {
 }
 
 #' @rdname pknca_units_table
-#' @export
 pknca_units_table.default <- function(concu, doseu, amountu, timeu,
                                       concu_pref = NULL, doseu_pref = NULL, amountu_pref = NULL, timeu_pref = NULL,
                                       conversions = data.frame(), ...) {
