@@ -201,7 +201,8 @@ pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) 
     dplyr::select(dplyr::any_of(c(group_dose_cols, doseu_col))) %>%
     unique()
 
-  groups_units_tbl <- merge(d_concu, d_doseu, all.x = TRUE) %>%
+  groups_units_tbl <-
+    dplyr::left_join(d_concu, d_doseu, by = intersect(names(d_concu), names(d_doseu))) %>%
     dplyr::mutate(dplyr::across(dplyr::everything(), ~ as.character(.))) %>%
     unique()
 
