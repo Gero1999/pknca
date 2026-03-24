@@ -8,6 +8,13 @@ the dosing including dose amount and route.
 
 ## Breaking changes
 
+* `pknca_units_table()` called on a `PKNCAdata` object now raises an error if
+  unit columns within the same concentration group contain mixed values (e.g.,
+  two different `concu` strings for the same subject group).  Previously, `NA`
+  values in unit columns were silently ignored and multiple values caused a
+  different error message; now any intra-group inconsistency is detected and
+  reported with the offending group identifiers.
+
 * Both include and excluding half-life points may not be done for the same interval (#406)
 
 ## Bugs fixed
@@ -17,6 +24,13 @@ the dosing including dose amount and route.
 * `pk.nca` will calculate `fe` and `clr` even if their dependant parameters (e.g, `ae`) were not requested to be calculated in the intervals (#473)
 
 ## New features
+
+* `pknca_units_table()` is now an S3 generic with a `PKNCAdata` method.  When
+  called on a `PKNCAdata` object it automatically builds the unit conversion
+  table from any unit columns stored in the underlying `PKNCAconc` and
+  `PKNCAdose` objects, supporting per-analyte or per-specimen unit
+  stratification.  The table is also built automatically on `PKNCAdata()`
+  construction when no `units` argument is supplied.
 
 * `pk.calc.half.life()` now returns also `lambda.z.corrxy`, the correlation between
   the time and the log-concentration of the lambda z points.
