@@ -58,6 +58,7 @@ pknca_units_table <- function(concu, ...) {
 }
 
 #' @rdname pknca_units_table
+#' @export
 pknca_units_table.default <- function(concu, doseu, amountu, timeu,
                                       concu_pref = NULL, doseu_pref = NULL, amountu_pref = NULL, timeu_pref = NULL,
                                       conversions = data.frame(), ...) {
@@ -678,7 +679,7 @@ select_minimal_grouping_cols <- function(df, strata_cols) {
     all_candidate_combs <- utils::combn(candidate_cols, n, simplify = FALSE)
     for (comb in all_candidate_combs) {
       comb_vals <- apply(df[, comb, drop = FALSE], 1, paste, collapse = "_")
-      if (all(tapply(strata_vals, comb_vals, FUN = \(x) length(unique(x)) == 1))) {
+      if (all(tapply(strata_vals, comb_vals, FUN = function(x) length(unique(x)) == 1))) {
         return(df[c(comb, strata_cols)])
       }
     }
