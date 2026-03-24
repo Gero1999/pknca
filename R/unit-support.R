@@ -57,8 +57,6 @@ pknca_units_table <- function(concu, ...) {
   UseMethod("pknca_units_table")
 }
 
-##' Default method for pknca_units_table
-#'
 #' @rdname pknca_units_table
 #' @export
 pknca_units_table.default <- function(concu, doseu, amountu, timeu,
@@ -170,11 +168,8 @@ pknca_units_table.default <- function(concu, doseu, amountu, timeu,
   ret
 }
 
-##' Method for PKNCAdata objects
-#'
 #' @rdname pknca_units_table
-#' @importFrom dplyr across any_of bind_rows case_when filter group_by mutate n select ungroup group_vars
-#' @importFrom tidyr fill
+#' @importFrom dplyr across any_of bind_rows mutate select group_vars
 #' @export
 pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) {
 
@@ -182,7 +177,7 @@ pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) 
   o_conc <- as_PKNCAconc(concu)
   o_dose <- as_PKNCAdose(concu)
 
-  # PKNCAdose can optionally be no present, being unit undefining
+  # PKNCAdose can optionally be not present, being unit undefining
   if (is.null(o_dose) || all(is.na(o_dose))) o_dose <- o_conc
 
   # If needed, ensure that the PKNCA objects have the required unit columns
@@ -245,7 +240,7 @@ pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) 
   }
 
   # Check that at least one unit column is not NA
-  units.are.all.na <- all(is.na(groups_units_tbl[,all_unit_cols]))
+  units.are.all.na <- all(is.na(groups_units_tbl[, all_unit_cols]))
   if (units.are.all.na) return(NULL)
 
   groups_units_tbl <- unique(select_minimal_grouping_cols(groups_units_tbl, all_unit_cols))
@@ -620,7 +615,6 @@ ensure_column_unit_exists <- function(pknca_obj, unit_name) {
 #' @param df A data frame.
 #' @param strata_cols Column names in df whose unique combination defines the strata.
 #' @returns A data frame containing the strata columns and their minimal set of grouping columns.
-#' @importFrom dplyr mutate select any_of
 #' @importFrom utils combn
 #' @keywords Internal
 select_minimal_grouping_cols <- function(df, strata_cols) {

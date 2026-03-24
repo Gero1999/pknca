@@ -436,13 +436,13 @@ test_that("pknca_units_table for PKNCAdata", {
   )
 })
 
-test_that("select_level_grouping_cols", {
+test_that("select_minimal_grouping_cols", {
   # Make a dataset where a variable `d` depends on `a` & `b`
   data <- data.frame(
     a = rep(letters[c(1, 2, 3)], each = 4),
     b = rep(letters[c(1, 2)], each = 3),
     c = letters[1]
-  ) 
+  )
   data$d <- paste0(data$a, data$b)
 
   # Returns the minimal grouping_columns (a, b) for one target columns
