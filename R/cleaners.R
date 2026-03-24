@@ -98,7 +98,12 @@ clean.conc.blq <- function(conc, time,
 
     # If all measurements are BLQ
     if (all(ret$conc == 0)){
-      # Apply "first" BLQ rule to everything for tfirst/tlast
+      # Apply "first" BLQ rule to everything for tfirst/tlast.
+      # tlast is set to tfirst + 1 as a sentinel that is guaranteed to be
+      # greater than all values in ret$time (since tfirst = max(ret$time)).
+      # It is only ever compared to ret$time (never used as an actual time
+      # point), so the fact that it lies outside the observed time range is
+      # intentional and harmless.
       tfirst <- max(ret$time)
       tlast <- tfirst + 1
 

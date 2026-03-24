@@ -36,14 +36,10 @@ This document records potential bugs, logic issues, and edge cases identified du
 
 ---
 
-## 5. All-BLQ Sentinel Value `tlast = tfirst + 1` in `clean.conc.blq()`
+## 5. ~~All-BLQ Sentinel Value `tlast = tfirst + 1` in `clean.conc.blq()`~~ (Resolved)
 
-**File:** `R/cleaners.R`, approximately lines 100–107
-**Classification:** Confirmed concern (unclear intent)
-
-When all concentrations are BLQ, the code sets `tlast <- tfirst + 1` as a sentinel. This value (`max(time) + 1`) is beyond the actual time range of the data and is used in subsequent mask operations like `tlast <= ret$time`. If the time range happens to include a value exactly equal to `max(time) + 1` (e.g., extended sampling), the mask could behave unexpectedly.
-
-**Recommendation:** Use `Inf` or a clearly named sentinel constant instead of `tfirst + 1`. Add a comment explaining what this sentinel represents and why it is used.
+**File:** `R/cleaners.R`
+**Resolution:** Not a bug. The sentinel value `tlast = tfirst + 1` is only ever compared to `ret$time` in mask operations (e.g., `tlast <= ret$time`). Since `tfirst = max(ret$time)`, the sentinel is guaranteed to exceed all observed time values, correctly making the "last" mask empty for all-BLQ data. A comment has been added explaining this intent.
 
 ---
 
@@ -142,7 +138,7 @@ The default value `form = stats::formula(object)` is evaluated lazily when the a
 | 2 | `auc_integrate.R` log of zero | — | ~~Resolved~~ — comment added to source |
 | 3 | `auc_integrate.R` floating point `==` | — | ~~Resolved~~ — check + test added |
 | 4 | `half.life.R` warning side effect in mask | — | ~~Resolved~~ — false positive; comment added |
-| 5 | `cleaners.R` all-BLQ sentinel value | Medium | Confirmed concern — unclear intent |
+| 5 | `cleaners.R` all-BLQ sentinel value | — | ~~Resolved~~ — false positive; comment added |
 | 6 | `pk.calc.simple.R` `|` vs `||` | Low | Style issue |
 | 7 | `auc_integrate.R` `%in% 0` pattern | Low | Confirmed concern — semantic clarity |
 | 8 | `interpolate.conc.R` duplicate times | Low | Likely safe — needs guard/comment |
