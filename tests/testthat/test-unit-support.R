@@ -435,6 +435,36 @@ test_that("pknca_units_table for PKNCAdata", {
     regexp = "Units should be uniform at least across concentration groups.*"
   )
 
+  # The conversions argument is passed through to the per-group unit tables
+  o_conc <- PKNCAconc(
+    d_conc, conc ~ time | treatment + specimen + subject / analyte,
+    concu = "ng/mL", timeu = "h"
+  )
+  o_dose <- PKNCAdose(
+    d_dose, dose ~ time | treatment + subject,
+    doseu = "mg"
+  )
+  o_data <- PKNCAdata(o_conc, o_dose)
+  my_conversions <- data.frame(
+    PPORRESU = "(ng/mL)/mg",
+    PPSTRESU = "nmol/L/mg",
+    conversion_factor = 1 / 138.121  # hypothetical molecular weight
+  )
+  units_table_converted <- expect_no_error(
+    pknca_units_table(o_data, conversions = my_conversions)
+  )
+  # PPSTRESU and conversion_factor columns appear when conversions are supplied
+  expect_true(all(c("PPSTRESU", "conversion_factor") %in% names(units_table_converted)))
+  # The specified conversion is applied to the matching PPORRESU row
+  expect_equal(
+    units_table_converted$PPSTRESU[units_table_converted$PPTESTCD == "cmax.dn"],
+    "nmol/L/mg"
+  )
+  expect_equal(
+    units_table_converted$conversion_factor[units_table_converted$PPTESTCD == "cmax.dn"],
+    1 / 138.121
+  )
+
   # When no dose is provided, dose-related parameters are excluded from the unit
   # table (they do not appear with NA units)
   o_conc <- PKNCAconc(
