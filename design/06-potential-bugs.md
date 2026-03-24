@@ -22,20 +22,10 @@ This document records potential bugs, logic issues, and edge cases identified du
 
 ---
 
-## 3. Floating Point Equality in `which(time == tlast)`
+## 3. ~~Floating Point Equality in `which(time == tlast)`~~ (Resolved)
 
-**File:** `R/auc_integrate.R`, line 96
-**Classification:** Likely safe in practice, but theoretically fragile
-
-```r
-idx_tlast <- which(time == tlast)
-```
-
-If `tlast` is computed by `pk.calc.tlast()` which returns the actual value from the `time` vector, then `time == tlast` compares a value to itself — floating point equality holds. However, if `tlast` is ever passed in from an external source that has applied arithmetic to the time values (e.g., `tlast = max(time) - epsilon` for some reason), this comparison could silently return an empty integer vector, causing downstream failures.
-
-**Mitigation:** `pk.calc.tlast()` returns a value directly from the input `time` vector (it's the last time where `conc > 0`), so floating point equality is preserved in the normal call path. The `missing(tlast)` branch recalculates it fresh.
-
-**Recommendation:** If `tlast` is provided externally, consider using `which.min(abs(time - tlast))` as a robust fallback, or add a check that `tlast %in% time` with a clear error if not.
+**File:** `R/auc_integrate.R`
+**Resolution:** An explicit check on `length(idx_tlast) == 1` was added after the `which(time == tlast)` call (but after the all-zeros early return, since `tlast` is `NA` for all-zero data). An informative error is now raised if `tlast` is not found or is found more than once. A test using the classic `0.1 + 0.2 != 0.3` floating point case was added to `test-auc_integrate.R` to verify the error fires correctly.
 
 ---
 
@@ -168,7 +158,7 @@ The default value `form = stats::formula(object)` is evaluated lazily when the a
 |---|------|----------|----------------|
 | 1 | `auc_integrate.R` log division by zero | — | ~~Resolved~~ — comment added to source |
 | 2 | `auc_integrate.R` log of zero | — | ~~Resolved~~ — comment added to source |
-| 3 | `auc_integrate.R` floating point `==` | Low | Likely safe in practice |
+| 3 | `auc_integrate.R` floating point `==` | — | ~~Resolved~~ — check + test added |
 | 4 | `half.life.R` warning side effect in mask | Medium | Confirmed concern |
 | 5 | `cleaners.R` all-BLQ sentinel value | Medium | Confirmed concern — unclear intent |
 | 6 | `pk.calc.simple.R` `|` vs `||` | Low | Style issue |

@@ -101,9 +101,6 @@ choose_interval_method <- function(conc, time, tlast, method, auc.type, options)
     stopifnot(length(tlast) == 1)
   }
 
-  # Where is tlast in the data?
-  idx_tlast <- which(time == tlast)
-
   ret <- rep(NA_character_, length(conc))
   # Handle all interpolation
   idx_1 <- seq(1, length(conc) - 1)
@@ -111,9 +108,26 @@ choose_interval_method <- function(conc, time, tlast, method, auc.type, options)
   mask_zero <- conc[idx_1] == 0 & conc[idx_2] == 0
   if (all(conc %in% 0)) {
     ret[] <- "zero"
-    # short circuit other options
+    # short circuit other options — tlast is NA for all-zero data, so
+    # idx_tlast is not computed here.
     return(ret)
-  } else if (method == "linear") {
+  }
+
+  # Where is tlast in the data?  Must be checked after the all-zeros early
+  # return above, since tlast is NA when all concentrations are zero.
+  idx_tlast <- which(time == tlast)
+  if (length(idx_tlast) != 1) {
+    stop(
+      "tlast (", tlast, ") must occur exactly once in time; ",
+      if (length(idx_tlast) == 0) {
+        "tlast was not found in time (possible floating point issue)"
+      } else {
+        "tlast was found multiple times"
+      }
+    )
+  }
+
+  if (method == "linear") {
     ret[seq_len(idx_tlast - 1)] <- "linear"
   } else if (method == "lin up/log down") {
     mask_down <- conc[idx_2] < conc[idx_1] & conc[idx_2] != 0
