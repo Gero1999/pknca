@@ -370,7 +370,6 @@ pk.nca.interval <- function(conc, time, volume, duration.conc,
   if (nrow(interval) != 1) {
     stop("Please report a bug.  Interval must be a one-row data.frame")
   }
-
   if (!all(is.na(impute_method))) {
     impute_funs <- PKNCA_impute_fun_list(impute_method)
     stopifnot(length(impute_funs) == 1)
@@ -386,9 +385,7 @@ pk.nca.interval <- function(conc, time, volume, duration.conc,
     }
     conc <- impute_data$conc
     time <- impute_data$time
-    tmp_imp_method <- c(
-      paste0("Imputation: ", paste(na.omit(impute_method), collapse = ", "))
-    )
+    tmp_imp_method <- paste0("Imputation: ", paste(na.omit(impute_method), collapse = ", "))
   } else {
     tmp_imp_method <- character()
   }
@@ -498,7 +495,6 @@ pk.nca.interval <- function(conc, time, volume, duration.conc,
           }
         }
       }
-
       # Apply manual inclusion and exclusion
       if (n %in% "half.life") {
         uses_include_hl <- !is.null(include_half.life) && !all(is.na(include_half.life))
@@ -514,7 +510,6 @@ pk.nca.interval <- function(conc, time, volume, duration.conc,
           call_args$time <- call_args$time[!exclude_tf]
         }
       }
-
       # Do the calculation
       tmp_result <- do.call(all_intervals[[n]]$FUN, call_args)
       # The handling of the exclude column is documented in the

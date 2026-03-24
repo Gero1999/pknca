@@ -20,14 +20,14 @@ test_that("sparse_auc", {
     sparse_batch <- pk.calc.sparse_auc(conc=d_sparse$conc, time=d_sparse$time, subject=d_sparse$id),
     regexp="Cannot yet calculate sparse degrees of freedom for multiple samples per subject"
   )
-  expect_equal(sparse_batch$sparse_auc, auclast, ignore_attr = TRUE)
-  expect_equal(sparse_batch$sparse_auc_se, auclast_se_batch, ignore_attr = TRUE)
-  expect_equal(sparse_batch$sparse_auc_df, NA_real_, ignore_attr = TRUE)
+  expect_equal(sparse_batch$sparse_auc, structure(auclast, method=c("AUC: linear", "Sparse: arithmetic mean, <=50% BLQ")))
+  expect_equal(sparse_batch$sparse_auc_se, structure(auclast_se_batch, method=c("AUC: linear", "Sparse: arithmetic mean, <=50% BLQ")))
+  expect_equal(sparse_batch$sparse_auc_df, structure(NA_real_, method=c("AUC: linear", "Sparse: arithmetic mean, <=50% BLQ")))
 
   sparse_serial <- pk.calc.sparse_auc(conc=d_sparse$conc, time=d_sparse$time, subject=seq_len(nrow(d_sparse)))
-  expect_equal(sparse_serial$sparse_auc, auclast, ignore_attr = TRUE)
+  expect_equal(sparse_serial$sparse_auc, structure(auclast, method=c("AUC: linear", "Sparse: arithmetic mean, <=50% BLQ")))
   expect_equal(as.numeric(sparse_serial$sparse_auc_se), auclast_se_serial)
-  expect_equal(sparse_serial$sparse_auc_df, auclast_df_serial, ignore_attr = TRUE)
+  expect_equal(sparse_serial$sparse_auc_df, structure(auclast_df_serial, method=c("AUC: linear", "Sparse: arithmetic mean, <=50% BLQ")))
 })
 
 test_that("sparse_auclast expected errors", {
@@ -51,11 +51,11 @@ test_that("sparse_mean", {
       time = c(0, 0, 0, 1, 1, 1, 6, 6, 6, 2, 2, 2, 10, 10, 10, 4, 4, 4, 24, 24, 24),
       dose = c(100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100)
     )
-  
+
   sparse_pk <- as_sparse_pk(d_sparse)
   sparse_pk_wt <- sparse_auc_weight_linear(sparse_pk)
   sparse_pk_mean <- sparse_mean(sparse_pk_wt, sparse_mean_method="arithmetic mean")
-  
+
   expect_equal(
     sparse_pk_mean[[7]]$mean_method,
     "arithmetic mean"
@@ -76,5 +76,5 @@ test_that("sparse_auc and sparse_auclast method attribute", {
 
   auclast <- pk.calc.sparse_auclast(conc=d_sparse$conc, time=d_sparse$time, subject=seq_len(nrow(d_sparse)))
   expect_equal(attr(auclast$sparse_auclast, "method"),
-                c("AUC: linear", "Sparse: arithmetic mean, <=50% BLQ"))
+               c("AUC: linear", "Sparse: arithmetic mean, <=50% BLQ"))
 })

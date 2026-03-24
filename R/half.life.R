@@ -134,7 +134,6 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
       data <- data[as.numeric(data$time) > max(end.dose, na.rm = TRUE), ]
     }
   }
-
   # Prepare the return values
   ret <- data.frame(
     # Terminal elimination slope
@@ -158,10 +157,6 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
     # T1/2 span ratio
     span.ratio=NA)
 
-  
-  # Build method attribute
-  attr(ret, "method") <- character()
-  
   ret_replacements <-
     c("lambda.z", "r.squared", "adj.r.squared", "lambda.z.corrxy", "lambda.z.time.first",
       "lambda.z.time.last", "lambda.z.n.points", "clast.pred", "half.life", "span.ratio")
@@ -187,7 +182,7 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
     dfK <- data[as.numeric(data$time) > as.numeric(ret$tmax), ]
   }
   if (manually.selected.points) {
-    attr(ret, "method") <- c(attr(ret, "method"), "Lambda Z: Manual selection")
+    attr(ret, "method") <- "Lambda Z: Manual selection"
     if (nrow(data) > 0) {
       fit <- fit_half_life(data=data, tlast=ret$tlast, conc_units=conc_units)
       ret[,ret_replacements] <- fit[,ret_replacements]
@@ -273,12 +268,12 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
       class = "pknca_halflife_too_few_points"
     )
   }
+
   # Drop the inputs of tmax and tlast, if given.
   if (!missing(tmax))
     ret$tmax <- NULL
   if (!missing(tlast))
     ret$tlast <- NULL
-
   ret
 }
 
