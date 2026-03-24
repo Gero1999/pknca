@@ -256,6 +256,16 @@ pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) 
   units.are.all.na <- all(is.na(groups_units_tbl[, all_unit_cols]))
   if (units.are.all.na) return(NULL)
 
+  # Reduce to the minimal set of grouping columns that identify each unique unit
+  # combination.  A simpler alternative would be to retain all grouping columns
+  # (treatment, subject, analyte, specimen, ...) and skip this step entirely,
+  # but that causes the output table to scale with the number of subjects rather
+  # than the number of distinct unit strata.  For a study with 200 subjects x 4
+  # analytes x 2 specimens and unit variation only by analyte x specimen,
+  # retaining all group columns produces ~400,000 rows (200 * 8 * N_params)
+  # versus ~1,000 rows (8 * N_params) here.  The combinatorial search in
+  # select_minimal_grouping_cols is O(2^k) in the number of candidate grouping
+  # columns k, but k is typically small (2-5) in practice.
   groups_units_tbl <- unique(select_minimal_grouping_cols(groups_units_tbl, all_unit_cols))
   groups_cols <- setdiff(names(groups_units_tbl), all_unit_cols)
 
