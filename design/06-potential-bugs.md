@@ -55,18 +55,10 @@ This document records potential bugs, logic issues, and edge cases identified du
 
 ---
 
-## 8. Duplicate Time Points in `interpolate.conc()`
+## 8. ~~Duplicate Time Points in `interpolate.conc()`~~ (Resolved)
 
 **File:** `R/interpolate.conc.R`, approximately line 198
-**Classification:** Likely safe, but edge case not clearly tested
-
-```r
-ret <- data$conc[time.out == data$time]
-```
-
-If `data$time` contains duplicate values (two measurements at the same time), this would return a vector of length > 1. The surrounding code expects a scalar. Duplicate times should be caught earlier in `assert_conc_time()`, but the behavior in this function if they are not caught is undefined.
-
-**Recommendation:** Add a `stopifnot(length(ret) == 1)` guard after this assignment, or verify that the assertions in the call chain always prevent duplicate times from reaching this point and add a comment to that effect.
+**Resolution:** Not a bug. `data$time` can never contain duplicate values because `assert_conc_time()` enforces uniqueness of time points before any interpolation logic runs. Duplicate times are therefore structurally impossible at this call site.
 
 ---
 
@@ -123,7 +115,7 @@ The default value `form = stats::formula(object)` is evaluated lazily when the a
 | 5 | `cleaners.R` all-BLQ sentinel value | — | ~~Resolved~~ — false positive; comment added |
 | 6 | `pk.calc.simple.R` `|` vs `||` | — | ~~Resolved~~ — `||`/`&&` applied throughout |
 | 7 | `auc_integrate.R` `%in% 0` pattern | — | ~~Resolved~~ — exact zero is correct; comment added |
-| 8 | `interpolate.conc.R` duplicate times | Low | Likely safe — needs guard/comment |
+| 8 | `interpolate.conc.R` duplicate times | — | ~~Resolved~~ — false positive; `assert_conc_time()` prevents duplicates |
 | 9 | `unit-support.R` `stopifnot` vector | — | False positive — code is correct |
 | 10 | `pk.calc.simple.R` lambda.z = NA | Low | Needs test confirmation |
 | 11 | `class-PKNCAconc.R` lazy default | Low | Likely safe |
