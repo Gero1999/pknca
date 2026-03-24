@@ -29,28 +29,10 @@ This document records potential bugs, logic issues, and edge cases identified du
 
 ---
 
-## 4. Half-Life Selection Warning as Side Effect in Mask Construction
+## 4. ~~Half-Life Selection Warning as Side Effect in Mask Construction~~ (Resolved)
 
-**File:** `R/half.life.R`, lines 225–241
-**Classification:** Confirmed concern (logic correctness)
-
-```r
-mask_best <-
-  half_lives_for_selection$lambda.z > 0 &
-  if (min.hl.points == 2 & nrow(half_lives_for_selection) == 2) {
-    rlang::warn(...)
-    TRUE
-  } else {
-    half_lives_for_selection$adj.r.squared >
-      (max(half_lives_for_selection$adj.r.squared, na.rm=TRUE) - adj.r.squared.factor)
-  }
-```
-
-When the `if` branch evaluates to `TRUE` (the `min.hl.points == 2` edge case), `mask_best` becomes `half_lives_for_selection$lambda.z > 0 & TRUE`, which means **all rows with positive lambda.z are selected** as "best". This could select multiple half-life fits simultaneously. The subsequent assignment `ret[, ret_replacements] <- half_lives_for_selection[mask_best, ret_replacements]` will silently take only the first matching row if multiple are selected (due to scalar assignment semantics).
-
-**Risk:** In the edge case of exactly 2 data points with `min.hl.points = 2`, if both produce valid fits (positive lambda.z), both will match `mask_best`, and the first one will be used. This is probably the desired behavior (use the fit with more points, or the first found), but it's not explicitly documented.
-
-**Recommendation:** After the `mask_best` construction, add an assertion or comment: if `sum(mask_best) > 1`, use `which.max(half_lives_for_selection$lambda.z[mask_best])` or document the tie-breaking rule explicitly.
+**File:** `R/half.life.R`
+**Resolution:** Not a bug. Immediately after the `mask_best` construction there is already a `sum(mask_best) > 1` tie-breaking block that selects the fit with the most points. When the `min.hl.points == 2` edge case fires, selecting all positive-lambda.z fits via `TRUE` and then resolving via the tie-breaker is the intended behavior. A comment has been added to the `mask_best` construction explaining this.
 
 ---
 
@@ -159,7 +141,7 @@ The default value `form = stats::formula(object)` is evaluated lazily when the a
 | 1 | `auc_integrate.R` log division by zero | — | ~~Resolved~~ — comment added to source |
 | 2 | `auc_integrate.R` log of zero | — | ~~Resolved~~ — comment added to source |
 | 3 | `auc_integrate.R` floating point `==` | — | ~~Resolved~~ — check + test added |
-| 4 | `half.life.R` warning side effect in mask | Medium | Confirmed concern |
+| 4 | `half.life.R` warning side effect in mask | — | ~~Resolved~~ — false positive; comment added |
 | 5 | `cleaners.R` all-BLQ sentinel value | Medium | Confirmed concern — unclear intent |
 | 6 | `pk.calc.simple.R` `|` vs `||` | Low | Style issue |
 | 7 | `auc_integrate.R` `%in% 0` pattern | Low | Confirmed concern — semantic clarity |

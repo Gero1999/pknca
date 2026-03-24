@@ -227,6 +227,10 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
       half_lives_for_selection[i,names(fit)] <- fit
     }
     # Find the best model
+    # When min.hl.points == 2 and only 2 points are available, all fits with
+    # positive lambda.z are initially selected (TRUE), and the tie-breaking
+    # block below then picks the one with the most points — which is the
+    # intended behavior in this edge case.
     mask_best <-
       half_lives_for_selection$lambda.z > 0 &
       if (min.hl.points == 2 & nrow(half_lives_for_selection) == 2) {
