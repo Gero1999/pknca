@@ -50,6 +50,9 @@ interpolate_conc_linear <- function(conc_1, conc_2, time_1, time_2, time_out) {
 
 #' @rdname interp_extrap_conc_method
 interpolate_conc_log <- function(conc_1, conc_2, time_1, time_2, time_out) {
+  # conc_1 > 0 and conc_2 > 0 are guaranteed by choose_interval_method(),
+  # which assigns "zero" or "linear" to any interval where either endpoint
+  # is zero, so log() will never receive a zero or negative value here.
   exp(
     log(conc_1)+
       (time_out-time_1)/(time_2-time_1)*(log(conc_2)-log(conc_1))

@@ -15,25 +15,10 @@ This document records potential bugs, logic issues, and edge cases identified du
 
 ---
 
-## 2. Log of Zero in `interpolate_conc_log()`
+## 2. ~~Log of Zero in `interpolate_conc_log()`~~ (Resolved)
 
-**File:** `R/auc_integrate.R`, lines 46–51
-**Classification:** Likely safe, but deserves a comment
-
-```r
-interpolate_conc_log <- function(conc_1, conc_2, time_1, time_2, time_out) {
-  exp(
-    log(conc_1) +
-      (time_out-time_1)/(time_2-time_1)*(log(conc_2)-log(conc_1))
-  )
-}
-```
-
-If `conc_1 == 0` or `conc_2 == 0`, `log(0) = -Inf` and the result would be 0 or degenerate.
-
-**Mitigation:** `choose_interval_method()` guards against zero concentrations at interval boundaries by assigning `"zero"` or `"linear"` methods when either endpoint is zero. The `interpolate_conc_log` function should therefore never receive a zero concentration.
-
-**Recommendation:** Add a comment to `interpolate_conc_log` stating the precondition (`conc_1 > 0`, `conc_2 > 0`) and add a `stopifnot` in debug mode or an explicit check.
+**File:** `R/auc_integrate.R`
+**Resolution:** Not a bug. `choose_interval_method()` assigns `"zero"` or `"linear"` to any interval where either endpoint is zero, so `interpolate_conc_log()` will never receive a zero or negative concentration. A comment has been added to the function documenting this precondition.
 
 ---
 
@@ -182,7 +167,7 @@ The default value `form = stats::formula(object)` is evaluated lazily when the a
 | # | File | Severity | Classification |
 |---|------|----------|----------------|
 | 1 | `auc_integrate.R` log division by zero | — | ~~Resolved~~ — comment added to source |
-| 2 | `auc_integrate.R` log of zero | Medium | Likely safe — needs comment |
+| 2 | `auc_integrate.R` log of zero | — | ~~Resolved~~ — comment added to source |
 | 3 | `auc_integrate.R` floating point `==` | Low | Likely safe in practice |
 | 4 | `half.life.R` warning side effect in mask | Medium | Confirmed concern |
 | 5 | `cleaners.R` all-BLQ sentinel value | Medium | Confirmed concern — unclear intent |
