@@ -434,6 +434,24 @@ test_that("pknca_units_table for PKNCAdata", {
     PKNCAdata(o_conc, o_dose),
     regexp = "Units should be uniform at least across concentration groups.*"
   )
+
+  # When no dose is provided, dose-related parameters are excluded from the unit
+  # table (they do not appear with NA units)
+  o_conc <- PKNCAconc(
+    d_conc, conc ~ time | treatment + specimen + subject / analyte,
+    concu = "ng/mL", timeu = "h"
+  )
+  o_data <- PKNCAdata(
+    o_conc,
+    intervals = data.frame(start = 0, end = Inf, cmax = TRUE, totdose = FALSE)
+  )
+  units_table <- expect_no_error(pknca_units_table(o_data))
+  # Non-dose-related parameters have units
+  expect_true("cmax" %in% units_table$PPTESTCD)
+  expect_false(anyNA(units_table$PPORRESU[units_table$PPTESTCD == "cmax"]))
+  # Dose-related parameters are absent entirely
+  expect_false("totdose" %in% units_table$PPTESTCD)
+  expect_false("cmax.dn" %in% units_table$PPTESTCD)
 })
 
 test_that("select_minimal_grouping_cols", {

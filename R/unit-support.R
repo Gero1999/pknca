@@ -169,7 +169,7 @@ pknca_units_table.default <- function(concu, doseu, amountu, timeu,
 }
 
 #' @rdname pknca_units_table
-#' @importFrom dplyr across any_of bind_rows mutate select group_vars
+#' @importFrom dplyr across any_of bind_rows cross_join mutate select group_vars
 #' @export
 pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) {
 
@@ -177,34 +177,47 @@ pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) 
   o_conc <- as_PKNCAconc(concu)
   o_dose <- as_PKNCAdose(concu)
 
-  # PKNCAdose can optionally be not present, being unit undefining
-  if (is.null(o_dose) || all(is.na(o_dose))) o_dose <- o_conc
+  has_dose <- !is.null(o_dose) && !all(is.na(o_dose))
 
   # If needed, ensure that the PKNCA objects have the required unit columns
   o_conc <- ensure_column_unit_exists(o_conc, c("concu", "timeu", "amountu"))
-  o_dose <- ensure_column_unit_exists(o_dose, c("doseu"))
 
-  # Extract relevant columns from o_conc and o_dose
-  group_dose_cols <- dplyr::group_vars(o_dose)
+  # Extract relevant columns from o_conc
   group_conc_cols <- dplyr::group_vars(o_conc)
   concu_col <- o_conc$columns$concu
   amountu_col <- o_conc$columns$amountu
   timeu_col <- o_conc$columns$timeu
-  doseu_col <- o_dose$columns$doseu
-  all_unit_cols <- c(concu_col, amountu_col, timeu_col, doseu_col)
 
-  # Join dose units with concentration group columns and units
   d_concu <- o_conc$data %>%
     dplyr::select(dplyr::any_of(c(group_conc_cols, concu_col, amountu_col, timeu_col))) %>%
     unique()
-  d_doseu <- o_dose$data %>%
-    dplyr::select(dplyr::any_of(c(group_dose_cols, doseu_col))) %>%
-    unique()
 
-  groups_units_tbl <-
-    dplyr::left_join(d_concu, d_doseu, by = intersect(names(d_concu), names(d_doseu))) %>%
-    dplyr::mutate(dplyr::across(dplyr::everything(), ~ as.character(.))) %>%
-    unique()
+  if (has_dose) {
+    # When a dose is present, join dose units with concentration unit columns
+    o_dose <- ensure_column_unit_exists(o_dose, c("doseu"))
+    group_dose_cols <- dplyr::group_vars(o_dose)
+    doseu_col <- o_dose$columns$doseu
+    d_doseu <- o_dose$data %>%
+      dplyr::select(dplyr::any_of(c(group_dose_cols, doseu_col))) %>%
+      unique()
+    join_cols <- intersect(names(d_concu), names(d_doseu))
+    groups_units_tbl <-
+      if (length(join_cols) == 0) {
+        dplyr::cross_join(d_concu, d_doseu)
+      } else {
+        dplyr::left_join(d_concu, d_doseu, by = join_cols)
+      } %>%
+      dplyr::mutate(dplyr::across(dplyr::everything(), ~ as.character(.))) %>%
+      unique()
+    all_unit_cols <- c(concu_col, amountu_col, timeu_col, doseu_col)
+  } else {
+    # When no dose is present, dose-related parameters are excluded entirely
+    doseu_col <- NULL
+    groups_units_tbl <- d_concu %>%
+      dplyr::mutate(dplyr::across(dplyr::everything(), ~ as.character(.))) %>%
+      unique()
+    all_unit_cols <- c(concu_col, amountu_col, timeu_col)
+  }
 
   # Check that at least for each concentration group units are uniform
   if (length(group_conc_cols) == 0) {
@@ -249,17 +262,24 @@ pknca_units_table.PKNCAdata <- function(concu, ..., conversions = data.frame()) 
 
   ret <- vector(mode = "list", length = nrow(groups_units_tbl))
   for (i in seq_len(nrow(groups_units_tbl))) {
-    pknca_units_tbl_i <- pknca_units_table(
+    pknca_units_tbl_args <- list(
       concu = groups_units_tbl[[concu_col]][i],
-      doseu = groups_units_tbl[[doseu_col]][i],
       amountu = groups_units_tbl[[amountu_col]][i],
       timeu = groups_units_tbl[[timeu_col]][i],
       concu_pref = o_conc$units$concu_pref[1],
-      doseu_pref = o_dose$units$doseu_pref[1],
       amountu_pref = o_conc$units$amountu_pref[1],
       timeu_pref = o_conc$units$timeu_pref[1],
       conversions = conversions
     )
+    if (has_dose) {
+      pknca_units_tbl_args$doseu <- groups_units_tbl[[doseu_col]][i]
+      pknca_units_tbl_args$doseu_pref <- o_dose$units$doseu_pref[1]
+    }
+    pknca_units_tbl_i <- do.call(pknca_units_table, pknca_units_tbl_args)
+    if (!has_dose) {
+      # Remove parameters that require dose units since no dose was provided
+      pknca_units_tbl_i <- pknca_units_tbl_i[!is.na(pknca_units_tbl_i$PPORRESU), ]
+    }
     if (length(groups_cols) > 0) {
       groups_values <- groups_units_tbl[i, groups_cols, drop = FALSE]
       row.names(groups_values) <- NULL
