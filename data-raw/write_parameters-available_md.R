@@ -94,12 +94,12 @@ get_function_for_calc <- function(x) {
 }
 
 param_table <- data.frame(
-  Parameter      = names(interval_spec),
-  Formula        = vapply(interval_spec, get_formula, FUN.VALUE = ""),
+  Parameter = names(interval_spec),
+  Formula = vapply(interval_spec, get_formula, FUN.VALUE = ""),
   `Formula Note` = vapply(interval_spec, get_formula_note, FUN.VALUE = ""),
-  `Unit Type`    = vapply(interval_spec, "[[", "unit_type", FUN.VALUE = ""),
-  Description    = vapply(interval_spec, "[[", "desc", FUN.VALUE = ""),
-  Function       = vapply(interval_spec, get_function_for_calc, FUN.VALUE = ""),
+  `Unit Type` = vapply(interval_spec, "[[", "unit_type", FUN.VALUE = ""),
+  Description = vapply(interval_spec, "[[", "desc", FUN.VALUE = ""),
+  Function = vapply(interval_spec, get_function_for_calc, FUN.VALUE = ""),
   check.names = FALSE,
   stringsAsFactors = FALSE
 )
