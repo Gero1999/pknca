@@ -43,33 +43,15 @@ This document records potential bugs, logic issues, and edge cases identified du
 
 ---
 
-## 6. `|` Instead of `||` for Scalar Comparisons
+## 6. ~~`|` Instead of `||` for Scalar Comparisons~~ (Resolved)
 
-**File:** `R/pk.calc.simple.R`, line 33 (and several other locations)
-**Classification:** Style issue, not a bug
-
-```r
-if (length(conc) == 0 | all(is.na(conc))) {
-```
-
-Both sides of `|` are scalar expressions here. Using `|` (element-wise OR) rather than `||` (short-circuit OR) means that `all(is.na(conc))` is always evaluated even when `length(conc) == 0`. For empty `conc`, `all(is.na(conc))` returns `TRUE` (vacuous truth), so this is correct, but using `||` would be slightly more efficient and more idiomatic for scalar conditions.
-
-**Recommendation:** Replace `|` with `||` and `&` with `&&` in scalar `if()` conditions throughout the codebase. This is a low-risk style improvement.
+**Resolution:** All scalar `if()` conditions using `|` and `&` have been updated to `||` and `&&` throughout the R source files. Vectorized uses of `|` and `&` (inside `all()`, `any()`, or column-level mask construction) were left unchanged. All 2292 tests pass.
 
 ---
 
-## 7. `conc %in% 0` Pattern
+## 7. ~~`conc %in% 0` Pattern~~ (Resolved)
 
-**File:** `R/auc_integrate.R` line 103, `R/auc.R`, and others
-**Classification:** Confirmed concern (subtle semantics)
-
-```r
-if (all(conc %in% 0)) {
-```
-
-The `%in%` operator uses `==` internally, which means it tests exact equality. For concentrations that are computationally zero (e.g., `1e-320` due to floating point underflow) this check would fail and the interval would not be treated as zero. Similarly, `%in%` is designed for set membership — using it to test equality to a scalar is non-idiomatic and could confuse readers.
-
-**Recommendation:** Replace `conc %in% 0` with `conc == 0` (or `abs(conc) < .Machine$double.eps` if near-zero values are a concern). Add a comment if exact zero is definitionally correct here (i.e., BLQ values have been cleaned to exactly 0 upstream).
+**Resolution:** Not a bug. BLQ concentrations are cleaned to exactly 0 by `clean.conc.blq()` before any AUC or interpolation logic runs. Exact equality via `%in% 0` is therefore definitionally correct; a tolerance cannot be used because what constitutes a "low" concentration is context-dependent. Comments have been added in `R/auc_integrate.R` and `R/cleaners.R` documenting this intent.
 
 ---
 
@@ -139,8 +121,8 @@ The default value `form = stats::formula(object)` is evaluated lazily when the a
 | 3 | `auc_integrate.R` floating point `==` | — | ~~Resolved~~ — check + test added |
 | 4 | `half.life.R` warning side effect in mask | — | ~~Resolved~~ — false positive; comment added |
 | 5 | `cleaners.R` all-BLQ sentinel value | — | ~~Resolved~~ — false positive; comment added |
-| 6 | `pk.calc.simple.R` `|` vs `||` | Low | Style issue |
-| 7 | `auc_integrate.R` `%in% 0` pattern | Low | Confirmed concern — semantic clarity |
+| 6 | `pk.calc.simple.R` `|` vs `||` | — | ~~Resolved~~ — `||`/`&&` applied throughout |
+| 7 | `auc_integrate.R` `%in% 0` pattern | — | ~~Resolved~~ — exact zero is correct; comment added |
 | 8 | `interpolate.conc.R` duplicate times | Low | Likely safe — needs guard/comment |
 | 9 | `unit-support.R` `stopifnot` vector | — | False positive — code is correct |
 | 10 | `pk.calc.simple.R` lambda.z = NA | Low | Needs test confirmation |

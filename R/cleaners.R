@@ -115,7 +115,11 @@ clean.conc.blq <- function(conc, time,
     for (i in seq_len(length(conc.blq))) {
       # Set the mask to apply the rule to
       time_type <- names(conc.blq)[i]
-      if (is.null(time_type) & length(conc.blq) == 1) {
+      if (is.null(time_type) && length(conc.blq) == 1) {
+        # %in% 0 is used for BLQ checks throughout because BLQ concentrations
+        # are set to exactly 0 by this function. Exact equality is
+        # definitionally correct; a tolerance cannot be used because we do not
+        # know what a "low" concentration may be in all situations.
         mask <- ret$conc %in% 0
       } else if (time_type == "first") {
         mask <- ret$time <= tfirst & ret$conc %in% 0

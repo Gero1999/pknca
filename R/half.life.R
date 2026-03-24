@@ -233,7 +233,7 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
     # intended behavior in this edge case.
     mask_best <-
       half_lives_for_selection$lambda.z > 0 &
-      if (min.hl.points == 2 & nrow(half_lives_for_selection) == 2) {
+      if (min.hl.points == 2 && nrow(half_lives_for_selection) == 2) {
         rlang::warn(
           message = "2 points used for half-life calculation",
           class = "pknca_halflife_2points"

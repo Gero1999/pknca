@@ -26,7 +26,7 @@ pk.calc.c0 <- function(conc, time, time.dose=0,
   }
   if (length(time.dose) != 1) {
     stop("time.dose must be a scalar")
-  } else if (!is.numeric(time.dose) | is.factor(time.dose)) {
+  } else if (!is.numeric(time.dose) || is.factor(time.dose)) {
     stop("time.dose must be a number")
   }
   if (is.na(time.dose)) {
@@ -76,7 +76,7 @@ pk.calc.c0.method.logslope <- function(conc, time, time.dose=0,
   c2 <- conc[mask.2]
   t1 <- time[mask.1]
   t2 <- time[mask.2]
-  if (c2 < c1 &
+  if (c2 < c1 &&
       c2 != 0) {
     exp(log(c1) - (log(c2)-log(c1))/(t2-t1)*(t1 - time.dose))
   } else {

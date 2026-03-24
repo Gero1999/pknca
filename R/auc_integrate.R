@@ -106,6 +106,10 @@ choose_interval_method <- function(conc, time, tlast, method, auc.type, options)
   idx_1 <- seq(1, length(conc) - 1)
   idx_2 <- idx_1 + 1
   mask_zero <- conc[idx_1] == 0 & conc[idx_2] == 0
+  # %in% 0 is used throughout instead of == 0 because BLQ concentrations are
+  # cleaned to exactly 0 upstream (by clean.conc.blq()), making exact equality
+  # definitionally correct. We cannot use a tolerance here because we do not
+  # know what a "low" concentration may be in all situations.
   if (all(conc %in% 0)) {
     ret[] <- "zero"
     # short circuit other options — tlast is NA for all-zero data, so

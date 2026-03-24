@@ -110,7 +110,7 @@ signifString <- function(x, ...)
 signifString.data.frame <- function(x, ...) {
   ret <- lapply(x,
                 function(y) {
-                  if (is.numeric(y) & !is.factor(y)) {
+                  if (is.numeric(y) && !is.factor(y)) {
                     signifString(x=y, ...)
                   } else {
                     y

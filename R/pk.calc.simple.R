@@ -30,7 +30,7 @@ pk.calc.cmax <- function(conc, check=TRUE) {
   if (check) {
     assert_conc(conc = conc)
   }
-  if (length(conc) == 0 | all(is.na(conc))) {
+  if (length(conc) == 0 || all(is.na(conc))) {
     NA
   } else {
     max(conc, na.rm=TRUE)
@@ -62,7 +62,7 @@ pk.calc.cmin <- function(conc, check=TRUE) {
   if (check) {
     assert_conc(conc=conc)
   }
-  if (length(conc) == 0 | all(is.na(conc))) {
+  if (length(conc) == 0 || all(is.na(conc))) {
     NA
   } else {
     min(conc, na.rm=TRUE)
@@ -115,7 +115,7 @@ pk.calc.tmax <- function(conc, time,
   if (check) {
     assert_conc_time(conc = conc, time = time)
   }
-  if (length(conc) == 0 | all(conc %in% c(NA, 0))) {
+  if (length(conc) == 0 || all(conc %in% c(NA, 0))) {
     NA
   } else {
     ret <- time[conc %in% pk.calc.cmax(conc, check=FALSE)]
@@ -173,7 +173,7 @@ pk.calc.tmin <- function(conc, time,
   if (check) {
     assert_conc_time(conc = conc, time = time)
   }
-  if (length(conc) == 0 | all(is.na(conc))) {
+  if (length(conc) == 0 || all(is.na(conc))) {
     NA
   } else {
     ret <- time[conc %in% pk.calc.cmin(conc, check=FALSE)]
@@ -416,9 +416,9 @@ PKNCA.set.summary(
 pk.calc.aucpext <- function(auclast, aucinf) {
   scalar_auclast <- length(auclast) == 1
   scalar_aucinf <- length(aucinf) == 1
-  if (scalar_auclast | scalar_aucinf) {
+  if (scalar_auclast || scalar_aucinf) {
     # no length checking needs to occur
-  } else if ((!scalar_auclast & !scalar_aucinf) &
+  } else if ((!scalar_auclast && !scalar_aucinf) &&
              length(auclast) != length(aucinf)) {
     stop("auclast and aucinf must either be a scalar or the same length.")
   }
@@ -877,7 +877,7 @@ pk.calc.vz <- function(cl, lambda.z) {
   # Ensure that cl is either a scalar or the same length as AUC
   # (more complex repeating patterns while valid for general R are
   # likely errors here).
-  if (!(length(cl) %in% c(1, length(lambda.z))) |
+  if (!(length(cl) %in% c(1, length(lambda.z))) ||
       !(length(lambda.z) %in% c(1, length(cl))))
     stop("'cl' and 'lambda.z' must be the same length")
   cl/lambda.z

@@ -26,7 +26,7 @@ pk.tss.data.prep <- function(conc, time, subject, treatment,
     sorted_time <- missing(subject) & missing(treatment)
     assert_conc_time(conc = conc, time = time, sorted_time = sorted_time)
   }
-  if (!missing(subject.dosing) & missing(subject)) {
+  if (!missing(subject.dosing) && missing(subject)) {
     stop("Cannot give subject.dosing without subject")
   }
   if (any(is.na(time.dosing))) {

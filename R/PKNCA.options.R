@@ -11,11 +11,11 @@
       return(0.0001)
     if (length(x) != 1)
       stop("adj.r.squared.factor must be a scalar")
-    if (is.factor(x) |
+    if (is.factor(x) ||
         !is.numeric(x))
       stop("adj.r.squared.factor must be numeric (and not a factor)")
     # Must be between 0 and 1, exclusive
-    if (x <= 0 | x >= 1)
+    if (x <= 0 || x >= 1)
       stop("adj.r.squared.factor must be between 0 and 1, exclusive")
     if (x > 0.01)
       warning("adj.r.squared.factor is usually <0.01")
@@ -30,10 +30,10 @@
       return(0.5)
     if (length(x) != 1)
       stop("max.missing must be a scalar")
-    if (is.factor(x) | !is.numeric(x))
+    if (is.factor(x) || !is.numeric(x))
       stop("max.missing must be numeric (and not a factor)")
     # Must be between 0 and 1, inclusive
-    if (x < 0 | x >= 1)
+    if (x < 0 || x >= 1)
       stop("max.missing must be between 0 and 1")
     if (x > 0.5)
       warning("max.missing is usually <= 0.5")
@@ -286,7 +286,7 @@
       stop("min.hl.r.squared cannot be a factor")
     if (!is.numeric(x))
       stop("min.hl.r.squared must be a number")
-    if (x <= 0 | x >= 1)
+    if (x <= 0 || x >= 1)
       stop("min.hl.r.squared must be between 0 and 1, exclusive")
     if (x < 0.9)
       warning("min.hl.r.squared is usually >= 0.9")
@@ -314,7 +314,7 @@
       return(NA)
     if (is.factor(x))
       stop("tau.choices cannot be a factor")
-    if (length(x) > 1 & any(is.na(x)))
+    if (length(x) > 1 && any(is.na(x)))
       stop("tau.choices may not include NA and be a vector")
     if (!identical(x, NA))
       if (!is.numeric(x))
@@ -398,7 +398,7 @@
 PKNCA.options <- function(..., default=FALSE, check=FALSE, name, value) {
   current <- get("options", envir=.PKNCAEnv)
   # If the options have not been initialized, initialize them and then proceed.
-  if (is.null(current) & !default) {
+  if (is.null(current) && !default) {
     PKNCA.options(default=TRUE)
     current <- get("options", envir=.PKNCAEnv)
   }
@@ -417,7 +417,7 @@ PKNCA.options <- function(..., default=FALSE, check=FALSE, name, value) {
       args <- append(args, name)
     }
   }
-  if (default & check)
+  if (default && check)
     stop("Cannot request both default and check")
   if (default) {
     if (length(args) > 0)
@@ -542,7 +542,7 @@ PKNCA.set.summary <- function(name, description, point, spread,
   } else {
     current <- get("summary", envir=.PKNCAEnv)
   }
-  if (missing(name) & missing(point) & missing(spread)) {
+  if (missing(name) && missing(point) && missing(spread)) {
     if (reset)
       assign("summary", current, envir=.PKNCAEnv)
     return(invisible(current))
