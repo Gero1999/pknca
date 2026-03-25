@@ -15,7 +15,8 @@ add.interval.col(
   sparse = FALSE,
   formalsmap = list(),
   datatype = c("interval", "individual", "population"),
-  formula = NULL
+  formula = NULL,
+  formula_note = NULL
 )
 }
 \arguments{
@@ -49,6 +50,10 @@ to NCA parameter names.  See the details for information on use of
 \item{formula}{Character value providing a LaTeX expression to identify how the
 calculation of the parameter is performed. It is an optional argument merely
 used for documentation.}
+
+\item{formula_note}{Character value providing additional context about the
+formula (e.g. assumptions, method details). Displayed alongside the formula
+in documentation tables.}
 }
 \value{
 NULL (Calling this function has a side effect of changing the
