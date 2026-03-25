@@ -32,6 +32,15 @@ the dosing including dose amount and route.
   stratification.  The table is also built automatically on `PKNCAdata()`
   construction when no `units` argument is supplied.
 
+* `pk.calc.half.life()` now supports Tobit regression for half-life estimation via
+  `hl_method = "tobit"`.  Tobit regression treats BLQ observations as
+  left-censored rather than discarding them, which generally improves half-life
+  accuracy when some measurements are below the LLOQ.  The new `lloq` argument
+  (required for Tobit) accepts a scalar or per-observation vector.  New
+  PKNCA options: `hl_method` (default `"log-linear"`), `tobit_n_points_penalty`
+  (default 0), and `tobit_optim_control`.  New NCA output columns:
+  `tobit_residual`, `adj_tobit_residual`, and `lambda.z.n.points_blq`.
+
 * `pk.calc.half.life()` now returns also `lambda.z.corrxy`, the correlation between
   the time and the log-concentration of the lambda z points.
 * `get_halflife_points()` can now be used on PKNCAdata objects to see which points
