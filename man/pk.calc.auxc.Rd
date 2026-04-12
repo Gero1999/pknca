@@ -14,7 +14,7 @@
 \alias{pk.calc.aumc.inf.obs}
 \alias{pk.calc.aumc.inf.pred}
 \alias{pk.calc.aumc.all}
-\title{A compute the Area Under the (Moment) Curve}
+\title{Compute the Area Under the (Moment) Curve}
 \usage{
 pk.calc.auxc(
   conc,
@@ -97,7 +97,7 @@ the curve (if log integration is used; not required for AUC or AUMC
 functions)}
 
 \item{fun_inf}{The function to use for extrapolation from the final
-measurement to infinite time (not required for AUC or AUMC functions.}
+measurement to infinite time (not required for AUC or AUMC functions).}
 
 \item{...}{For functions other than \code{pk.calc.auxc}, these values are passed
 to \code{pk.calc.auxc}}

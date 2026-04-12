@@ -73,7 +73,7 @@ exclude.default <- function(object, reason, mask, FUN) {
       mask <- !is.na(reason)
     }
   } else if (!xor(missing(mask), missing(FUN))) {
-    stop("Either mask for FUN must be given (but not both).")
+    stop("Either mask or FUN must be given (but not both).")
   }
   if (!(length(reason) %in% c(1, nrow(object[[dataname]])))) {
     stop("reason must be a scalar or have the same length as the data.")
