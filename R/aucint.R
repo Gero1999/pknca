@@ -12,10 +12,6 @@
 #' @inheritParams pk.calc.auxc
 #' @inheritParams assert_intervaltime_single
 #' @inheritParams assert_lambdaz
-#' @param clast,clast.obs,clast.pred The last concentration above the limit of
-#'   quantification; this is used for AUCinf calculations.  If provided as
-#'   clast.obs (observed clast value, default), AUCinf is AUCinf,obs. If
-#'   provided as clast.pred, AUCinf is AUCinf,pred.
 #' @param time.dose,route,duration.dose The time of doses, route of
 #'   administration, and duration of dose used with interpolation and
 #'   extrapolation of concentration data (see [interp.extrap.conc.dose()]).  If
