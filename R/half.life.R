@@ -64,11 +64,8 @@
 #'   for Tobit window selection.  See [PKNCA.options()].
 #' @param tobit_optim_control A list of control parameters passed to
 #'   [stats::optim()] for the Tobit fit.  See [PKNCA.options()].
-#' @param conc.blq See [clean.conc.blq()]
-#' @param conc.na See [clean.conc.na()]
-#' @param check Run [assert_conc_time()],
-#'   [clean.conc.blq()], and [clean.conc.na()]?
-#' @param first.tmax See [pk.calc.tmax()].
+#' @inheritParams clean.conc.blq
+#' @inheritParams pk.calc.tmax
 #' @param allow.tmax.in.half.life Allow the concentration point for tmax
 #'   to be included in the half-life slope calculation.
 #' @return A data frame with one row.  Columns depend on `hl_method`:

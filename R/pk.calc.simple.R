@@ -98,10 +98,10 @@ PKNCA.set.summary(
 #'
 #' @inheritParams assert_conc_time
 #' @inheritParams PKNCA.choose.option
+#' @inheritParams clean.conc.blq
 #' @param first.tmax If there is more than one time point with the maximum value (Cmax or ERmax),
 #'   which time should be selected for Tmax/ERTmax?  If 'TRUE', the first will be selected. If not, then the
 #'   last is considered Tmax/ERTmax.
-#' @param check Run [assert_conc_time()]?
 #' @returns The time of the maximum concentration
 #' @examples
 #' conc_data <- Theoph[Theoph$Subject == 1,]
@@ -156,10 +156,10 @@ PKNCA.set.summary(
 #'
 #' @inheritParams assert_conc_time
 #' @inheritParams PKNCA.choose.option
+#' @inheritParams clean.conc.blq
 #' @param first.tmin If there is more than one time point with the minimum value (Cmin),
 #'   which time should be selected for Tmin?  If 'TRUE', the first will be selected. If not,
 #'   then the last is considered Tmin.
-#' @param check Run [assert_conc_time()]?
 #' @returns The time of the minimum concentration
 #' @examples
 #' conc_data <- Theoph[Theoph$Subject == 1,]
@@ -205,7 +205,7 @@ PKNCA.set.summary(
 #' `NA` will be returned if all `conc` are `NA` or 0.
 #'
 #' @inheritParams assert_conc_time
-#' @param check Run [assert_conc_time()]?
+#' @inheritParams clean.conc.blq
 #' @returns The time of the last observed concentration measurement
 #' @export
 pk.calc.tlast <- function(conc, time, check=TRUE) {
@@ -270,7 +270,7 @@ PKNCA.set.summary(
 #' this will return `NA_real_`.
 #'
 #' @inheritParams assert_conc_time
-#' @param check Run [assert_conc_time()]?
+#' @inheritParams clean.conc.blq
 #' @returns The last observed concentration above the LOQ
 #' @family NCA parameters for concentrations during the intervals
 #' @export
@@ -1298,9 +1298,9 @@ PKNCA.set.summary(
 #' Determine the concentration at the end of infusion
 #'
 #' @inheritParams assert_conc_time
+#' @inheritParams clean.conc.blq
 #' @param duration.dose The duration for the dosing administration (typically
 #'   from IV infusion)
-#' @param check Run [assert_conc_time()]?
 #' @returns The concentration at the end of the infusion, `NA` if
 #'   `duration.dose` is `NA`, or `NA` if all `time != duration.dose`
 #' @export

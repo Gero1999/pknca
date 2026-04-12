@@ -36,7 +36,7 @@ pk.calc.c0.method.cmin(conc, time, time.dose = 0, check = TRUE)
 
 \item{method}{The order of methods to test (see details)}
 
-\item{check}{Check the \code{conc} and \code{time} inputs}
+\item{check}{Run \code{\link[=assert_conc_time]{assert_conc_time()}}?}
 }
 \value{
 The estimated concentration at time 0.

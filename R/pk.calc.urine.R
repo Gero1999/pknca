@@ -244,7 +244,7 @@ PKNCA.set.summary(
 #' @param volume The volume (or mass) of the sample
 #' @param time The starting time of the collection interval
 #' @param duration.conc The duration of the collection interval
-#' @param options List of changes to the default PKNCA options (see \code{PKNCA.options()})
+#' @inheritParams PKNCA.choose.option
 #' @param check Should the concentration and time data be checked?
 #' @param first.tmax If TRUE, return the first time of maximum excretion rate; otherwise, return the last
 #' @return The midpoint collection time of the maximum excretion rate, or NA if not available
