@@ -34,7 +34,7 @@ check.interval.specification <- function(x) {
                         collapse=", ")))
   }
   interval_cols <- get.interval.cols()
-  # Check the value of each column
+  # Check the edit of each column
   for (n in names(interval_cols)) {
     if (!(n %in% names(x))) {
       if (is.vector(interval_cols[[n]]$values)) {
