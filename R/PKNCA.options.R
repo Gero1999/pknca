@@ -204,7 +204,7 @@
       if (is.na(x)) {
         stop("Could not convert allow.tmax.in.half.life to a logical value")
       } else {
-        warning("Converting allow.tmax.in.half.life to a logical value: ", ret)
+        warning("Converting allow.tmax.in.half.life to a logical value: ", x)
       }
     }
     x

@@ -188,7 +188,7 @@ interpolate.conc <- function(conc, time, time.out,
   } else if (all(data$conc == 0)) {
     ret <- 0
   } else if (time.out > tlast) {
-    stop("`interpolate.conc()` can only works through Tlast, please use `interp.extrap.conc()` to combine both interpolation and extrapolation.")
+    stop("`interpolate.conc()` can only work through Tlast, please use `interp.extrap.conc()` to combine both interpolation and extrapolation.")
   } else if (time.out %in% data$time) {
     # See if there is an exact time match and return that if it
     # exists.
