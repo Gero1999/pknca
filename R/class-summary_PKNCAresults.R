@@ -108,7 +108,7 @@ summary.PKNCAresults <- function(object, ...,
   has_subject_col <- length(subject_col) > 0
   if (is.na(summarize_n)) {
     summarize_n <- has_subject_col
-  } else if (summarize_n & !has_subject_col) {
+  } else if (summarize_n && !has_subject_col) {
     warning("summarize_n was requested, but no subject column exists")
     summarize_n <- FALSE
   }
@@ -494,7 +494,7 @@ summarize_PKNCAresults_parameter <- function(data, parameter, subject_col, inclu
     result_txt <- paste0(point_txt, spread_txt)
   }
 
-  if (na_point & na_spread) {
+  if (na_point && na_spread) {
     result_txt <- not_calculated
   } else if (include_units) {
     result_txt <- paste(result_txt, units)

@@ -105,7 +105,7 @@ PKNCAdata.default <- function(data.conc, data.dose, ...,
   class(ret) <- c("PKNCAdata", class(ret))
 
   # Check the intervals
-  if (missing(intervals) & identical(ret$dose, NA)) {
+  if (missing(intervals) && identical(ret$dose, NA)) {
     stop("If data.dose is not given, intervals must be given")
   } else if (missing(intervals)) {
     # Generate the intervals for each grouping of concentration and

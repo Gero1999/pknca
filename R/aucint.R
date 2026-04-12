@@ -71,7 +71,7 @@ pk.calc.aucint <- function(conc, time,
       return(structure(NA_real_, exclude = "clast.pred is NA because the half-life is NA"))
     } else if (is.na(clast)) {
       stop("Please report a bug. clast is NA and the half-life is not NA") # nocov
-    } else if (clast != clast_obs & interval[2] > tlast) {
+    } else if (clast != clast_obs && interval[2] > tlast) {
       # If using clast.pred, we need to doubly calculate at tlast.
       conc_clast <- clast
       time_clast <- tlast

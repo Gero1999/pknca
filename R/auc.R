@@ -100,7 +100,7 @@ pk.calc.auxc <- function(conc, time, interval=c(0, Inf),
   }
   auc.type <- match.arg(auc.type)
   interval <- assert_intervaltime_single(interval = interval)
-  if (auc.type %in% "AUCinf" & is.finite(interval[2])) {
+  if (auc.type %in% "AUCinf" && is.finite(interval[2])) {
     warning("Requesting AUCinf when the end of the interval is not Inf")
   }
 

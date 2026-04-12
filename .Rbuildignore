@@ -19,4 +19,5 @@ cran-comments.md
 ^revdep$
 ^CRAN-SUBMISSION$
 ^\.claude$
+^design$
 ^CLAUDE\.md$
