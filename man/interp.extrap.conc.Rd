@@ -174,3 +174,4 @@ without interpolating or extrapolating beyond doses.
 \seealso{
 \code{\link[=pk.calc.clast.obs]{pk.calc.clast.obs()}}, \code{\link[=pk.calc.half.life]{pk.calc.half.life()}}, \code{\link[=pk.calc.c0]{pk.calc.c0()}}
 }
+\concept{Concentration interpolation and extrapolation}
