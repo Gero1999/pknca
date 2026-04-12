@@ -886,7 +886,7 @@ get_halflife_points_single <- function(conc, results, time_start, time_end, rowi
       ret$hl_used <- conc_included$include_half.life %in% TRUE
     } else {
       # Shift the time by time_start to account for the fact that
-      # lambda.z.time.first and are relative to the start of the interval
+      # lambda.z.time.first and lambda.z.time.last are relative to the start of the interval
       time_first <- time_start + results$PPORRES[results$PPTESTCD %in% "lambda.z.time.first"]
       time_last <- time_start + results$PPORRES[results$PPTESTCD %in% "lambda.z.time.last"]
       excluded <-

@@ -105,7 +105,7 @@ add.interval.col(
   unit_type = "auc",
   pretty_name = "AUCinf,pred (IV dosing)",
   depends = c("aucinf.pred", "c0"),
-  desc = "The  calculated with back-extrapolation for intravenous dosing using extrapolated C0",
+  desc = "The AUCinf,pred calculated with back-extrapolation for intravenous dosing using extrapolated C0",
   sparse = FALSE,
   formalsmap = list(auc="aucinf.pred")
 )

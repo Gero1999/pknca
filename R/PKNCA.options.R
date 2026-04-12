@@ -204,7 +204,7 @@
       if (is.na(x)) {
         stop("Could not convert allow.tmax.in.half.life to a logical value")
       } else {
-        warning("Converting allow.tmax.in.half.life to a logical value: ", ret)
+        warning("Converting allow.tmax.in.half.life to a logical value: ", x)
       }
     }
     x
@@ -426,7 +426,7 @@
 #'   of the values when used in another function)
 #' @param name An option name to use with the `value`.
 #' @param value An option value (paired with the `name`) to set or check (if
-#'   `NULL`, ).
+#'   `NULL`, the current value of the option is returned).
 #' @returns If...
 #' \describe{
 #'   \item{no arguments are given}{returns the current options.}
