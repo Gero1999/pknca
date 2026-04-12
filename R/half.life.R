@@ -110,6 +110,7 @@
 #' and Applications, 4th Edition.  Stockholm, Sweden: Swedish
 #' Pharmaceutical Press, 2000.  167-9.
 #' @family NCA parameter calculations
+#' @family Half-life and elimination
 #' @export
 pk.calc.half.life <- function(conc, time, tmax, tlast,
                               time.dose=NULL,

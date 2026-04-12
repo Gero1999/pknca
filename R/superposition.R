@@ -36,6 +36,7 @@
 #' dose time as well), `additional.times`, and `tau`.
 #'
 #' @seealso [interp.extrap.conc()]
+#' @family Superposition
 #' @export
 superposition <- function(conc, ...) {
   UseMethod("superposition", conc)
