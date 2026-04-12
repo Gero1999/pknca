@@ -6,6 +6,7 @@
 #' @param method The order of methods to test (see details)
 #' @returns The estimated concentration at time 0.
 #'
+#' @family NCA parameters for concentrations during the intervals
 #' @details Methods available for interpolation are below, and each
 #' has its own specific function.
 #'

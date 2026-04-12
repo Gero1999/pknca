@@ -152,6 +152,7 @@ AUCinf.pred
 \code{\link[=PKNCA.options]{PKNCA.options()}}, \code{\link[=interp.extrap.conc.dose]{interp.extrap.conc.dose()}}
 
 Other AUC calculations: 
+\code{\link{pk.calc.auciv}()},
 \code{\link{pk.calc.auxc}()}
 }
 \concept{AUC calculations}

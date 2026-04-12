@@ -67,6 +67,7 @@
 #' from the data after dosing.
 #'
 #' @seealso [pk.calc.clast.obs()], [pk.calc.half.life()], [pk.calc.c0()]
+#' @family Concentration interpolation and extrapolation
 #' @export
 interp.extrap.conc <- function(conc, time, time.out,
                                lambda.z = NA,

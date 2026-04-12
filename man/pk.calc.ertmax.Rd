@@ -36,3 +36,13 @@ The midpoint collection time of the maximum excretion rate, or NA if not availab
 \description{
 Calculate the midpoint collection time of the maximum excretion rate
 }
+\seealso{
+Other Urine/Excretion parameters: 
+\code{\link{pk.calc.ae}()},
+\code{\link{pk.calc.clr}()},
+\code{\link{pk.calc.ermax}()},
+\code{\link{pk.calc.ertlst}()},
+\code{\link{pk.calc.fe}()},
+\code{\link{pk.calc.volpk}()}
+}
+\concept{Urine/Excretion parameters}

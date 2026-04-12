@@ -60,3 +60,9 @@ The calculation for back-extrapolation is \code{100*(1 - auc/auciv)}.
 administration
 
 }}
+\seealso{
+Other AUC calculations: 
+\code{\link{pk.calc.aucint}()},
+\code{\link{pk.calc.auxc}()}
+}
+\concept{AUC calculations}

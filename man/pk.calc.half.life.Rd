@@ -169,4 +169,11 @@ lambda-z."  Pharmacokinetic & Pharmacodynamic Data Analysis: Concepts
 and Applications, 4th Edition.  Stockholm, Sweden: Swedish
 Pharmaceutical Press, 2000.  167-9.
 }
+\seealso{
+Other Half-life and elimination: 
+\code{\link{adj.r.squared}()},
+\code{\link{pk.calc.aucpext}()},
+\code{\link{pk.calc.thalf.eff}()}
+}
+\concept{Half-life and elimination}
 \concept{NCA parameter calculations}
