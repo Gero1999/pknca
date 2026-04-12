@@ -1,11 +1,12 @@
 #' Estimate the concentration at dosing time for an IV bolus dose.
 #'
 #' @inheritParams assert_conc_time
+#' @inheritParams clean.conc.blq
 #' @param time.dose The time when dosing occurred
 #' @param method The order of methods to test (see details)
-#' @param check Check the `conc` and `time` inputs
 #' @returns The estimated concentration at time 0.
 #'
+#' @family NCA parameters for concentrations during the intervals
 #' @details Methods available for interpolation are below, and each
 #' has its own specific function.
 #'

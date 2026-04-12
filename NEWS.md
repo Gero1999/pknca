@@ -6,6 +6,23 @@ the dosing including dose amount and route.
 
 # PKNCA 0.12.2
 
+## Bug Fixes
+
+* `normalize.data.frame()` no longer triggers a dplyr deprecation warning
+  (`Using 'by = character()' to perform a cross join was deprecated in dplyr 1.1.0`)
+  when called with ungrouped data (i.e., no common group columns between `object`
+  and `norm_table`). `dplyr::cross_join()` is now used explicitly for this case.
+
+## Improvements
+
+* `normalize.data.frame()` now validates that `norm_table` contains exactly one
+  row when used with ungrouped data, giving a clear error message instead of
+  silently producing incorrect results.
+
+* `normalize.data.frame()` now uses `dplyr::inner_join()` instead of `merge()` 
+  for grouped joins, preserving left-table row order. Missing group validation 
+  ensures no rows are silently dropped.
+
 ## Breaking changes
 
 * `pknca_units_table()` called on a `PKNCAdata` object now raises an error if
@@ -31,6 +48,15 @@ the dosing including dose amount and route.
   `PKNCAdose` objects, supporting per-analyte or per-specimen unit
   stratification.  The table is also built automatically on `PKNCAdata()`
   construction when no `units` argument is supplied.
+
+* `pk.calc.half.life()` now supports Tobit regression for half-life estimation via
+  `hl_method = "tobit"`.  Tobit regression treats BLQ observations as
+  left-censored rather than discarding them, which generally improves half-life
+  accuracy when some measurements are below the LLOQ.  The new `lloq` argument
+  (required for Tobit) accepts a scalar or per-observation vector.  New
+  PKNCA options: `hl_method` (default `"log-linear"`), `tobit_n_points_penalty`
+  (default 0), and `tobit_optim_control`.  New NCA output columns:
+  `tobit_residual`, `adj_tobit_residual`, and `lambda.z.n.points_blq`.
 
 * `pk.calc.half.life()` now returns also `lambda.z.corrxy`, the correlation between
   the time and the log-concentration of the lambda z points.
