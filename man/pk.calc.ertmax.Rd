@@ -23,7 +23,8 @@ pk.calc.ertmax(
 
 \item{duration.conc}{The duration of the collection interval}
 
-\item{options}{List of changes to the default PKNCA options (see \code{PKNCA.options()})}
+\item{options}{List of changes to the default PKNCA options (see
+\code{PKNCA.options()})}
 
 \item{check}{Should the concentration and time data be checked?}
 
