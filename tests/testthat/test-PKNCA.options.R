@@ -86,7 +86,10 @@ test_that("PKNCA.options", {
           cmax = c(FALSE, TRUE)
         )
       ),
-      allow_partial_missing_units = FALSE
+      allow_partial_missing_units = FALSE,
+      hl_method = "log-linear",
+      tobit_n_points_penalty = 0,
+      tobit_optim_control = list()
     )
   )
 
