@@ -361,6 +361,7 @@ pk.nca.intervals <- function(data_conc, data_dose, data_intervals, sparse,
 #'
 #' @seealso [check.interval.specification()]
 #' @export
+#' @importFrom stats na.omit
 pk.nca.interval <- function(conc, time, volume, duration.conc,
                             dose, time.dose, duration.dose, route,
                             conc.group=NULL, time.group=NULL, volume.group=NULL, duration.conc.group=NULL,
