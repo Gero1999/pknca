@@ -51,11 +51,11 @@ test_that("sparse_mean", {
       time = c(0, 0, 0, 1, 1, 1, 6, 6, 6, 2, 2, 2, 10, 10, 10, 4, 4, 4, 24, 24, 24),
       dose = c(100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100)
     )
-
+  
   sparse_pk <- as_sparse_pk(d_sparse)
   sparse_pk_wt <- sparse_auc_weight_linear(sparse_pk)
   sparse_pk_mean <- sparse_mean(sparse_pk_wt, sparse_mean_method="arithmetic mean")
-
+  
   expect_equal(
     sparse_pk_mean[[7]]$mean_method,
     "arithmetic mean"
