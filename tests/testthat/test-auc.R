@@ -542,7 +542,7 @@ test_that("pk.calc.auc.inf.obs returns NA when lambda.z is NA", {
       interval = c(0, Inf),
       method = "linear"
     ),
-    NA_real_
+    structure(NA_real_, method = "AUC: linear")
   )
 })
 
