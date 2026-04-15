@@ -238,11 +238,9 @@ test_that("pk.calc.auc: Confirm BLQ in the middle or end are calculated correctl
                                  middle="drop",
                                  last="keep"),
                                method=t))
-      expect_equal(
-        v1,
-        tests[[t]][[n]],
-        info=paste(t, n)
-      )
+      expect_equal(v1,
+                   tests[[t]][[n]],
+                   info=paste(t, n))
     }
   }
 })
@@ -276,11 +274,9 @@ test_that("pk.calc.auc: When AUCinf is requested with NA for lambda.z, the resul
                                  middle="drop",
                                  last="keep"),
                                method=t))
-      expect_equal(
-        v1,
-        tests[[t]][[n]],
-        info=paste(t, n)
-      )
+      expect_equal(v1,
+                   tests[[t]][[n]],
+                   info=paste(t, n))
     }
   }
 })
@@ -318,11 +314,9 @@ test_that("pk.calc.auc: Test NA at the end", {
                                  middle="drop",
                                  last="keep"),
                                method=t))
-      expect_equal(
-        v1,
-        tests[[t]][[n]],
-        info=paste(t, n)
-      )
+      expect_equal(v1,
+                   tests[[t]][[n]],
+                   info=paste(t, n))
     }
 })
 
@@ -355,11 +349,9 @@ test_that("pk.calc.auc: interpolation of times within the time interval", {
                                  middle="drop",
                                  last="keep"),
                                method=t))
-      expect_equal(
-        v1,
-        tests[[t]][[n]],
-        info=paste(t, n)
-      )
+      expect_equal(v1,
+                   tests[[t]][[n]],
+                   info=paste(t, n))
     }
   }
 })
@@ -402,11 +394,9 @@ test_that("pk.calc.auc: warning with beginning of interval before the beginning 
                           method=t),
         class="pknca_warn_auc_before_first"
       )
-      expect_equal(
-        v1,
-        tests[[t]][[n]],
-        info=paste(t, n)
-      )
+      expect_equal(v1,
+                   tests[[t]][[n]],
+                   info=paste(t, n))
     }
   }
 })
@@ -571,16 +561,14 @@ test_that("pk.calc.aumc", {
       time=0:3,
       interval=c(0, 3),
       method="linear"),
-    structure(3.75, method="AUC: linear")
-  )
+    structure(3.75, method="AUC: linear"))
   expect_equal(
     pk.calc.aumc(
       conc=c(0, 1, 1, 0.5),
       time=0:3,
       interval=c(0, 3),
       method="lin up/log down"),
-    structure(2-0.5/log(0.5)+0.5/(log(0.5)^2), method="AUC: lin up/log down")
-  )
+    structure(2-0.5/log(0.5)+0.5/(log(0.5)^2), method="AUC: lin up/log down"))
   expect_equal(
     pk.calc.aumc(
       conc=c(0, 1, 1, 0.5),
@@ -589,8 +577,7 @@ test_that("pk.calc.aumc", {
       auc.type="AUCinf",
       lambda.z=1,
       method="lin up/log down"),
-    structure(2 - 0.5/log(0.5) + 0.5/(log(0.5)^2) + 1.5 + 0.5, method="AUC: lin up/log down")
-  )
+    structure(2 - 0.5/log(0.5) + 0.5/(log(0.5)^2) + 1.5 + 0.5, method="AUC: lin up/log down"))
 })
 
 
@@ -611,10 +598,10 @@ test_that("pk.calc.aumc.inf", {
                  method="linear"))
   expect_error(
     pk.calc.aumc.inf(conc=c(0, 1, 1, 0),
-                     time=0:3,
-                     interval=c(0, 3),
-                     auc.type="foo",
-                     method="linear"),
+                    time=0:3,
+                    interval=c(0, 3),
+                    auc.type="foo",
+                    method="linear"),
     regexp="auc.type cannot be changed when calling pk.calc.aumc.inf, please use pk.calc.aumc")
 })
 
@@ -623,9 +610,9 @@ test_that("pk.calc.aumc.all", {
   # is done elsewhere.
   expect_equal(
     pk.calc.aumc.all(conc=c(0, 1, 1, 0),
-                     time=0:3,
-                     interval=c(0, 3),
-                     method="linear"),
+                    time=0:3,
+                    interval=c(0, 3),
+                    method="linear"),
     pk.calc.aumc(conc=c(0, 1, 1, 0),
                  time=0:3,
                  interval=c(0, 3),
@@ -633,10 +620,10 @@ test_that("pk.calc.aumc.all", {
                  method="linear"))
   expect_error(
     pk.calc.aumc.all(conc=c(0, 1, 1, 0),
-                     time=0:3,
-                     interval=c(0, 3),
-                     auc.type="foo",
-                     method="linear"),
+                    time=0:3,
+                    interval=c(0, 3),
+                    auc.type="foo",
+                    method="linear"),
     regexp="auc.type cannot be changed when calling pk.calc.aumc.all, please use pk.calc.aumc")
 })
 
@@ -645,9 +632,9 @@ test_that("pk.calc.aumc.last", {
   # is done elsewhere.
   expect_equal(
     pk.calc.aumc.last(conc=c(0, 1, 1, 0),
-                      time=0:3,
-                      interval=c(0, 3),
-                      method="linear"),
+                    time=0:3,
+                    interval=c(0, 3),
+                    method="linear"),
     pk.calc.aumc(conc=c(0, 1, 1, 0),
                  time=0:3,
                  interval=c(0, 3),
@@ -655,10 +642,10 @@ test_that("pk.calc.aumc.last", {
                  method="linear"))
   expect_error(
     pk.calc.aumc.last(conc=c(0, 1, 1, 0),
-                      time=0:3,
-                      interval=c(0, 3),
-                      auc.type="foo",
-                      method="linear"),
+                    time=0:3,
+                    interval=c(0, 3),
+                    auc.type="foo",
+                    method="linear"),
     regexp="auc.type cannot be changed when calling pk.calc.aumc.last, please use pk.calc.aumc")
 })
 

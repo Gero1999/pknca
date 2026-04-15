@@ -127,7 +127,7 @@ test_that("AUCint gives a warning and NA when it cannot interpolate or extrapola
     info = "warned when integrating over a dose with lambda.z=NA"
   )
   expect_equal(over_dose, NA_real_,
-               info = "When you cannot integrate over a dose, you get NA"
+    info = "When you cannot integrate over a dose, you get NA"
   )
 
   expect_warning(
@@ -320,12 +320,12 @@ test_that("aucint respects doses", {
 test_that("aucint works with infinite intervals", {
   concdata <- data.frame(conc = c(8, 4, 2, 1), time = 0:3)
   expect_equal(pk.calc.aucint.last(conc = concdata$conc, time = concdata$time, start = 0, end = Inf),
-               pk.calc.auc.last(conc = concdata$conc, time = concdata$time),
-               info = "Simple AUClast = aucint.last"
+    pk.calc.auc.last(conc = concdata$conc, time = concdata$time),
+    info = "Simple AUClast = aucint.last"
   )
   expect_equal(pk.calc.aucint.all(conc = concdata$conc, time = concdata$time, start = 0, end = Inf),
-               pk.calc.auc.all(conc = concdata$conc, time = concdata$time),
-               info = "Simple AUCall = aucint.all"
+    pk.calc.auc.all(conc = concdata$conc, time = concdata$time),
+    info = "Simple AUCall = aucint.all"
   )
   expect_equal(
     pk.calc.aucint.inf.obs(

@@ -151,7 +151,6 @@ pk.calc.half.life <- function(conc, time, tmax, tlast,
     half.life=NA,
     # T1/2 span ratio
     span.ratio=NA)
-
   ret_replacements <-
     c("lambda.z", "r.squared", "adj.r.squared", "lambda.z.corrxy", "lambda.z.time.first",
       "lambda.z.time.last", "lambda.z.n.points", "clast.pred", "half.life", "span.ratio")
