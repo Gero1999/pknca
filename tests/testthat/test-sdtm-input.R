@@ -541,3 +541,317 @@ test_that("derive_pcrftdtc output feeds into pc_to_PKNCAconc", {
   expect_equal(result$data$AFRLT, c(0, 1, 3))
 })
 
+# --- Tests for sdtm_join -----------------------------------------------------
+
+test_that("sdtm_join merges DM columns onto target by shared keys", {
+  target <- data.frame(
+    STUDYID = "S1",
+    USUBJID = c("S1-01", "S1-01", "S1-02"),
+    DOMAIN  = "PC",
+    VALUE   = c(1, 2, 3),
+    stringsAsFactors = FALSE
+  )
+  dm <- data.frame(
+    STUDYID = "S1",
+    USUBJID = c("S1-01", "S1-02"),
+    DOMAIN  = "DM",
+    AGE     = c(25, 30),
+    SEX     = c("M", "F"),
+    stringsAsFactors = FALSE
+  )
+  result <- sdtm_join(target, dm)
+  expect_true("AGE" %in% names(result))
+  expect_true("SEX" %in% names(result))
+  expect_equal(nrow(result), 3)
+  expect_equal(result$AGE, c(25, 25, 30))
+  # DOMAIN from dm should NOT appear (target keeps its own)
+  expect_equal(result$DOMAIN, c("PC", "PC", "PC"))
+})
+
+test_that("sdtm_join does not duplicate existing columns", {
+  target <- data.frame(
+    USUBJID = "S1-01",
+    AGE     = 99,
+    stringsAsFactors = FALSE
+  )
+  dm <- data.frame(
+    USUBJID = "S1-01",
+    AGE     = 25,
+    SEX     = "M",
+    stringsAsFactors = FALSE
+  )
+  result <- sdtm_join(target, dm)
+  # AGE should remain from target (99), not overwritten
+  expect_equal(result$AGE, 99)
+  # SEX is new, should be added
+  expect_equal(result$SEX, "M")
+})
+
+test_that("sdtm_join warns when no shared columns", {
+  target <- data.frame(X = 1, stringsAsFactors = FALSE)
+  src <- data.frame(Y = 2, stringsAsFactors = FALSE)
+  expect_warning(
+    sdtm_join(target, src),
+    class = "pknca_sdtm_no_shared_cols"
+  )
+})
+
+test_that("sdtm_join skips NULL or empty sources", {
+  target <- data.frame(USUBJID = "S1", VALUE = 1, stringsAsFactors = FALSE)
+  result <- sdtm_join(target, NULL, data.frame())
+  expect_equal(result, target)
+})
+
+test_that("sdtm_join chains multiple sources", {
+  target <- data.frame(
+    USUBJID = c("S1", "S2"),
+    VALUE   = c(1, 2),
+    stringsAsFactors = FALSE
+  )
+  dm <- data.frame(
+    USUBJID = c("S1", "S2"),
+    AGE     = c(25, 30),
+    stringsAsFactors = FALSE
+  )
+  vs_wide <- data.frame(
+    USUBJID = c("S1", "S2"),
+    WEIGHT  = c(70, 80),
+    stringsAsFactors = FALSE
+  )
+  result <- sdtm_join(target, dm, vs_wide)
+  expect_true(all(c("AGE", "WEIGHT") %in% names(result)))
+  expect_equal(result$AGE, c(25, 30))
+  expect_equal(result$WEIGHT, c(70, 80))
+})
+
+# --- Tests for vs_to_baseline ------------------------------------------------
+
+test_that("vs_to_baseline filters by VSBLFL and pivots to wide", {
+  vs <- data.frame(
+    STUDYID  = "S1",
+    USUBJID  = c("S1-01", "S1-01", "S1-01", "S1-01"),
+    VSTESTCD = c("WEIGHT", "HEIGHT", "WEIGHT", "HEIGHT"),
+    VSSTRESN = c(70, 175, 72, 176),
+    VSBLFL   = c("Y", "Y", NA, NA),
+    VISITNUM = c(1, 1, 2, 2),
+    stringsAsFactors = FALSE
+  )
+  result <- vs_to_baseline(vs)
+  expect_equal(nrow(result), 1)
+  expect_true("WEIGHT" %in% names(result))
+  expect_true("HEIGHT" %in% names(result))
+  expect_equal(result$WEIGHT, 70)
+  expect_equal(result$HEIGHT, 175)
+})
+
+test_that("vs_to_baseline falls back to first record when VSBLFL absent", {
+  vs <- data.frame(
+    USUBJID  = c("S1-01", "S1-01"),
+    VSTESTCD = c("WEIGHT", "WEIGHT"),
+    VSSTRESN = c(70, 72),
+    VISITNUM = c(1, 2),
+    stringsAsFactors = FALSE
+  )
+  result <- vs_to_baseline(vs)
+  expect_equal(nrow(result), 1)
+  expect_equal(result$WEIGHT, 70)
+})
+
+test_that("vs_to_baseline handles multiple subjects", {
+  vs <- data.frame(
+    USUBJID  = c("S1-01", "S1-01", "S1-02", "S1-02"),
+    VSTESTCD = c("WEIGHT", "HEIGHT", "WEIGHT", "HEIGHT"),
+    VSSTRESN = c(70, 175, 85, 180),
+    VSBLFL   = "Y",
+    stringsAsFactors = FALSE
+  )
+  result <- vs_to_baseline(vs)
+  expect_equal(nrow(result), 2)
+  expect_equal(result$WEIGHT, c(70, 85))
+  expect_equal(result$HEIGHT, c(175, 180))
+})
+
+test_that("vs_to_baseline warns on no baseline records", {
+  vs <- data.frame(
+    USUBJID  = "S1-01",
+    VSTESTCD = "WEIGHT",
+    VSSTRESN = 70,
+    VSBLFL   = NA,
+    stringsAsFactors = FALSE
+  )
+  expect_warning(
+    vs_to_baseline(vs),
+    class = "pknca_vs_no_baseline"
+  )
+})
+
+test_that("vs_to_baseline errors on missing required columns", {
+  vs <- data.frame(USUBJID = "S1", stringsAsFactors = FALSE)
+  expect_error(vs_to_baseline(vs), regexp = "VSTESTCD.*not found")
+})
+
+# --- Tests for sdtm_to_PKNCAdata ---------------------------------------------
+
+test_that("sdtm_to_PKNCAdata returns a PKNCAdata object with PC and EX", {
+  pc <- data.frame(
+    STUDYID  = "S1",
+    USUBJID  = c("S1-01", "S1-01"),
+    PCTEST   = "DrugA",
+    PCSPEC   = "SERUM",
+    PCSTRESN = c(0, 5.0),
+    PCSTRESU = "ug/mL",
+    PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00"),
+    PCRFTDTC = c("2024-01-01T08:00:00", "2024-01-01T08:00:00"),
+    stringsAsFactors = FALSE
+  )
+  ex <- data.frame(
+    STUDYID = "S1",
+    USUBJID = "S1-01",
+    EXTRT   = "DRUG A",
+    EXDOSE  = 100,
+    EXDOSU  = "mg",
+    EXROUTE = "ORAL",
+    EXSTDTC = "2024-01-01T08:00:00",
+    EXENDTC = NA,
+    stringsAsFactors = FALSE
+  )
+  result <- sdtm_to_PKNCAdata(pc, ex)
+  expect_s3_class(result, "PKNCAdata")
+  expect_s3_class(result$conc, "PKNCAconc")
+  expect_s3_class(result$dose, "PKNCAdose")
+})
+
+test_that("sdtm_to_PKNCAdata enriches data with DM columns", {
+  pc <- data.frame(
+    STUDYID  = "S1",
+    USUBJID  = c("S1-01", "S1-01"),
+    PCTEST   = "DrugA",
+    PCSPEC   = "SERUM",
+    PCSTRESN = c(0, 5.0),
+    PCSTRESU = "ug/mL",
+    PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00"),
+    PCRFTDTC = c("2024-01-01T08:00:00", "2024-01-01T08:00:00"),
+    stringsAsFactors = FALSE
+  )
+  ex <- data.frame(
+    STUDYID = "S1",
+    USUBJID = "S1-01",
+    EXTRT   = "DRUG A",
+    EXDOSE  = 100,
+    EXDOSU  = "mg",
+    EXROUTE = "ORAL",
+    EXSTDTC = "2024-01-01T08:00:00",
+    EXENDTC = NA,
+    stringsAsFactors = FALSE
+  )
+  dm <- data.frame(
+    STUDYID = "S1",
+    USUBJID = "S1-01",
+    AGE     = 25,
+    SEX     = "M",
+    stringsAsFactors = FALSE
+  )
+  result <- sdtm_to_PKNCAdata(pc, ex, dm = dm)
+  # DM columns should be present in both conc and dose data
+  expect_true("AGE" %in% names(result$conc$data))
+  expect_true("SEX" %in% names(result$conc$data))
+  expect_true("AGE" %in% names(result$dose$data))
+})
+
+test_that("sdtm_to_PKNCAdata enriches data with baseline VS", {
+  pc <- data.frame(
+    STUDYID  = "S1",
+    USUBJID  = c("S1-01", "S1-01"),
+    PCTEST   = "DrugA",
+    PCSPEC   = "SERUM",
+    PCSTRESN = c(0, 5.0),
+    PCSTRESU = "ug/mL",
+    PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00"),
+    PCRFTDTC = c("2024-01-01T08:00:00", "2024-01-01T08:00:00"),
+    stringsAsFactors = FALSE
+  )
+  ex <- data.frame(
+    STUDYID = "S1",
+    USUBJID = "S1-01",
+    EXTRT   = "DRUG A",
+    EXDOSE  = 100,
+    EXDOSU  = "mg",
+    EXROUTE = "ORAL",
+    EXSTDTC = "2024-01-01T08:00:00",
+    EXENDTC = NA,
+    stringsAsFactors = FALSE
+  )
+  vs <- data.frame(
+    STUDYID  = "S1",
+    USUBJID  = "S1-01",
+    VSTESTCD = c("WEIGHT", "HEIGHT"),
+    VSSTRESN = c(70, 175),
+    VSBLFL   = "Y",
+    stringsAsFactors = FALSE
+  )
+  result <- sdtm_to_PKNCAdata(pc, ex, vs = vs)
+  expect_true("WEIGHT" %in% names(result$conc$data))
+  expect_true("HEIGHT" %in% names(result$conc$data))
+  expect_equal(unique(result$conc$data$WEIGHT), 70)
+})
+
+test_that("sdtm_to_PKNCAdata derives PCRFTDTC from EX when missing", {
+  pc <- data.frame(
+    STUDYID  = "S1",
+    USUBJID  = c("S1-01", "S1-01"),
+    PCTEST   = "DrugA",
+    PCSPEC   = "SERUM",
+    PCSTRESN = c(0, 5.0),
+    PCSTRESU = "ug/mL",
+    PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00"),
+    stringsAsFactors = FALSE
+  )
+  ex <- data.frame(
+    STUDYID = "S1",
+    USUBJID = "S1-01",
+    EXTRT   = "DRUG A",
+    EXDOSE  = 100,
+    EXDOSU  = "mg",
+    EXROUTE = "ORAL",
+    EXSTDTC = "2024-01-01T08:00:00",
+    EXENDTC = NA,
+    stringsAsFactors = FALSE
+  )
+  # PC has no PCRFTDTC or PCELTM — should auto-derive from EX
+  result <- sdtm_to_PKNCAdata(pc, ex)
+  expect_s3_class(result, "PKNCAdata")
+  expect_equal(result$conc$data$AFRLT, c(0, 1))
+})
+
+test_that("sdtm_to_PKNCAdata passes pc_args and ex_args through", {
+  pc <- data.frame(
+    STUDYID  = "S1",
+    SUBJ     = c("S1-01", "S1-01"),
+    PCTEST   = "DrugA",
+    PCSPEC   = "SERUM",
+    PCSTRESN = c(0, 5.0),
+    PCSTRESU = "ug/mL",
+    PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00"),
+    PCRFTDTC = c("2024-01-01T08:00:00", "2024-01-01T08:00:00"),
+    stringsAsFactors = FALSE
+  )
+  ex <- data.frame(
+    STUDYID = "S1",
+    SUBJ    = "S1-01",
+    EXTRT   = "DRUG A",
+    EXDOSE  = 100,
+    EXDOSU  = "mg",
+    EXROUTE = "ORAL",
+    EXSTDTC = "2024-01-01T08:00:00",
+    EXENDTC = NA,
+    stringsAsFactors = FALSE
+  )
+  # Use custom USUBJID column name
+  result <- sdtm_to_PKNCAdata(
+    pc, ex,
+    pc_args = list(USUBJID = "SUBJ"),
+    ex_args = list(USUBJID = "SUBJ")
+  )
+  expect_s3_class(result, "PKNCAdata")
+})
+

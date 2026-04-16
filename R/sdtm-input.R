@@ -460,3 +460,219 @@ pc_to_PKNCAconc <- function(
 
   do.call(PKNCA::PKNCAconc, PKNCAconc_args)
 }
+
+# --- Enrich SDTM domains with subject-level data ----------------------------
+
+#' Join subject-level SDTM domains onto a target domain
+#'
+#' Merges columns from one or more subject-level SDTM data frames (e.g. DM, VS)
+#' onto a target data frame using the columns that are common between them as
+#' join keys. This follows the CDISC convention where \code{STUDYID} and
+#' \code{USUBJID} are the standard cross-domain identifiers.
+#'
+#' Columns that already exist in \code{target} are not duplicated from the
+#' source domain (the target's version is kept). The \code{DOMAIN} column, if
+#' present, is always excluded from the join keys and from the merged result
+#' because it is domain-specific by definition.
+#'
+#' @param target A data.frame to enrich (e.g. PC or EX domain)
+#' @param ... One or more data.frames to merge onto \code{target}. Each is
+#'   joined sequentially via \code{dplyr::left_join} using the intersection of
+#'   column names (excluding \code{DOMAIN}) as keys.
+#' @return The \code{target} data.frame with additional columns from each
+#'   source domain.
+#' @keywords internal
+sdtm_join <- function(target, ...) {
+  sources <- list(...)
+  for (src in sources) {
+    if (is.null(src) || !is.data.frame(src) || nrow(src) == 0) next
+
+    # Exclude DOMAIN from key detection — it is domain-specific
+    target_names <- setdiff(names(target), "DOMAIN")
+    src_names <- setdiff(names(src), "DOMAIN")
+
+    join_keys <- intersect(target_names, src_names)
+    if (length(join_keys) == 0) {
+      rlang::warn(
+        "No shared columns found between target and source domain; skipping join",
+        class = "pknca_sdtm_no_shared_cols"
+      )
+      next
+    }
+
+    # Only bring in columns that don't already exist in target (plus the keys)
+    new_cols <- setdiff(src_names, target_names)
+    if (length(new_cols) == 0) next
+
+    src_subset <- src[, c(join_keys, new_cols), drop = FALSE]
+    target <- dplyr::left_join(target, src_subset, by = join_keys)
+  }
+  target
+}
+
+#' Prepare baseline vital signs as a one-row-per-subject data frame
+#'
+#' Filters a VS (Vital Signs) SDTM domain to baseline records and pivots the
+#' result to wide format so that each test code becomes its own column (e.g.
+#' \code{WEIGHT}, \code{HEIGHT}). The resulting data frame has one row per
+#' subject and is ready to be joined onto other domains.
+#'
+#' @param vs A data.frame containing the VS SDTM domain
+#' @param USUBJID Column name for the unique subject identifier
+#' @param VSTESTCD Column name for the vital sign test code
+#' @param VSSTRESN Column name for the standardized numeric result
+#' @param VSBLFL Column name for the baseline flag. Records with
+#'   \code{VSBLFL == "Y"} are selected. If the column is absent, the earliest
+#'   record per subject per test is used instead.
+#' @param STUDYID Column name for the study identifier (included in output
+#'   if present)
+#' @return A data.frame with one row per subject and one column per vital sign
+#'   test code (e.g. \code{WEIGHT}, \code{HEIGHT}).
+#' @keywords internal
+vs_to_baseline <- function(
+  vs,
+  USUBJID = "USUBJID",
+  VSTESTCD = "VSTESTCD",
+  VSSTRESN = "VSSTRESN",
+  VSBLFL = "VSBLFL",
+  STUDYID = "STUDYID"
+) {
+  checkmate::assert_data_frame(vs, min.rows = 1)
+
+  if (!USUBJID %in% names(vs)) {
+    stop("Column '", USUBJID, "' not found in vs data")
+  }
+  if (!VSTESTCD %in% names(vs)) {
+    stop("Column '", VSTESTCD, "' not found in vs data")
+  }
+  if (!VSSTRESN %in% names(vs)) {
+    stop("Column '", VSSTRESN, "' not found in vs data")
+  }
+
+  # Filter to baseline records
+  if (VSBLFL %in% names(vs)) {
+    vs_bl <- vs[!is.na(vs[[VSBLFL]]) & vs[[VSBLFL]] == "Y", , drop = FALSE]
+  } else {
+    # Fallback: take first record per subject per test
+    vs <- vs[order(vs[[USUBJID]], vs[[VSTESTCD]]), , drop = FALSE]
+    vs_bl <- vs[!duplicated(vs[, c(USUBJID, VSTESTCD)]), , drop = FALSE]
+  }
+
+  if (nrow(vs_bl) == 0) {
+    rlang::warn(
+      "No baseline VS records found; returning empty data frame",
+      class = "pknca_vs_no_baseline"
+    )
+    # Return minimal structure
+    id_cols <- intersect(c(STUDYID, USUBJID), names(vs))
+    return(vs[0, id_cols, drop = FALSE])
+  }
+
+  # Select only the columns needed for pivoting
+  id_cols <- intersect(c(STUDYID, USUBJID), names(vs_bl))
+  pivot_data <- vs_bl[, c(id_cols, VSTESTCD, VSSTRESN), drop = FALSE]
+
+  # Pivot to wide: one column per VSTESTCD
+  tidyr::pivot_wider(
+    pivot_data,
+    names_from = VSTESTCD,
+    values_from = VSSTRESN
+  )
+}
+
+# --- SDTM to PKNCAdata -------------------------------------------------------
+
+#' Convert SDTM domains (PC, EX, DM, VS) to a PKNCAdata object
+#'
+#' Orchestrates the full conversion from CDISC SDTM domain data frames into a
+#' \code{PKNCAdata} object ready for NCA analysis. Internally calls
+#' \code{\link{pc_to_PKNCAconc}} and \code{\link{ex_to_PKNCAdose}}, and
+#' optionally enriches both with subject-level data from DM and baseline VS.
+#'
+#' @section Domain enrichment:
+#' When \code{dm} and/or \code{vs} are provided, their columns are merged onto
+#' both the PC and EX data \emph{before} creating the PKNCAconc and PKNCAdose
+#' objects. This means subject-level covariates (e.g. \code{AGE}, \code{SEX},
+#' \code{WEIGHT}) are available in the resulting objects for downstream use
+#' (e.g. dose normalization by weight via \code{normalize_by_col}).
+#'
+#' Joins use the intersection of column names between domains as merge keys,
+#' following the CDISC convention where \code{STUDYID} and \code{USUBJID} are
+#' the standard cross-domain identifiers. The \code{DOMAIN} column is always
+#' excluded from join keys.
+#'
+#' VS data is first reduced to baseline records (one row per subject) via
+#' \code{\link{vs_to_baseline}} before joining.
+#'
+#' @param pc A data.frame containing the PC (Pharmacokinetic Concentrations)
+#'   SDTM domain
+#' @param ex A data.frame containing the EX (Exposure) SDTM domain
+#' @param dm An optional data.frame containing the DM (Demographics) SDTM
+#'   domain. If provided, subject-level columns are merged onto PC and EX.
+#' @param vs An optional data.frame containing the VS (Vital Signs) SDTM
+#'   domain. If provided, baseline vital signs are pivoted to wide format and
+#'   merged onto PC and EX.
+#' @param pc_args A named list of additional arguments passed to
+#'   \code{\link{pc_to_PKNCAconc}} (e.g. custom column name mappings).
+#' @param ex_args A named list of additional arguments passed to
+#'   \code{\link{ex_to_PKNCAdose}} (e.g. custom column name mappings).
+#' @param intervals Optional interval specification passed to
+#'   \code{\link{PKNCAdata}}. If \code{NULL} (default), intervals are
+#'   automatically derived from the dosing data.
+#' @param units Optional unit table passed to \code{\link{PKNCAdata}}.
+#' @param options A list of PKNCA options passed to \code{\link{PKNCAdata}}.
+#' @return A \code{PKNCAdata} object
+#' @importFrom dplyr left_join
+#' @export
+sdtm_to_PKNCAdata <- function(
+  pc,
+  ex,
+  dm = NULL,
+  vs = NULL,
+  pc_args = list(),
+  ex_args = list(),
+  intervals = NULL,
+  units = NULL,
+  options = list()
+) {
+  checkmate::assert_data_frame(pc, min.rows = 1)
+  checkmate::assert_data_frame(ex, min.rows = 1)
+
+  # --- Prepare subject-level data for enrichment ---
+  # Pivot VS to baseline wide format (one row per subject)
+  vs_wide <- NULL
+  if (!is.null(vs)) {
+    checkmate::assert_data_frame(vs, min.rows = 1)
+    vs_wide <- as.data.frame(vs_to_baseline(vs))
+  }
+
+  # --- Derive PCRFTDTC if missing from PC ---
+  PCRFTDTC_col <- pc_args$PCRFTDTC %||% "PCRFTDTC"
+  PCELTM_col <- pc_args$PCELTM %||% "PCELTM"
+  if (!PCRFTDTC_col %in% names(pc) && !PCELTM_col %in% names(pc)) {
+    pc <- derive_pcrftdtc(pc, ex)
+  }
+
+  # --- Enrich PC and EX with subject-level data ---
+  pc <- sdtm_join(pc, dm, vs_wide)
+  ex <- sdtm_join(ex, dm, vs_wide)
+
+  # --- Build PKNCAconc and PKNCAdose ---
+  conc_obj <- do.call(pc_to_PKNCAconc, c(list(pc = pc), pc_args))
+  dose_obj <- do.call(ex_to_PKNCAdose, c(list(ex = ex), ex_args))
+
+  # --- Build PKNCAdata ---
+  pknca_args <- list(
+    data.conc = conc_obj,
+    data.dose = dose_obj,
+    options = options
+  )
+  if (!is.null(intervals)) {
+    pknca_args$intervals <- intervals
+  }
+  if (!is.null(units)) {
+    pknca_args$units <- units
+  }
+
+  do.call(PKNCA::PKNCAdata, pknca_args)
+}
