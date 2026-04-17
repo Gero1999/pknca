@@ -195,96 +195,100 @@ ex_to_PKNCAdose <- function(
   do.call(PKNCA::PKNCAdose, PKNCAdose_args)
 }
 
-# --- Derive PCRFTDTC from EX ------------------------------------------------
+# --- Derive FANLDTM from PKNCAdose -------------------------------------------
 
-#' Derive PCRFTDTC (reference datetime) for PC data from EX dosing records
+#' Derive FANLDTM (first analyte dose datetime) for PC data from a PKNCAdose
+#' object
 #'
-#' For each PC record, assigns the most recent dose start datetime
-#' (\code{EXSTDTC}) that is at or before the sample collection time
-#' (\code{PCDTC}) for the same subject. This is the standard SDTM derivation
-#' of the reference datetime used to compute elapsed time relative to the most
-#' recent dose.
+#' Extracts the first (earliest) dose datetime per subject from a
+#' \code{PKNCAdose} object and joins it onto a PC data frame as
+#' \code{FANLDTM}. The resulting column is a POSIXct datetime that serves as
+#' the reference point for computing a continuous time axis
+#' (\code{AFRLT = PCDTC - FANLDTM}).
+#'
+#' The grouping used to determine "first dose" comes from the PKNCAdose
+#' object's own grouping variables (typically \code{EXTRT + USUBJID} from
+#' \code{\link{ex_to_PKNCAdose}}). The join key between the FANLDTM lookup
+#' and the PC data is determined by the intersection of their column names,
+#' following the CDISC convention.
 #'
 #' @param pc A data.frame containing the PC (Pharmacokinetic Concentrations)
-#'   SDTM domain. Must contain at least \code{USUBJID} and \code{PCDTC}
-#'   columns (or the names specified via parameters).
-#' @param ex A data.frame containing the EX (Exposure) SDTM domain. Must
-#'   contain at least \code{USUBJID} and \code{EXSTDTC} columns (or the names
-#'   specified via parameters).
-#' @param USUBJID Column name for the unique subject identifier (must match
-#'   in both \code{pc} and \code{ex})
-#' @param PCDTC Column name for the PC collection date/time (ISO 8601)
-#' @param EXSTDTC Column name for the EX start date/time (ISO 8601)
-#' @param PCRFTDTC Column name to assign for the derived reference date/time.
+#'   SDTM domain.
+#' @param dose_obj A \code{PKNCAdose} object (e.g. from
+#'   \code{\link{ex_to_PKNCAdose}}).
+#' @param FANLDTM Column name to assign for the derived first dose datetime.
 #'   If this column already exists in \code{pc}, it is overwritten with a
 #'   warning.
-#' @return The \code{pc} data.frame with an added (or replaced) \code{PCRFTDTC}
-#'   column containing ISO 8601 datetime strings.
+#' @return The \code{pc} data.frame with an added (or replaced) \code{FANLDTM}
+#'   column (POSIXct in UTC).
 #' @export
-derive_pcrftdtc <- function(
+derive_fanldtm <- function(
   pc,
-  ex,
-  USUBJID = "USUBJID",
-  PCDTC = "PCDTC",
-  EXSTDTC = "EXSTDTC",
-  PCRFTDTC = "PCRFTDTC"
+  dose_obj,
+  FANLDTM = "FANLDTM"
 ) {
   checkmate::assert_data_frame(pc, min.rows = 1)
-  checkmate::assert_data_frame(ex, min.rows = 1)
-  checkmate::assert_string(USUBJID)
-  checkmate::assert_string(PCDTC)
-  checkmate::assert_string(EXSTDTC)
-  checkmate::assert_string(PCRFTDTC)
+  if (!inherits(dose_obj, "PKNCAdose")) {
+    stop("dose_obj must be a PKNCAdose object")
+  }
+  checkmate::assert_string(FANLDTM)
 
-  if (!USUBJID %in% names(pc)) {
-    stop("Column '", USUBJID, "' not found in pc data")
-  }
-  if (!PCDTC %in% names(pc)) {
-    stop("Column '", PCDTC, "' not found in pc data")
-  }
-  if (!USUBJID %in% names(ex)) {
-    stop("Column '", USUBJID, "' not found in ex data")
-  }
-  if (!EXSTDTC %in% names(ex)) {
-    stop("Column '", EXSTDTC, "' not found in ex data")
-  }
-
-  if (PCRFTDTC %in% names(pc)) {
+  if (FANLDTM %in% names(pc)) {
     rlang::warn(
-      paste0("Column '", PCRFTDTC, "' already exists in pc and will be overwritten"),
-      class = "pknca_pcrftdtc_overwrite"
+      paste0("Column '", FANLDTM, "' already exists in pc and will be overwritten"),
+      class = "pknca_fanldtm_overwrite"
     )
   }
 
-  # Parse datetimes
-  pc_dt <- std_dtc_to_rdate(pc[[PCDTC]])
-  ex_subj <- ex[[USUBJID]]
-  ex_dt <- std_dtc_to_rdate(ex[[EXSTDTC]])
+  # Get the dose data and identify the datetime column
+  dose_data <- dose_obj$data
+  # The EX_reference column is the per-subject first dose datetime set by
 
-  # For each PC record, find the most recent dose at or before collection time
-  pcrftdtc <- vapply(seq_len(nrow(pc)), function(i) {
-    subj <- pc[[USUBJID]][i]
-    sample_time <- pc_dt[i]
-    if (is.na(sample_time)) return(NA_character_)
+  # ex_to_PKNCAdose. If it exists, use it directly. Otherwise, find the
+  # minimum of the original datetime column per group.
+  group_vars <- dose_obj$columns$groups$group_vars
 
-    # All dose times for this subject
-    mask <- ex_subj == subj & !is.na(ex_dt)
-    dose_times <- ex_dt[mask]
-
-    if (length(dose_times) == 0) return(NA_character_)
-
-    # Most recent dose at or before sample time
-    eligible <- dose_times[dose_times <= sample_time]
-    if (length(eligible) == 0) {
-      # Pre-dose sample: use the earliest dose for this subject
-      ref <- min(dose_times)
-    } else {
-      ref <- max(eligible)
+  if ("EX_reference" %in% names(dose_data)) {
+    # EX_reference is already the min(EXSTDTC) per subject from ex_to_PKNCAdose
+    fanldtm_cols <- c(group_vars, "EX_reference")
+    fanldtm_lookup <- unique(dose_data[, fanldtm_cols, drop = FALSE])
+    names(fanldtm_lookup)[names(fanldtm_lookup) == "EX_reference"] <- FANLDTM
+  } else {
+    # Fallback: find the row with the minimum time per group
+    time_col <- dose_obj$columns$time
+    if (length(time_col) == 0 || !time_col %in% names(dose_data)) {
+      stop("Cannot determine dose times from PKNCAdose object")
     }
-    format(ref, "%Y-%m-%dT%H:%M:%S")
-  }, character(1), USE.NAMES = FALSE)
+    # Group by group_vars, take the row with min time
+    dose_data <- dose_data[order(dose_data[[time_col]]), , drop = FALSE]
+    first_rows <- dose_data[!duplicated(dose_data[, group_vars, drop = FALSE]), , drop = FALSE]
+    # Look for a POSIXct datetime column (EXSTDTC or similar)
+    posix_cols <- names(first_rows)[vapply(first_rows, inherits, logical(1), "POSIXct")]
+    if (length(posix_cols) == 0) {
+      stop(
+        "No POSIXct datetime column found in PKNCAdose data. ",
+        "Ensure ex_to_PKNCAdose was used to create the dose object."
+      )
+    }
+    # Use the first POSIXct column (typically EXSTDTC)
+    fanldtm_lookup <- first_rows[, c(group_vars, posix_cols[1]), drop = FALSE]
+    names(fanldtm_lookup)[names(fanldtm_lookup) == posix_cols[1]] <- FANLDTM
+  }
 
-  pc[[PCRFTDTC]] <- pcrftdtc
+  # Join onto PC using shared columns (CDISC convention)
+  join_keys <- intersect(names(pc), names(fanldtm_lookup))
+  join_keys <- setdiff(join_keys, c(FANLDTM, "DOMAIN"))
+  if (length(join_keys) == 0) {
+    stop(
+      "No shared columns between pc and PKNCAdose grouping variables. ",
+      "Ensure both use the same subject identifier (e.g. USUBJID)."
+    )
+  }
+
+  # Remove existing FANLDTM before join to avoid conflicts
+  pc[[FANLDTM]] <- NULL
+  pc <- dplyr::left_join(pc, fanldtm_lookup, by = join_keys)
+
   pc
 }
 
@@ -302,10 +306,11 @@ derive_pcrftdtc <- function(
 #' \enumerate{
 #'   \item \code{PCELTM}: If the column exists in \code{pc}, its ISO 8601
 #'     duration values (e.g. \code{"PT2H"}) are parsed to numeric hours.
-#'   \item \code{PCRFTDTC}: If \code{PCELTM} is absent but \code{PCRFTDTC}
-#'     exists, elapsed time is derived as \code{PCDTC - PCRFTDTC} in hours.
-#'     Use \code{\link{derive_pcrftdtc}} to populate this column from EX data
-#'     before calling this function.
+#'   \item \code{FANLDTM}: If \code{PCELTM} is absent but \code{FANLDTM}
+#'     exists (a POSIXct first-dose datetime), elapsed time is derived as
+#'     \code{PCDTC - FANLDTM} in hours, giving a continuous time axis from
+#'     the first dose. Use \code{\link{derive_fanldtm}} to populate this
+#'     column from a PKNCAdose object before calling this function.
 #'   \item If neither is available, the function stops with an error.
 #' }
 #'
@@ -338,13 +343,14 @@ derive_pcrftdtc <- function(
 #' @param PCDTC Column name for the collection date/time (ISO 8601)
 #' @param PCELTM Column name for the planned elapsed time (ISO 8601 duration,
 #'   e.g. \code{"PT2H"}). If present, used as the nominal time variable.
-#' @param PCRFTDTC Column name for the reference date/time (ISO 8601). Used
-#'   to derive elapsed time when \code{PCELTM} is absent. See
-#'   \code{\link{derive_pcrftdtc}} to populate this from EX data.
+#' @param FANLDTM Column name for the first analyte dose datetime (POSIXct).
+#'   Used to derive elapsed time when \code{PCELTM} is absent, giving a
+#'   continuous time axis from the first dose. See
+#'   \code{\link{derive_fanldtm}} to populate this from a PKNCAdose object.
 #' @return A \code{PKNCAconc} object with:
 #' \itemize{
 #'   \item Concentration from \code{PCSTRESN} (BLQ set to 0)
-#'   \item Time as \code{AFRLT} (hours from reference)
+#'   \item Time as \code{AFRLT} (hours from first dose)
 #'   \item Groups: \code{PCSPEC + USUBJID / PCTEST}
 #'   \item Units from \code{PCSTRESU} (if available)
 #'   \item Nominal time from \code{PCELTM} (if available, parsed to hours)
@@ -366,7 +372,7 @@ pc_to_PKNCAconc <- function(
   # Time columns
   PCDTC = "PCDTC",
   PCELTM = "PCELTM",
-  PCRFTDTC = "PCRFTDTC"
+  FANLDTM = "FANLDTM"
 ) {
   checkmate::assert_data_frame(pc, min.rows = 1)
 
@@ -392,7 +398,7 @@ pc_to_PKNCAconc <- function(
 
   # --- Time derivation ---
   has_pceltm <- PCELTM %in% names(pc)
-  has_pcrftdtc <- PCRFTDTC %in% names(pc)
+  has_fanldtm <- FANLDTM %in% names(pc)
   has_pcdtc <- PCDTC %in% names(pc)
 
   if (has_pceltm) {
@@ -405,19 +411,24 @@ pc_to_PKNCAconc <- function(
     stop("Column '", PCDTC, "' is required in pc data")
   }
 
-  if (has_pcrftdtc) {
-    # Derive AFRLT = PCDTC - PCRFTDTC in hours
+  if (has_fanldtm) {
+    # Derive AFRLT = PCDTC - FANLDTM in hours (continuous from first dose)
     pc_dt <- std_dtc_to_rdate(pc[[PCDTC]])
-    ref_dt <- std_dtc_to_rdate(pc[[PCRFTDTC]])
+    # FANLDTM may already be POSIXct (from derive_fanldtm) or ISO 8601 string
+    if (inherits(pc[[FANLDTM]], "POSIXct")) {
+      ref_dt <- pc[[FANLDTM]]
+    } else {
+      ref_dt <- std_dtc_to_rdate(pc[[FANLDTM]])
+    }
     pc[["AFRLT"]] <- as.numeric(difftime(pc_dt, ref_dt, units = "hours"))
   } else if (has_pceltm) {
     # Use parsed PCELTM as the time axis
     pc[["AFRLT"]] <- pc[["PCELTM_hours"]]
   } else {
     stop(
-      "Cannot derive time: neither '", PCELTM, "' nor '", PCRFTDTC,
+      "Cannot derive time: neither '", PCELTM, "' nor '", FANLDTM,
       "' found in pc data. ",
-      "Use derive_pcrftdtc() to add a reference datetime from EX data."
+      "Use derive_fanldtm() to add the first dose datetime from a PKNCAdose object."
     )
   }
 
@@ -646,20 +657,22 @@ sdtm_to_PKNCAdata <- function(
     vs_wide <- as.data.frame(vs_to_baseline(vs))
   }
 
-  # --- Derive PCRFTDTC if missing from PC ---
-  PCRFTDTC_col <- pc_args$PCRFTDTC %||% "PCRFTDTC"
+  # --- Enrich EX and PC with subject-level data ---
+  ex <- sdtm_join(ex, dm, vs_wide)
+  pc <- sdtm_join(pc, dm, vs_wide)
+
+  # --- Build PKNCAdose first (needed for FANLDTM derivation) ---
+  dose_obj <- do.call(ex_to_PKNCAdose, c(list(ex = ex), ex_args))
+
+  # --- Derive FANLDTM on PC if no time variable is available ---
+  FANLDTM_col <- pc_args$FANLDTM %||% "FANLDTM"
   PCELTM_col <- pc_args$PCELTM %||% "PCELTM"
-  if (!PCRFTDTC_col %in% names(pc) && !PCELTM_col %in% names(pc)) {
-    pc <- derive_pcrftdtc(pc, ex)
+  if (!FANLDTM_col %in% names(pc) && !PCELTM_col %in% names(pc)) {
+    pc <- derive_fanldtm(pc, dose_obj)
   }
 
-  # --- Enrich PC and EX with subject-level data ---
-  pc <- sdtm_join(pc, dm, vs_wide)
-  ex <- sdtm_join(ex, dm, vs_wide)
-
-  # --- Build PKNCAconc and PKNCAdose ---
+  # --- Build PKNCAconc ---
   conc_obj <- do.call(pc_to_PKNCAconc, c(list(pc = pc), pc_args))
-  dose_obj <- do.call(ex_to_PKNCAdose, c(list(ex = ex), ex_args))
 
   # --- Build PKNCAdata ---
   pknca_args <- list(

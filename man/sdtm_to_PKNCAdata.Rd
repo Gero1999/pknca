@@ -58,7 +58,7 @@ When \code{dm} and/or \code{vs} are provided, their columns are merged onto
 both the PC and EX data \emph{before} creating the PKNCAconc and PKNCAdose
 objects. This means subject-level covariates (e.g. \code{AGE}, \code{SEX},
 \code{WEIGHT}) are available in the resulting objects for downstream use
-(e.g. dose normalization by weight via \code{normalize_by_col}).
+(e.g. dose normalization by weight).
 
 Joins use the intersection of column names between domains as merge keys,
 following the CDISC convention where \code{STUDYID} and \code{USUBJID} are
@@ -67,4 +67,12 @@ excluded from join keys.
 
 VS data is first reduced to baseline records (one row per subject) via
 \code{vs_to_baseline} before joining.
+}
+
+\section{Time derivation}{
+
+When the PC data lacks both \code{FANLDTM} and \code{PCELTM}, the function
+automatically derives \code{FANLDTM} (first analyte dose datetime) from the
+PKNCAdose object using \code{\link{derive_fanldtm}}. This provides a
+continuous time axis from the first dose for each subject.
 }

@@ -7,7 +7,7 @@
 # - Pre-dose, post-dose, and trough time points
 # - BLQ samples (PCSTRESN = NA with numeric PCORRES)
 # - NOT DONE samples (both PCSTRESN and PCORRES = NA)
-# - PCRFTDTC and PCELTM provided for time derivation
+# - PCELTM provided for nominal time derivation
 #
 # Modeled after pharmaverse/aNCA sdtm_example.R structure
 
@@ -69,16 +69,6 @@ pc_example <- data.frame(
     "2024-03-01T12:05:00", "2024-03-01T15:05:00",
     "2024-03-02T09:00:00", "2024-03-02T10:05:00"
   ),
-  PCRFTDTC = c(
-    # Subject 1: reference = dose time for each period
-    rep("2024-03-01T08:00:00", 4), rep("2024-03-02T08:00:00", 4),
-    # Subject 2
-    rep("2024-03-01T08:15:00", 4), rep("2024-03-02T08:15:00", 4),
-    # Subject 3
-    rep("2024-03-01T09:00:00", 4), rep("2024-03-02T09:00:00", 4),
-    # Subject 4
-    rep("2024-03-01T09:05:00", 4), rep("2024-03-02T09:05:00", 2)
-  ),
   PCELTM   = c(
     # Subject 1: nominal times relative to dose
     "PT-0.083H", "PT1H", "PT3H", "PT6H",
@@ -96,7 +86,7 @@ pc_example <- data.frame(
   stringsAsFactors = FALSE
 )
 
-# Corresponding EX data for derive_pcrftdtc example
+# Corresponding EX data for derive_fanldtm example
 ex_for_pc_example <- data.frame(
   STUDYID  = "PKS-001",
   DOMAIN   = "EX",

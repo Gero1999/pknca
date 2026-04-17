@@ -15,7 +15,7 @@ pc_to_PKNCAconc(
   PCSTRESU = "PCSTRESU",
   PCDTC = "PCDTC",
   PCELTM = "PCELTM",
-  PCRFTDTC = "PCRFTDTC"
+  FANLDTM = "FANLDTM"
 )
 }
 \arguments{
@@ -43,15 +43,16 @@ has a numeric value, the concentration is set to \code{0} (BLQ).}
 \item{PCELTM}{Column name for the planned elapsed time (ISO 8601 duration,
 e.g. \code{"PT2H"}). If present, used as the nominal time variable.}
 
-\item{PCRFTDTC}{Column name for the reference date/time (ISO 8601). Used
-to derive elapsed time when \code{PCELTM} is absent. See
-\code{\link{derive_pcrftdtc}} to populate this from EX data.}
+\item{FANLDTM}{Column name for the first analyte dose datetime (POSIXct).
+Used to derive elapsed time when \code{PCELTM} is absent, giving a
+continuous time axis from the first dose. See
+\code{\link{derive_fanldtm}} to populate this from a PKNCAdose object.}
 }
 \value{
 A \code{PKNCAconc} object with:
 \itemize{
   \item Concentration from \code{PCSTRESN} (BLQ set to 0)
-  \item Time as \code{AFRLT} (hours from reference)
+  \item Time as \code{AFRLT} (hours from first dose)
   \item Groups: \code{PCSPEC + USUBJID / PCTEST}
   \item Units from \code{PCSTRESU} (if available)
   \item Nominal time from \code{PCELTM} (if available, parsed to hours)
@@ -68,10 +69,11 @@ from reference in hours) using the following priority:
 \enumerate{
   \item \code{PCELTM}: If the column exists in \code{pc}, its ISO 8601
     duration values (e.g. \code{"PT2H"}) are parsed to numeric hours.
-  \item \code{PCRFTDTC}: If \code{PCELTM} is absent but \code{PCRFTDTC}
-    exists, elapsed time is derived as \code{PCDTC - PCRFTDTC} in hours.
-    Use \code{\link{derive_pcrftdtc}} to populate this column from EX data
-    before calling this function.
+  \item \code{FANLDTM}: If \code{PCELTM} is absent but \code{FANLDTM}
+    exists (a POSIXct first-dose datetime), elapsed time is derived as
+    \code{PCDTC - FANLDTM} in hours, giving a continuous time axis from
+    the first dose. Use \code{\link{derive_fanldtm}} to populate this
+    column from a PKNCAdose object before calling this function.
   \item If neither is available, the function stops with an error.
 }
 }

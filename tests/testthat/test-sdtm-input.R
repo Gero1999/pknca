@@ -213,87 +213,105 @@ test_that("std_dtc_to_rdate parses mixed precision datetimes", {
   expect_s3_class(result, "POSIXct")
 })
 
-# --- Tests for derive_pcrftdtc -----------------------------------------------
+# --- Tests for derive_fanldtm ------------------------------------------------
 
-test_that("derive_pcrftdtc assigns most recent dose as reference", {
-  pc <- data.frame(
-    USUBJID = c("S1", "S1", "S1", "S1"),
-    PCDTC   = c(
-      "2024-01-01T07:55:00",  # pre-dose
-      "2024-01-01T09:00:00",  # 1h post dose 1
-      "2024-01-02T07:55:00",  # pre-dose 2
-      "2024-01-02T09:00:00"   # 1h post dose 2
-    ),
-    PCSTRESN = c(0, 5.0, 0.1, 4.8),
-    stringsAsFactors = FALSE
-  )
+# Helper: build a minimal PKNCAdose for testing
+make_test_dose <- function(
+  usubjid = c("S1", "S1"),
+  extrt = "DRUG A",
+  exdose = 100,
+  exdosu = "mg",
+  exroute = "ORAL",
+  exstdtc = c("2024-01-01T08:00:00", "2024-01-02T08:00:00"),
+  exendtc = NA
+) {
   ex <- data.frame(
-    USUBJID = c("S1", "S1"),
-    EXSTDTC = c("2024-01-01T08:00:00", "2024-01-02T08:00:00"),
+    USUBJID = usubjid,
+    EXTRT   = extrt,
+    EXDOSE  = exdose,
+    EXDOSU  = exdosu,
+    EXROUTE = exroute,
+    EXSTDTC = exstdtc,
+    EXENDTC = exendtc,
     stringsAsFactors = FALSE
   )
+  ex_to_PKNCAdose(ex)
+}
 
-  result <- derive_pcrftdtc(pc, ex)
-  expect_true("PCRFTDTC" %in% names(result))
-  # Pre-dose sample before first dose -> earliest dose used
-  expect_equal(result$PCRFTDTC[1], "2024-01-01T08:00:00")
-  # Post dose 1
-  expect_equal(result$PCRFTDTC[2], "2024-01-01T08:00:00")
-  # Pre-dose 2 (before dose 2, after dose 1) -> dose 1
-  expect_equal(result$PCRFTDTC[3], "2024-01-01T08:00:00")
-  # Post dose 2
-  expect_equal(result$PCRFTDTC[4], "2024-01-02T08:00:00")
+test_that("derive_fanldtm adds FANLDTM column from PKNCAdose", {
+  dose_obj <- make_test_dose()
+  pc <- data.frame(
+    USUBJID  = c("S1", "S1", "S1"),
+    PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00",
+                 "2024-01-02T09:00:00"),
+    PCSTRESN = c(0, 5.0, 4.8),
+    stringsAsFactors = FALSE
+  )
+  result <- derive_fanldtm(pc, dose_obj)
+  expect_true("FANLDTM" %in% names(result))
+  expect_s3_class(result$FANLDTM, "POSIXct")
+  # All rows for S1 should have the same FANLDTM (first dose)
+  expect_equal(
+    result$FANLDTM,
+    rep(as.POSIXct("2024-01-01T08:00:00", tz = "UTC"), 3)
+  )
 })
 
-test_that("derive_pcrftdtc handles multiple subjects independently", {
+test_that("derive_fanldtm handles multiple subjects", {
+  dose_obj <- make_test_dose(
+    usubjid = c("S1", "S2"),
+    exstdtc = c("2024-01-01T08:00:00", "2024-01-01T10:00:00")
+  )
   pc <- data.frame(
-    USUBJID = c("S1", "S2"),
-    PCDTC   = c("2024-01-01T09:00:00", "2024-01-01T11:00:00"),
+    USUBJID  = c("S1", "S2"),
+    PCDTC    = c("2024-01-01T09:00:00", "2024-01-01T11:00:00"),
     PCSTRESN = c(5.0, 3.0),
     stringsAsFactors = FALSE
   )
-  ex <- data.frame(
-    USUBJID = c("S1", "S2"),
-    EXSTDTC = c("2024-01-01T08:00:00", "2024-01-01T10:00:00"),
-    stringsAsFactors = FALSE
+  result <- derive_fanldtm(pc, dose_obj)
+  expect_equal(
+    result$FANLDTM,
+    as.POSIXct(c("2024-01-01T08:00:00", "2024-01-01T10:00:00"), tz = "UTC")
   )
-
-  result <- derive_pcrftdtc(pc, ex)
-  expect_equal(result$PCRFTDTC[1], "2024-01-01T08:00:00")
-  expect_equal(result$PCRFTDTC[2], "2024-01-01T10:00:00")
 })
 
-test_that("derive_pcrftdtc warns when PCRFTDTC already exists", {
+test_that("derive_fanldtm warns when FANLDTM already exists", {
+  dose_obj <- make_test_dose(
+    usubjid = "S1",
+    exstdtc = "2024-01-01T08:00:00"
+  )
   pc <- data.frame(
     USUBJID  = "S1",
     PCDTC    = "2024-01-01T09:00:00",
-    PCRFTDTC = "old_value",
+    FANLDTM  = as.POSIXct("1999-01-01", tz = "UTC"),
     PCSTRESN = 5.0,
     stringsAsFactors = FALSE
   )
-  ex <- data.frame(
-    USUBJID = "S1",
-    EXSTDTC = "2024-01-01T08:00:00",
-    stringsAsFactors = FALSE
-  )
-
   expect_warning(
-    derive_pcrftdtc(pc, ex),
+    derive_fanldtm(pc, dose_obj),
     regexp = "already exists.*overwritten",
-    class = "pknca_pcrftdtc_overwrite"
+    class = "pknca_fanldtm_overwrite"
   )
 })
 
-test_that("derive_pcrftdtc errors on missing columns", {
-  pc <- data.frame(USUBJID = "S1", stringsAsFactors = FALSE)
-  ex <- data.frame(USUBJID = "S1", EXSTDTC = "2024-01-01T08:00:00",
-                   stringsAsFactors = FALSE)
-  expect_error(derive_pcrftdtc(pc, ex), regexp = "PCDTC.*not found")
+test_that("derive_fanldtm errors when dose_obj is not PKNCAdose", {
+  pc <- data.frame(USUBJID = "S1", PCDTC = "2024-01-01T09:00:00",
+                   PCSTRESN = 5.0, stringsAsFactors = FALSE)
+  expect_error(derive_fanldtm(pc, data.frame()), regexp = "PKNCAdose")
+})
 
-  pc2 <- data.frame(USUBJID = "S1", PCDTC = "2024-01-01T09:00:00",
-                    stringsAsFactors = FALSE)
-  ex2 <- data.frame(USUBJID = "S1", stringsAsFactors = FALSE)
-  expect_error(derive_pcrftdtc(pc2, ex2), regexp = "EXSTDTC.*not found")
+test_that("derive_fanldtm errors when no shared columns", {
+  dose_obj <- make_test_dose(
+    usubjid = "S1",
+    exstdtc = "2024-01-01T08:00:00"
+  )
+  pc <- data.frame(
+    SUBJ     = "S1",  # different column name
+    PCDTC    = "2024-01-01T09:00:00",
+    PCSTRESN = 5.0,
+    stringsAsFactors = FALSE
+  )
+  expect_error(derive_fanldtm(pc, dose_obj), regexp = "No shared columns")
 })
 
 # --- Tests for pc_to_PKNCAconc ------------------------------------------------
@@ -308,15 +326,14 @@ test_that("pc_to_PKNCAconc returns a PKNCAconc object", {
     PCSTRESU = "ug/mL",
     PCDTC    = c("2024-01-01T07:55:00", "2024-01-01T09:00:00",
                  "2024-01-01T11:00:00"),
-    PCRFTDTC = c("2024-01-01T08:00:00", "2024-01-01T08:00:00",
-                 "2024-01-01T08:00:00"),
+    FANLDTM  = as.POSIXct("2024-01-01T08:00:00", tz = "UTC"),
     stringsAsFactors = FALSE
   )
   result <- pc_to_PKNCAconc(pc)
   expect_s3_class(result, "PKNCAconc")
 })
 
-test_that("pc_to_PKNCAconc derives time from PCRFTDTC", {
+test_that("pc_to_PKNCAconc derives time from FANLDTM", {
   pc <- data.frame(
     USUBJID  = c("S1", "S1", "S1"),
     PCTEST   = "DrugA",
@@ -325,8 +342,7 @@ test_that("pc_to_PKNCAconc derives time from PCRFTDTC", {
     PCSTRESU = "ug/mL",
     PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00",
                  "2024-01-01T11:00:00"),
-    PCRFTDTC = c("2024-01-01T08:00:00", "2024-01-01T08:00:00",
-                 "2024-01-01T08:00:00"),
+    FANLDTM  = as.POSIXct("2024-01-01T08:00:00", tz = "UTC"),
     stringsAsFactors = FALSE
   )
   result <- pc_to_PKNCAconc(pc)
@@ -351,7 +367,7 @@ test_that("pc_to_PKNCAconc uses PCELTM when available", {
   expect_equal(result$data$PCELTM_hours, c(0, 1, 3))
 })
 
-test_that("pc_to_PKNCAconc prefers PCRFTDTC for AFRLT when both PCELTM and PCRFTDTC exist", {
+test_that("pc_to_PKNCAconc prefers FANLDTM for AFRLT when both PCELTM and FANLDTM exist", {
   pc <- data.frame(
     USUBJID  = c("S1", "S1"),
     PCTEST   = "DrugA",
@@ -359,12 +375,12 @@ test_that("pc_to_PKNCAconc prefers PCRFTDTC for AFRLT when both PCELTM and PCRFT
     PCSTRESN = c(0, 5.0),
     PCSTRESU = "ug/mL",
     PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:30:00"),
-    PCRFTDTC = c("2024-01-01T08:00:00", "2024-01-01T08:00:00"),
+    FANLDTM  = as.POSIXct("2024-01-01T08:00:00", tz = "UTC"),
     PCELTM   = c("PT0H", "PT1.5H"),
     stringsAsFactors = FALSE
   )
   result <- pc_to_PKNCAconc(pc)
-  # AFRLT derived from PCRFTDTC (actual times)
+  # AFRLT derived from FANLDTM (actual times)
   expect_equal(result$data$AFRLT, c(0, 1.5))
   # PCELTM_hours used as nominal time
   expect_equal(result$data$PCELTM_hours, c(0, 1.5))
@@ -380,7 +396,7 @@ test_that("pc_to_PKNCAconc handles BLQ correctly", {
     PCSTRESU = "ug/mL",
     PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00",
                  "2024-01-01T11:00:00", "2024-01-01T14:00:00"),
-    PCRFTDTC = rep("2024-01-01T08:00:00", 4),
+    FANLDTM  = as.POSIXct("2024-01-01T08:00:00", tz = "UTC"),
     stringsAsFactors = FALSE
   )
   result <- pc_to_PKNCAconc(pc)
@@ -403,7 +419,7 @@ test_that("pc_to_PKNCAconc builds correct formula with PCSPEC and PCTEST", {
     PCSTRESN = c(0, 5.0),
     PCSTRESU = "ug/mL",
     PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00"),
-    PCRFTDTC = rep("2024-01-01T08:00:00", 2),
+    FANLDTM  = as.POSIXct("2024-01-01T08:00:00", tz = "UTC"),
     stringsAsFactors = FALSE
   )
   result <- pc_to_PKNCAconc(pc)
@@ -419,7 +435,7 @@ test_that("pc_to_PKNCAconc works without PCSPEC", {
     PCSTRESN = c(0, 5.0),
     PCSTRESU = "ug/mL",
     PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00"),
-    PCRFTDTC = rep("2024-01-01T08:00:00", 2),
+    FANLDTM  = as.POSIXct("2024-01-01T08:00:00", tz = "UTC"),
     stringsAsFactors = FALSE
   )
   result <- pc_to_PKNCAconc(pc)
@@ -433,7 +449,7 @@ test_that("pc_to_PKNCAconc works without PCTEST or PCSPEC", {
     PCSTRESN = c(0, 5.0),
     PCSTRESU = "ug/mL",
     PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00"),
-    PCRFTDTC = rep("2024-01-01T08:00:00", 2),
+    FANLDTM  = as.POSIXct("2024-01-01T08:00:00", tz = "UTC"),
     stringsAsFactors = FALSE
   )
   result <- pc_to_PKNCAconc(pc)
@@ -475,8 +491,8 @@ test_that("pc_to_PKNCAconc handles multiple subjects", {
     PCSTRESU = "ug/mL",
     PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00",
                  "2024-01-01T10:00:00", "2024-01-01T11:00:00"),
-    PCRFTDTC = c("2024-01-01T08:00:00", "2024-01-01T08:00:00",
-                 "2024-01-01T10:00:00", "2024-01-01T10:00:00"),
+    FANLDTM  = as.POSIXct(c("2024-01-01T08:00:00", "2024-01-01T08:00:00",
+                 "2024-01-01T10:00:00", "2024-01-01T10:00:00"), tz = "UTC"),
     stringsAsFactors = FALSE
   )
   result <- pc_to_PKNCAconc(pc)
@@ -491,7 +507,7 @@ test_that("pc_to_PKNCAconc sets concu from PCSTRESU", {
     PCSTRESN = c(0, 5.0),
     PCSTRESU = "ng/mL",
     PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00"),
-    PCRFTDTC = rep("2024-01-01T08:00:00", 2),
+    FANLDTM  = as.POSIXct("2024-01-01T08:00:00", tz = "UTC"),
     stringsAsFactors = FALSE
   )
   result <- pc_to_PKNCAconc(pc)
@@ -499,7 +515,7 @@ test_that("pc_to_PKNCAconc sets concu from PCSTRESU", {
   expect_true("concu" %in% names(result$columns))
 })
 
-test_that("pc_to_PKNCAconc works with PCELTM only (no PCRFTDTC)", {
+test_that("pc_to_PKNCAconc works with PCELTM only (no FANLDTM)", {
   pc <- data.frame(
     USUBJID  = c("S1", "S1", "S1"),
     PCTEST   = "DrugA",
@@ -512,13 +528,17 @@ test_that("pc_to_PKNCAconc works with PCELTM only (no PCRFTDTC)", {
   )
   result <- pc_to_PKNCAconc(pc)
   expect_s3_class(result, "PKNCAconc")
-  # AFRLT should come from PCELTM when PCRFTDTC is absent
+  # AFRLT should come from PCELTM when FANLDTM is absent
   expect_equal(result$data$AFRLT, c(0, 1, 3))
 })
 
-# --- Integration: derive_pcrftdtc + pc_to_PKNCAconc --------------------------
+# --- Integration: derive_fanldtm + pc_to_PKNCAconc --------------------------
 
-test_that("derive_pcrftdtc output feeds into pc_to_PKNCAconc", {
+test_that("derive_fanldtm output feeds into pc_to_PKNCAconc", {
+  dose_obj <- make_test_dose(
+    usubjid = "S1",
+    exstdtc = "2024-01-01T08:00:00"
+  )
   pc <- data.frame(
     USUBJID  = c("S1", "S1", "S1"),
     PCTEST   = "DrugA",
@@ -529,13 +549,8 @@ test_that("derive_pcrftdtc output feeds into pc_to_PKNCAconc", {
                  "2024-01-01T11:00:00"),
     stringsAsFactors = FALSE
   )
-  ex <- data.frame(
-    USUBJID = c("S1"),
-    EXSTDTC = c("2024-01-01T08:00:00"),
-    stringsAsFactors = FALSE
-  )
 
-  pc_with_ref <- derive_pcrftdtc(pc, ex)
+  pc_with_ref <- derive_fanldtm(pc, dose_obj)
   result <- pc_to_PKNCAconc(pc_with_ref)
   expect_s3_class(result, "PKNCAconc")
   expect_equal(result$data$AFRLT, c(0, 1, 3))
@@ -692,6 +707,21 @@ test_that("vs_to_baseline errors on missing required columns", {
 
 # --- Tests for sdtm_to_PKNCAdata ---------------------------------------------
 
+# Helper: standard EX data for sdtm_to_PKNCAdata tests
+make_test_ex <- function(studyid = "S1", usubjid = "S1-01") {
+  data.frame(
+    STUDYID = studyid,
+    USUBJID = usubjid,
+    EXTRT   = "DRUG A",
+    EXDOSE  = 100,
+    EXDOSU  = "mg",
+    EXROUTE = "ORAL",
+    EXSTDTC = "2024-01-01T08:00:00",
+    EXENDTC = NA,
+    stringsAsFactors = FALSE
+  )
+}
+
 test_that("sdtm_to_PKNCAdata returns a PKNCAdata object with PC and EX", {
   pc <- data.frame(
     STUDYID  = "S1",
@@ -701,21 +731,9 @@ test_that("sdtm_to_PKNCAdata returns a PKNCAdata object with PC and EX", {
     PCSTRESN = c(0, 5.0),
     PCSTRESU = "ug/mL",
     PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00"),
-    PCRFTDTC = c("2024-01-01T08:00:00", "2024-01-01T08:00:00"),
     stringsAsFactors = FALSE
   )
-  ex <- data.frame(
-    STUDYID = "S1",
-    USUBJID = "S1-01",
-    EXTRT   = "DRUG A",
-    EXDOSE  = 100,
-    EXDOSU  = "mg",
-    EXROUTE = "ORAL",
-    EXSTDTC = "2024-01-01T08:00:00",
-    EXENDTC = NA,
-    stringsAsFactors = FALSE
-  )
-  result <- sdtm_to_PKNCAdata(pc, ex)
+  result <- sdtm_to_PKNCAdata(pc, make_test_ex())
   expect_s3_class(result, "PKNCAdata")
   expect_s3_class(result$conc, "PKNCAconc")
   expect_s3_class(result$dose, "PKNCAdose")
@@ -730,18 +748,6 @@ test_that("sdtm_to_PKNCAdata enriches data with DM columns", {
     PCSTRESN = c(0, 5.0),
     PCSTRESU = "ug/mL",
     PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00"),
-    PCRFTDTC = c("2024-01-01T08:00:00", "2024-01-01T08:00:00"),
-    stringsAsFactors = FALSE
-  )
-  ex <- data.frame(
-    STUDYID = "S1",
-    USUBJID = "S1-01",
-    EXTRT   = "DRUG A",
-    EXDOSE  = 100,
-    EXDOSU  = "mg",
-    EXROUTE = "ORAL",
-    EXSTDTC = "2024-01-01T08:00:00",
-    EXENDTC = NA,
     stringsAsFactors = FALSE
   )
   dm <- data.frame(
@@ -751,7 +757,7 @@ test_that("sdtm_to_PKNCAdata enriches data with DM columns", {
     SEX     = "M",
     stringsAsFactors = FALSE
   )
-  result <- sdtm_to_PKNCAdata(pc, ex, dm = dm)
+  result <- sdtm_to_PKNCAdata(pc, make_test_ex(), dm = dm)
   # DM columns should be present in both conc and dose data
   expect_true("AGE" %in% names(result$conc$data))
   expect_true("SEX" %in% names(result$conc$data))
@@ -767,18 +773,6 @@ test_that("sdtm_to_PKNCAdata enriches data with baseline VS", {
     PCSTRESN = c(0, 5.0),
     PCSTRESU = "ug/mL",
     PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00"),
-    PCRFTDTC = c("2024-01-01T08:00:00", "2024-01-01T08:00:00"),
-    stringsAsFactors = FALSE
-  )
-  ex <- data.frame(
-    STUDYID = "S1",
-    USUBJID = "S1-01",
-    EXTRT   = "DRUG A",
-    EXDOSE  = 100,
-    EXDOSU  = "mg",
-    EXROUTE = "ORAL",
-    EXSTDTC = "2024-01-01T08:00:00",
-    EXENDTC = NA,
     stringsAsFactors = FALSE
   )
   vs <- data.frame(
@@ -789,13 +783,13 @@ test_that("sdtm_to_PKNCAdata enriches data with baseline VS", {
     VSBLFL   = "Y",
     stringsAsFactors = FALSE
   )
-  result <- sdtm_to_PKNCAdata(pc, ex, vs = vs)
+  result <- sdtm_to_PKNCAdata(pc, make_test_ex(), vs = vs)
   expect_true("WEIGHT" %in% names(result$conc$data))
   expect_true("HEIGHT" %in% names(result$conc$data))
   expect_equal(unique(result$conc$data$WEIGHT), 70)
 })
 
-test_that("sdtm_to_PKNCAdata derives PCRFTDTC from EX when missing", {
+test_that("sdtm_to_PKNCAdata derives FANLDTM from EX when PC has no time vars", {
   pc <- data.frame(
     STUDYID  = "S1",
     USUBJID  = c("S1-01", "S1-01"),
@@ -806,52 +800,9 @@ test_that("sdtm_to_PKNCAdata derives PCRFTDTC from EX when missing", {
     PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00"),
     stringsAsFactors = FALSE
   )
-  ex <- data.frame(
-    STUDYID = "S1",
-    USUBJID = "S1-01",
-    EXTRT   = "DRUG A",
-    EXDOSE  = 100,
-    EXDOSU  = "mg",
-    EXROUTE = "ORAL",
-    EXSTDTC = "2024-01-01T08:00:00",
-    EXENDTC = NA,
-    stringsAsFactors = FALSE
-  )
-  # PC has no PCRFTDTC or PCELTM — should auto-derive from EX
-  result <- sdtm_to_PKNCAdata(pc, ex)
+  # PC has no FANLDTM or PCELTM — should auto-derive FANLDTM from PKNCAdose
+  result <- sdtm_to_PKNCAdata(pc, make_test_ex())
   expect_s3_class(result, "PKNCAdata")
   expect_equal(result$conc$data$AFRLT, c(0, 1))
-})
-
-test_that("sdtm_to_PKNCAdata passes pc_args and ex_args through", {
-  pc <- data.frame(
-    STUDYID  = "S1",
-    SUBJ     = c("S1-01", "S1-01"),
-    PCTEST   = "DrugA",
-    PCSPEC   = "SERUM",
-    PCSTRESN = c(0, 5.0),
-    PCSTRESU = "ug/mL",
-    PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00"),
-    PCRFTDTC = c("2024-01-01T08:00:00", "2024-01-01T08:00:00"),
-    stringsAsFactors = FALSE
-  )
-  ex <- data.frame(
-    STUDYID = "S1",
-    SUBJ    = "S1-01",
-    EXTRT   = "DRUG A",
-    EXDOSE  = 100,
-    EXDOSU  = "mg",
-    EXROUTE = "ORAL",
-    EXSTDTC = "2024-01-01T08:00:00",
-    EXENDTC = NA,
-    stringsAsFactors = FALSE
-  )
-  # Use custom USUBJID column name
-  result <- sdtm_to_PKNCAdata(
-    pc, ex,
-    pc_args = list(USUBJID = "SUBJ"),
-    ex_args = list(USUBJID = "SUBJ")
-  )
-  expect_s3_class(result, "PKNCAdata")
 })
 
