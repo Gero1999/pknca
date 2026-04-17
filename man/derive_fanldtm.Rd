@@ -32,6 +32,7 @@ the reference point for computing a continuous time axis
 The grouping used to determine "first dose" comes from the PKNCAdose
 object's own grouping variables (typically \code{EXTRT + USUBJID} from
 \code{\link{ex_to_PKNCAdose}}). The join key between the FANLDTM lookup
-and the PC data is determined by the intersection of their column names,
-following the CDISC convention.
+and the PC data is restricted to the PKNCAdose grouping variables that
+also exist in \code{pc}, preventing accidental joins on other shared
+columns.
 }

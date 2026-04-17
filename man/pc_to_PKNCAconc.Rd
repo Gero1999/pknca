@@ -41,21 +41,23 @@ has a numeric value, the concentration is set to \code{0} (BLQ).}
 \item{PCDTC}{Column name for the collection date/time (ISO 8601)}
 
 \item{PCELTM}{Column name for the planned elapsed time (ISO 8601 duration,
-e.g. \code{"PT2H"}). If present, used as the nominal time variable.}
+e.g. \code{"PT2H"}). If present, parsed to numeric hours and used as
+\code{time.nominal} (\code{NFRLT}) in the PKNCAconc object.}
 
 \item{FANLDTM}{Column name for the first analyte dose datetime (POSIXct).
-Used to derive elapsed time when \code{PCELTM} is absent, giving a
-continuous time axis from the first dose. See
+Required. Used to derive \code{AFRLT = PCDTC - FANLDTM} in hours. See
 \code{\link{derive_fanldtm}} to populate this from a PKNCAdose object.}
 }
 \value{
 A \code{PKNCAconc} object with:
 \itemize{
   \item Concentration from \code{PCSTRESN} (BLQ set to 0)
-  \item Time as \code{AFRLT} (hours from first dose)
+  \item Time as \code{AFRLT} (hours from first dose, derived from
+    \code{FANLDTM})
+  \item Nominal time as \code{NFRLT} (hours, parsed from \code{PCELTM}
+    if available)
   \item Groups: \code{PCSPEC + USUBJID / PCTEST}
   \item Units from \code{PCSTRESU} (if available)
-  \item Nominal time from \code{PCELTM} (if available, parsed to hours)
 }
 }
 \description{
@@ -64,17 +66,17 @@ suitable for NCA analysis with PKNCA.
 }
 \section{Time derivation}{
 
-The function computes a relative time variable (\code{AFRLT}, actual time
-from reference in hours) using the following priority:
-\enumerate{
-  \item \code{PCELTM}: If the column exists in \code{pc}, its ISO 8601
-    duration values (e.g. \code{"PT2H"}) are parsed to numeric hours.
-  \item \code{FANLDTM}: If \code{PCELTM} is absent but \code{FANLDTM}
-    exists (a POSIXct first-dose datetime), elapsed time is derived as
-    \code{PCDTC - FANLDTM} in hours, giving a continuous time axis from
-    the first dose. Use \code{\link{derive_fanldtm}} to populate this
-    column from a PKNCAdose object before calling this function.
-  \item If neither is available, the function stops with an error.
+The function derives two time variables:
+\describe{
+  \item{\code{AFRLT} (actual time from reference)}{Derived from
+    \code{FANLDTM} as \code{PCDTC - FANLDTM} in hours. This gives a
+    continuous time axis from the first dose. \code{FANLDTM} is required;
+    use \code{\link{derive_fanldtm}} to populate it from a PKNCAdose
+    object before calling this function.}
+  \item{\code{NFRLT} (nominal time from reference)}{Optionally derived
+    from \code{PCELTM} if present. ISO 8601 duration values (e.g.
+    \code{"PT2H"}) are parsed to numeric hours and used as
+    \code{time.nominal} in the PKNCAconc object.}
 }
 }
 

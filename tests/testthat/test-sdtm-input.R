@@ -349,7 +349,7 @@ test_that("pc_to_PKNCAconc derives time from FANLDTM", {
   expect_equal(result$data$AFRLT, c(0, 1, 3))
 })
 
-test_that("pc_to_PKNCAconc uses PCELTM when available", {
+test_that("pc_to_PKNCAconc uses PCELTM as nominal time (NFRLT)", {
   pc <- data.frame(
     USUBJID  = c("S1", "S1", "S1"),
     PCTEST   = "DrugA",
@@ -358,16 +358,17 @@ test_that("pc_to_PKNCAconc uses PCELTM when available", {
     PCSTRESU = "ug/mL",
     PCDTC    = c("2024-01-01T08:00:00", "2024-01-01T09:00:00",
                  "2024-01-01T11:00:00"),
+    FANLDTM  = as.POSIXct("2024-01-01T08:00:00", tz = "UTC"),
     PCELTM   = c("PT0H", "PT1H", "PT3H"),
     stringsAsFactors = FALSE
   )
   result <- pc_to_PKNCAconc(pc)
   expect_s3_class(result, "PKNCAconc")
-  # Nominal time should be parsed PCELTM
-  expect_equal(result$data$PCELTM_hours, c(0, 1, 3))
+  # NFRLT should be parsed from PCELTM
+  expect_equal(result$data$NFRLT, c(0, 1, 3))
 })
 
-test_that("pc_to_PKNCAconc prefers FANLDTM for AFRLT when both PCELTM and FANLDTM exist", {
+test_that("pc_to_PKNCAconc derives both AFRLT and NFRLT when both FANLDTM and PCELTM exist", {
   pc <- data.frame(
     USUBJID  = c("S1", "S1"),
     PCTEST   = "DrugA",
@@ -380,10 +381,10 @@ test_that("pc_to_PKNCAconc prefers FANLDTM for AFRLT when both PCELTM and FANLDT
     stringsAsFactors = FALSE
   )
   result <- pc_to_PKNCAconc(pc)
-  # AFRLT derived from FANLDTM (actual times)
+  # AFRLT from FANLDTM
   expect_equal(result$data$AFRLT, c(0, 1.5))
-  # PCELTM_hours used as nominal time
-  expect_equal(result$data$PCELTM_hours, c(0, 1.5))
+  # NFRLT from PCELTM (nominal time)
+  expect_equal(result$data$NFRLT, c(0, 1.5))
 })
 
 test_that("pc_to_PKNCAconc handles BLQ correctly", {
@@ -457,7 +458,7 @@ test_that("pc_to_PKNCAconc works without PCTEST or PCSPEC", {
   expect_equal(deparse(f), "PCSTRESN ~ AFRLT | USUBJID")
 })
 
-test_that("pc_to_PKNCAconc errors when no time derivation is possible", {
+test_that("pc_to_PKNCAconc errors when FANLDTM is missing", {
   pc <- data.frame(
     USUBJID  = "S1",
     PCSTRESN = 5.0,
@@ -466,7 +467,7 @@ test_that("pc_to_PKNCAconc errors when no time derivation is possible", {
   )
   expect_error(
     pc_to_PKNCAconc(pc),
-    regexp = "Cannot derive time"
+    regexp = "FANLDTM.*not found"
   )
 })
 
@@ -515,7 +516,7 @@ test_that("pc_to_PKNCAconc sets concu from PCSTRESU", {
   expect_true("concu" %in% names(result$columns))
 })
 
-test_that("pc_to_PKNCAconc works with PCELTM only (no FANLDTM)", {
+test_that("pc_to_PKNCAconc errors when FANLDTM is missing (even with PCELTM)", {
   pc <- data.frame(
     USUBJID  = c("S1", "S1", "S1"),
     PCTEST   = "DrugA",
@@ -526,10 +527,10 @@ test_that("pc_to_PKNCAconc works with PCELTM only (no FANLDTM)", {
     PCELTM   = c("PT0H", "PT1H", "PT3H"),
     stringsAsFactors = FALSE
   )
-  result <- pc_to_PKNCAconc(pc)
-  expect_s3_class(result, "PKNCAconc")
-  # AFRLT should come from PCELTM when FANLDTM is absent
-  expect_equal(result$data$AFRLT, c(0, 1, 3))
+  expect_error(
+    pc_to_PKNCAconc(pc),
+    regexp = "FANLDTM.*not found"
+  )
 })
 
 # --- Integration: derive_fanldtm + pc_to_PKNCAconc --------------------------

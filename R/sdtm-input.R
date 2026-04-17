@@ -209,8 +209,9 @@ ex_to_PKNCAdose <- function(
 #' The grouping used to determine "first dose" comes from the PKNCAdose
 #' object's own grouping variables (typically \code{EXTRT + USUBJID} from
 #' \code{\link{ex_to_PKNCAdose}}). The join key between the FANLDTM lookup
-#' and the PC data is determined by the intersection of their column names,
-#' following the CDISC convention.
+#' and the PC data is restricted to the PKNCAdose grouping variables that
+#' also exist in \code{pc}, preventing accidental joins on other shared
+#' columns.
 #'
 #' @param pc A data.frame containing the PC (Pharmacokinetic Concentrations)
 #'   SDTM domain.
@@ -275,12 +276,14 @@ derive_fanldtm <- function(
     names(fanldtm_lookup)[names(fanldtm_lookup) == posix_cols[1]] <- FANLDTM
   }
 
-  # Join onto PC using shared columns (CDISC convention)
-  join_keys <- intersect(names(pc), names(fanldtm_lookup))
-  join_keys <- setdiff(join_keys, c(FANLDTM, "DOMAIN"))
+  # Join onto PC using only the PKNCAdose grouping variables that exist in PC.
+  # This avoids accidental joins on other shared columns (e.g. STUDYID) that
+  # could have different semantics across domains.
+  join_keys <- intersect(names(pc), group_vars)
   if (length(join_keys) == 0) {
     stop(
-      "No shared columns between pc and PKNCAdose grouping variables. ",
+      "No shared columns between pc and PKNCAdose grouping variables (",
+      paste(group_vars, collapse = ", "), "). ",
       "Ensure both use the same subject identifier (e.g. USUBJID)."
     )
   }
@@ -301,17 +304,17 @@ derive_fanldtm <- function(
 #' suitable for NCA analysis with PKNCA.
 #'
 #' @section Time derivation:
-#' The function computes a relative time variable (\code{AFRLT}, actual time
-#' from reference in hours) using the following priority:
-#' \enumerate{
-#'   \item \code{PCELTM}: If the column exists in \code{pc}, its ISO 8601
-#'     duration values (e.g. \code{"PT2H"}) are parsed to numeric hours.
-#'   \item \code{FANLDTM}: If \code{PCELTM} is absent but \code{FANLDTM}
-#'     exists (a POSIXct first-dose datetime), elapsed time is derived as
-#'     \code{PCDTC - FANLDTM} in hours, giving a continuous time axis from
-#'     the first dose. Use \code{\link{derive_fanldtm}} to populate this
-#'     column from a PKNCAdose object before calling this function.
-#'   \item If neither is available, the function stops with an error.
+#' The function derives two time variables:
+#' \describe{
+#'   \item{\code{AFRLT} (actual time from reference)}{Derived from
+#'     \code{FANLDTM} as \code{PCDTC - FANLDTM} in hours. This gives a
+#'     continuous time axis from the first dose. \code{FANLDTM} is required;
+#'     use \code{\link{derive_fanldtm}} to populate it from a PKNCAdose
+#'     object before calling this function.}
+#'   \item{\code{NFRLT} (nominal time from reference)}{Optionally derived
+#'     from \code{PCELTM} if present. ISO 8601 duration values (e.g.
+#'     \code{"PT2H"}) are parsed to numeric hours and used as
+#'     \code{time.nominal} in the PKNCAconc object.}
 #' }
 #'
 #' @section BLQ handling:
@@ -350,10 +353,12 @@ derive_fanldtm <- function(
 #' @return A \code{PKNCAconc} object with:
 #' \itemize{
 #'   \item Concentration from \code{PCSTRESN} (BLQ set to 0)
-#'   \item Time as \code{AFRLT} (hours from first dose)
+#'   \item Time as \code{AFRLT} (hours from first dose, derived from
+#'     \code{FANLDTM})
+#'   \item Nominal time as \code{NFRLT} (hours, parsed from \code{PCELTM}
+#'     if available)
 #'   \item Groups: \code{PCSPEC + USUBJID / PCTEST}
 #'   \item Units from \code{PCSTRESU} (if available)
-#'   \item Nominal time from \code{PCELTM} (if available, parsed to hours)
 #' }
 #' @importFrom dplyr mutate
 #' @importFrom rlang sym
@@ -399,37 +404,31 @@ pc_to_PKNCAconc <- function(
   # --- Time derivation ---
   has_pceltm <- PCELTM %in% names(pc)
   has_fanldtm <- FANLDTM %in% names(pc)
-  has_pcdtc <- PCDTC %in% names(pc)
 
-  if (has_pceltm) {
-    # Parse ISO 8601 duration to numeric hours
-    pceltm_hours <- parse_iso8601_duration(pc[[PCELTM]])
-    pc[["PCELTM_hours"]] <- pceltm_hours
-  }
-
-  if (!has_pcdtc) {
+  if (!PCDTC %in% names(pc)) {
     stop("Column '", PCDTC, "' is required in pc data")
   }
 
-  if (has_fanldtm) {
-    # Derive AFRLT = PCDTC - FANLDTM in hours (continuous from first dose)
-    pc_dt <- std_dtc_to_rdate(pc[[PCDTC]])
-    # FANLDTM may already be POSIXct (from derive_fanldtm) or ISO 8601 string
-    if (inherits(pc[[FANLDTM]], "POSIXct")) {
-      ref_dt <- pc[[FANLDTM]]
-    } else {
-      ref_dt <- std_dtc_to_rdate(pc[[FANLDTM]])
-    }
-    pc[["AFRLT"]] <- as.numeric(difftime(pc_dt, ref_dt, units = "hours"))
-  } else if (has_pceltm) {
-    # Use parsed PCELTM as the time axis
-    pc[["AFRLT"]] <- pc[["PCELTM_hours"]]
-  } else {
+  # AFRLT (actual time from reference): always derived from FANLDTM
+  if (!has_fanldtm) {
     stop(
-      "Cannot derive time: neither '", PCELTM, "' nor '", FANLDTM,
-      "' found in pc data. ",
+      "Column '", FANLDTM, "' not found in pc data. ",
       "Use derive_fanldtm() to add the first dose datetime from a PKNCAdose object."
     )
+  }
+  pc_dt <- std_dtc_to_rdate(pc[[PCDTC]])
+  # FANLDTM may already be POSIXct (from derive_fanldtm) or ISO 8601 string
+  if (inherits(pc[[FANLDTM]], "POSIXct")) {
+    ref_dt <- pc[[FANLDTM]]
+  } else {
+    ref_dt <- std_dtc_to_rdate(pc[[FANLDTM]])
+  }
+  pc[["AFRLT"]] <- as.numeric(difftime(pc_dt, ref_dt, units = "hours"))
+
+  # NFRLT (nominal time from reference): optionally derived from PCELTM
+  if (has_pceltm) {
+    pceltm_hours <- parse_iso8601_duration(pc[[PCELTM]])
+    pc[["NFRLT"]] <- pceltm_hours
   }
 
   # --- Build formula ---
@@ -456,9 +455,9 @@ pc_to_PKNCAconc <- function(
     formula = as.formula(formula_str)
   )
 
-  # Nominal time from PCELTM (parsed to hours)
+  # Nominal time from PCELTM (parsed to hours as NFRLT)
   if (has_pceltm) {
-    PKNCAconc_args$time.nominal <- "PCELTM_hours"
+    PKNCAconc_args$time.nominal <- "NFRLT"
   }
 
   # Concentration units
