@@ -300,6 +300,64 @@ test_that("derive_fanldtm errors when dose_obj is not PKNCAdose", {
   expect_error(derive_fanldtm(pc, data.frame()), regexp = "PKNCAdose")
 })
 
+test_that("derive_fanldtm assigns correct treatment via dose-time proximity", {
+  # Multi-drug: Drug A dosed Day 1, Drug B dosed Day 8 (crossover)
+  ex <- data.frame(
+    USUBJID = c("S1", "S1"),
+    EXTRT   = c("DRUG A", "DRUG B"),
+    EXDOSE  = c(100, 200),
+    EXDOSU  = "mg",
+    EXROUTE = "ORAL",
+    EXSTDTC = c("2024-01-01T08:00:00", "2024-01-08T08:00:00"),
+    EXENDTC = NA,
+    stringsAsFactors = FALSE
+  )
+  dose_obj <- ex_to_PKNCAdose(ex)
+
+  pc <- data.frame(
+    USUBJID  = rep("S1", 4),
+    PCDTC    = c(
+      "2024-01-01T09:00:00",  # 1h after Drug A dose -> Drug A
+      "2024-01-01T14:00:00",  # 6h after Drug A dose -> Drug A
+      "2024-01-08T09:00:00",  # 1h after Drug B dose -> Drug B
+      "2024-01-08T14:00:00"   # 6h after Drug B dose -> Drug B
+    ),
+    PCSTRESN = c(5.0, 2.0, 8.0, 4.0),
+    stringsAsFactors = FALSE
+  )
+
+  result <- derive_fanldtm(pc, dose_obj)
+  expect_true("FANLDTM" %in% names(result))
+  # Drug A samples: FANLDTM = first Drug A dose = 2024-01-01T08:00:00
+  # Drug B samples: FANLDTM = first Drug B dose = 2024-01-08T08:00:00
+  expect_equal(
+    result$FANLDTM,
+    as.POSIXct(c(
+      "2024-01-01T08:00:00", "2024-01-01T08:00:00",
+      "2024-01-08T08:00:00", "2024-01-08T08:00:00"
+    ), tz = "UTC")
+  )
+})
+
+test_that("derive_fanldtm handles pre-dose samples before first dose", {
+  dose_obj <- make_test_dose(
+    usubjid = "S1",
+    exstdtc = "2024-01-01T08:00:00"
+  )
+  pc <- data.frame(
+    USUBJID  = c("S1", "S1"),
+    PCDTC    = c("2024-01-01T07:50:00", "2024-01-01T09:00:00"),
+    PCSTRESN = c(0, 5.0),
+    stringsAsFactors = FALSE
+  )
+  result <- derive_fanldtm(pc, dose_obj)
+  # Pre-dose sample should get the same FANLDTM as post-dose
+  expect_equal(
+    result$FANLDTM,
+    rep(as.POSIXct("2024-01-01T08:00:00", tz = "UTC"), 2)
+  )
+})
+
 test_that("derive_fanldtm errors when no shared columns", {
   dose_obj <- make_test_dose(
     usubjid = "S1",

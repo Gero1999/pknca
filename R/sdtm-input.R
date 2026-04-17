@@ -200,23 +200,33 @@ ex_to_PKNCAdose <- function(
 #' Derive FANLDTM (first analyte dose datetime) for PC data from a PKNCAdose
 #' object
 #'
-#' Extracts the first (earliest) dose datetime per subject from a
-#' \code{PKNCAdose} object and joins it onto a PC data frame as
-#' \code{FANLDTM}. The resulting column is a POSIXct datetime that serves as
-#' the reference point for computing a continuous time axis
-#' (\code{AFRLT = PCDTC - FANLDTM}).
+#' Links each PC record to its most recent dose by matching sample collection
+#' times to dose start times, then computes the first dose datetime per
+#' treatment group. The result is a continuous time reference for NCA analysis.
 #'
-#' The grouping used to determine "first dose" comes from the PKNCAdose
-#' object's own grouping variables (typically \code{EXTRT + USUBJID} from
-#' \code{\link{ex_to_PKNCAdose}}). The join key between the FANLDTM lookup
-#' and the PC data is restricted to the PKNCAdose grouping variables that
-#' also exist in \code{pc}, preventing accidental joins on other shared
-#' columns.
+#' @section Algorithm:
+#' \enumerate{
+#'   \item The PKNCAdose grouping variables (from the dose formula, e.g.
+#'     \code{EXTRT + USUBJID}) and dose datetimes are extracted.
+#'   \item PC and dose data are linked by the grouping variables that exist
+#'     in both (typically \code{USUBJID}).
+#'   \item For each PC record, the most recent dose at or before the sample
+#'     collection time (\code{PCDTC}) is identified. This assigns each
+#'     sample to its corresponding dosing period and treatment.
+#'   \item Pre-dose samples collected before any dose are assigned to the
+#'     earliest dose for that subject.
+#'   \item \code{FANLDTM} is set to the minimum dose datetime for the
+#'     full grouping (e.g. per \code{EXTRT + USUBJID}).
+#' }
 #'
 #' @param pc A data.frame containing the PC (Pharmacokinetic Concentrations)
-#'   SDTM domain.
+#'   SDTM domain. Must contain a \code{PCDTC} column (or the name specified
+#'   via the parameter) and at least one column matching the PKNCAdose
+#'   grouping variables.
 #' @param dose_obj A \code{PKNCAdose} object (e.g. from
 #'   \code{\link{ex_to_PKNCAdose}}).
+#' @param PCDTC Column name for the PC collection date/time (ISO 8601) in
+#'   \code{pc}.
 #' @param FANLDTM Column name to assign for the derived first dose datetime.
 #'   If this column already exists in \code{pc}, it is overwritten with a
 #'   warning.
@@ -226,71 +236,116 @@ ex_to_PKNCAdose <- function(
 derive_fanldtm <- function(
   pc,
   dose_obj,
+  PCDTC = "PCDTC",
   FANLDTM = "FANLDTM"
 ) {
   checkmate::assert_data_frame(pc, min.rows = 1)
   if (!inherits(dose_obj, "PKNCAdose")) {
     stop("dose_obj must be a PKNCAdose object")
   }
+  checkmate::assert_string(PCDTC)
   checkmate::assert_string(FANLDTM)
+
+  if (!PCDTC %in% names(pc)) {
+    stop("Column '", PCDTC, "' not found in pc data")
+  }
 
   if (FANLDTM %in% names(pc)) {
     rlang::warn(
       paste0("Column '", FANLDTM, "' already exists in pc and will be overwritten"),
       class = "pknca_fanldtm_overwrite"
     )
+    pc[[FANLDTM]] <- NULL
   }
 
-  # Get the dose data and identify the datetime column
+  # --- Extract dose schedule from PKNCAdose ---
   dose_data <- dose_obj$data
-  # The EX_reference column is the per-subject first dose datetime set by
-
-  # ex_to_PKNCAdose. If it exists, use it directly. Otherwise, find the
-  # minimum of the original datetime column per group.
   group_vars <- dose_obj$columns$groups$group_vars
 
-  if ("EX_reference" %in% names(dose_data)) {
-    # EX_reference is already the min(EXSTDTC) per subject from ex_to_PKNCAdose
-    fanldtm_cols <- c(group_vars, "EX_reference")
-    fanldtm_lookup <- unique(dose_data[, fanldtm_cols, drop = FALSE])
-    names(fanldtm_lookup)[names(fanldtm_lookup) == "EX_reference"] <- FANLDTM
-  } else {
-    # Fallback: find the row with the minimum time per group
-    time_col <- dose_obj$columns$time
-    if (length(time_col) == 0 || !time_col %in% names(dose_data)) {
-      stop("Cannot determine dose times from PKNCAdose object")
-    }
-    # Group by group_vars, take the row with min time
-    dose_data <- dose_data[order(dose_data[[time_col]]), , drop = FALSE]
-    first_rows <- dose_data[!duplicated(dose_data[, group_vars, drop = FALSE]), , drop = FALSE]
-    # Look for a POSIXct datetime column (EXSTDTC or similar)
-    posix_cols <- names(first_rows)[vapply(first_rows, inherits, logical(1), "POSIXct")]
-    if (length(posix_cols) == 0) {
-      stop(
-        "No POSIXct datetime column found in PKNCAdose data. ",
-        "Ensure ex_to_PKNCAdose was used to create the dose object."
-      )
-    }
-    # Use the first POSIXct column (typically EXSTDTC)
-    fanldtm_lookup <- first_rows[, c(group_vars, posix_cols[1]), drop = FALSE]
-    names(fanldtm_lookup)[names(fanldtm_lookup) == posix_cols[1]] <- FANLDTM
-  }
-
-  # Join onto PC using only the PKNCAdose grouping variables that exist in PC.
-  # This avoids accidental joins on other shared columns (e.g. STUDYID) that
-  # could have different semantics across domains.
-  join_keys <- intersect(names(pc), group_vars)
-  if (length(join_keys) == 0) {
+  # Determine which group_vars exist in PC (typically USUBJID) for the
+  # subject-level match. The remaining group_vars (e.g. EXTRT) will be
+  # assigned to each PC record based on dose-time proximity.
+  shared_keys <- intersect(names(pc), group_vars)
+  if (length(shared_keys) == 0) {
     stop(
       "No shared columns between pc and PKNCAdose grouping variables (",
       paste(group_vars, collapse = ", "), "). ",
-      "Ensure both use the same subject identifier (e.g. USUBJID)."
+      "Ensure both use the same subject identifier."
     )
   }
+  assigned_vars <- setdiff(group_vars, shared_keys)
 
-  # Remove existing FANLDTM before join to avoid conflicts
-  pc[[FANLDTM]] <- NULL
-  pc <- dplyr::left_join(pc, fanldtm_lookup, by = join_keys)
+  # Find the POSIXct datetime column in dose data (EXSTDTC parsed by
+  # ex_to_PKNCAdose)
+  posix_cols <- names(dose_data)[vapply(dose_data, inherits, logical(1), "POSIXct")]
+  posix_cols <- setdiff(posix_cols, "EX_reference")
+  if (length(posix_cols) == 0) {
+    stop(
+      "No POSIXct datetime column found in PKNCAdose data. ",
+      "Ensure ex_to_PKNCAdose was used to create the dose object."
+    )
+  }
+  dose_dtc_col <- posix_cols[1]
+
+  # Build minimal dose lookup: group_vars + dose datetime
+  dose_cols <- unique(c(group_vars, dose_dtc_col))
+  doses <- unique(dose_data[, dose_cols, drop = FALSE])
+
+  # --- Parse PC collection times ---
+  pc_dt <- std_dtc_to_rdate(pc[[PCDTC]])
+
+  # --- For each PC record, find the most recent dose at or before PCDTC ---
+  # Match on shared_keys (e.g. USUBJID), then pick by time proximity
+  assigned_rows <- vapply(seq_len(nrow(pc)), function(i) {
+    sample_time <- pc_dt[i]
+    if (is.na(sample_time)) return(NA_integer_)
+
+    # Filter doses to those matching on shared keys
+    mask <- rep(TRUE, nrow(doses))
+    for (key in shared_keys) {
+      mask <- mask & (doses[[key]] == pc[[key]][i])
+    }
+    if (!any(mask)) return(NA_integer_)
+
+    dose_times <- doses[[dose_dtc_col]][mask]
+    mask_idx <- which(mask)
+
+    # Most recent dose at or before sample time
+    eligible <- mask_idx[dose_times <= sample_time]
+    if (length(eligible) == 0) {
+      # Pre-dose: assign to the earliest dose for this subject
+      mask_idx[which.min(dose_times)]
+    } else {
+      eligible[which.max(doses[[dose_dtc_col]][eligible])]
+    }
+  }, integer(1), USE.NAMES = FALSE)
+
+  # --- Compute FANLDTM = min(dose datetime) per full group_vars ---
+  fanldtm_lookup <- do.call(
+    rbind,
+    lapply(
+      split(seq_len(nrow(doses)), doses[, group_vars, drop = FALSE]),
+      function(idx) {
+        result <- doses[idx[1], group_vars, drop = FALSE]
+        result[[FANLDTM]] <- min(doses[[dose_dtc_col]][idx], na.rm = TRUE)
+        result
+      }
+    )
+  )
+  rownames(fanldtm_lookup) <- NULL
+
+  # --- Assign group_vars from matched dose rows to PC, then join FANLDTM ---
+  # Temporarily add the dose-assigned group vars (e.g. EXTRT) to PC
+  for (av in assigned_vars) {
+    pc[[av]] <- doses[[av]][assigned_rows]
+  }
+
+  pc <- dplyr::left_join(pc, fanldtm_lookup, by = group_vars)
+
+  # Remove the temporary columns (they came from EX, not PC)
+  for (av in assigned_vars) {
+    pc[[av]] <- NULL
+  }
 
   pc
 }

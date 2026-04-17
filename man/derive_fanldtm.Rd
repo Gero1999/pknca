@@ -5,14 +5,19 @@
 \title{Derive FANLDTM (first analyte dose datetime) for PC data from a PKNCAdose
 object}
 \usage{
-derive_fanldtm(pc, dose_obj, FANLDTM = "FANLDTM")
+derive_fanldtm(pc, dose_obj, PCDTC = "PCDTC", FANLDTM = "FANLDTM")
 }
 \arguments{
 \item{pc}{A data.frame containing the PC (Pharmacokinetic Concentrations)
-SDTM domain.}
+SDTM domain. Must contain a \code{PCDTC} column (or the name specified
+via the parameter) and at least one column matching the PKNCAdose
+grouping variables.}
 
 \item{dose_obj}{A \code{PKNCAdose} object (e.g. from
 \code{\link{ex_to_PKNCAdose}}).}
+
+\item{PCDTC}{Column name for the PC collection date/time (ISO 8601) in
+\code{pc}.}
 
 \item{FANLDTM}{Column name to assign for the derived first dose datetime.
 If this column already exists in \code{pc}, it is overwritten with a
@@ -23,16 +28,23 @@ The \code{pc} data.frame with an added (or replaced) \code{FANLDTM}
   column (POSIXct in UTC).
 }
 \description{
-Extracts the first (earliest) dose datetime per subject from a
-\code{PKNCAdose} object and joins it onto a PC data frame as
-\code{FANLDTM}. The resulting column is a POSIXct datetime that serves as
-the reference point for computing a continuous time axis
-(\code{AFRLT = PCDTC - FANLDTM}).
+Links each PC record to its most recent dose by matching sample collection
+times to dose start times, then computes the first dose datetime per
+treatment group. The result is a continuous time reference for NCA analysis.
+}
+\section{Algorithm}{
 
-The grouping used to determine "first dose" comes from the PKNCAdose
-object's own grouping variables (typically \code{EXTRT + USUBJID} from
-\code{\link{ex_to_PKNCAdose}}). The join key between the FANLDTM lookup
-and the PC data is restricted to the PKNCAdose grouping variables that
-also exist in \code{pc}, preventing accidental joins on other shared
-columns.
+\enumerate{
+  \item The PKNCAdose grouping variables (from the dose formula, e.g.
+    \code{EXTRT + USUBJID}) and dose datetimes are extracted.
+  \item PC and dose data are linked by the grouping variables that exist
+    in both (typically \code{USUBJID}).
+  \item For each PC record, the most recent dose at or before the sample
+    collection time (\code{PCDTC}) is identified. This assigns each
+    sample to its corresponding dosing period and treatment.
+  \item Pre-dose samples collected before any dose are assigned to the
+    earliest dose for that subject.
+  \item \code{FANLDTM} is set to the minimum dose datetime for the
+    full grouping (e.g. per \code{EXTRT + USUBJID}).
+}
 }
