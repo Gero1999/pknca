@@ -80,5 +80,6 @@ Where:
 
 Other Sparse Methods:
 [`as_sparse_pk()`](http://humanpred.github.io/pknca/reference/as_sparse_pk.md),
+[`pk.calc.sparse_aumc()`](http://humanpred.github.io/pknca/reference/pk.calc.sparse_aumc.md),
 [`sparse_auc_weight_linear()`](http://humanpred.github.io/pknca/reference/sparse_auc_weight_linear.md),
 [`sparse_mean()`](http://humanpred.github.io/pknca/reference/sparse_mean.md)

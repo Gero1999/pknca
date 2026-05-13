@@ -1,4 +1,4 @@
-pandoc: 3.1.11
+pandoc: 3.8.3
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
@@ -17,10 +17,11 @@ articles:
   v22-time-to-steady-state: v22-time-to-steady-state.html
   v23-auc-integration-methods: v23-auc-integration-methods.html
   v30-training-session: v30-training-session.html
+  v31-FDA-introduction: v31-FDA-introduction.html
   v40-options-for-controlling-PKNCA: v40-options-for-controlling-PKNCA.html
   v60-PKNCA-validation: v60-PKNCA-validation.html
   v80-writing-parameter-functions: v80-writing-parameter-functions.html
-last_built: 2026-04-15T11:07Z
+last_built: 2026-05-13T14:29Z
 urls:
   reference: http://humanpred.github.io/pknca/reference
   article: http://humanpred.github.io/pknca/articles
