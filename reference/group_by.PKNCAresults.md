@@ -34,6 +34,7 @@ ungroup(x, ...)
 
 - ...:
 
+  \<[`data-masking`](https://rlang.r-lib.org/reference/args_data_masking.html)\>
   In
   [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html),
   variables or computations to group by. Computations are always done on
@@ -53,10 +54,6 @@ ungroup(x, ...)
   will override existing groups. To add to the existing groups, use
   `.add = TRUE`.
 
-  This argument was previously called `add`, but that prevented creating
-  a new grouping variable called `add`, and conflicts with our naming
-  conventions.
-
 - .drop:
 
   Drop groups formed by factor levels that don't appear in the data? The
@@ -72,6 +69,6 @@ ungroup(x, ...)
 ## See also
 
 Other dplyr verbs:
-[`filter.PKNCAresults()`](http://humanpred.github.io/pknca/reference/filter.PKNCAresults.md),
-[`inner_join.PKNCAresults()`](http://humanpred.github.io/pknca/reference/inner_join.PKNCAresults.md),
-[`mutate.PKNCAresults()`](http://humanpred.github.io/pknca/reference/mutate.PKNCAresults.md)
+[`filter.PKNCAresults()`](https://humanpred.github.io/pknca/reference/filter.PKNCAresults.md),
+[`inner_join.PKNCAresults()`](https://humanpred.github.io/pknca/reference/inner_join.PKNCAresults.md),
+[`mutate.PKNCAresults()`](https://humanpred.github.io/pknca/reference/mutate.PKNCAresults.md)

@@ -2,7 +2,7 @@
 
 For one subject/time range, compute all available PK parameters. All the
 internal options should be set by
-[`PKNCA.options()`](http://humanpred.github.io/pknca/reference/PKNCA.options.md)
+[`PKNCA.options()`](https://humanpred.github.io/pknca/reference/PKNCA.options.md)
 prior to running. The only part that changes with a call to this
 function is the `conc`entration and `time`.
 
@@ -29,6 +29,7 @@ pk.nca.interval(
   impute_method = NA_character_,
   include_half.life = NULL,
   exclude_half.life = NULL,
+  lloq = NULL,
   subject,
   sparse,
   interval,
@@ -100,16 +101,30 @@ pk.nca.interval(
 
   The method to use for imputation as a character string
 
-- include_half.life:
+- exclude_half.life, include_half.life:
 
-  An optional boolean vector of the concentration measurements to
-  include in the half-life calculation. If given, no half-life point
-  selection will occur.
+  Manual half-life point selection, given as a logical value per
+  concentration measurement (or, in
+  [`PKNCAconc()`](https://humanpred.github.io/pknca/reference/PKNCAconc.md),
+  the name of such a column in the data). `exclude_half.life` drops the
+  flagged points; automatic curve-stripping point selection is still
+  performed on the remaining (non-excluded) points and is not bypassed.
+  `include_half.life` names the exact points to use, bypassing automatic
+  curve-stripping point selection. Each value is `TRUE`, `FALSE`, or
+  `NA` (undefined); the column/vector is treated as "in use" for an
+  interval unless it is entirely `NA` (so an all-`FALSE` column still
+  counts as in use), so leave it `NA` (rather than `FALSE`) where the
+  mechanism should not apply. Only one of `exclude_half.life` and
+  `include_half.life` may be in use for a given interval. See the
+  "Half-Life Calculation" vignette for more details on the use of these
+  arguments.
 
-- exclude_half.life:
+- lloq:
 
-  An optional boolean vector of the concentration measurements to
-  exclude from the half-life calculation.
+  An optional scalar or vector (the same length as `conc`) with the
+  lower limit of quantification passed to
+  [`pk.calc.half.life()`](https://humanpred.github.io/pknca/reference/pk.calc.half.life.md)
+  for the Tobit half-life method.
 
 - subject:
 
@@ -123,13 +138,13 @@ pk.nca.interval(
 - interval:
 
   One row of an interval definition (see
-  [`check.interval.specification()`](http://humanpred.github.io/pknca/reference/check.interval.specification.md)
+  [`check.interval.specification()`](https://humanpred.github.io/pknca/reference/check.interval.specification.md)
   for how to define the interval.
 
 - options:
 
   List of changes to the default PKNCA options (see
-  [`PKNCA.options()`](http://humanpred.github.io/pknca/reference/PKNCA.options.md))
+  [`PKNCA.options()`](https://humanpred.github.io/pknca/reference/PKNCA.options.md))
 
 ## Value
 
@@ -138,4 +153,4 @@ for the `interval`
 
 ## See also
 
-[`check.interval.specification()`](http://humanpred.github.io/pknca/reference/check.interval.specification.md)
+[`check.interval.specification()`](https://humanpred.github.io/pknca/reference/check.interval.specification.md)

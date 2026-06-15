@@ -15,7 +15,7 @@ data.frame then run the following code.
 
 Useful links:
 
-- <https://humanpred.github.io/pknca/>
+- <https://pknca.humanpredictions.com/>
 
 - <https://github.com/humanpred/pknca>
 
@@ -27,6 +27,9 @@ Useful links:
 ([ORCID](https://orcid.org/0000-0002-5759-428X))
 
 Authors:
+
+- Bill Denney <wdenney@humanpredictions.com>
+  ([ORCID](https://orcid.org/0000-0002-5759-428X))
 
 - Clare Buckeridge <clare.buckeridge@pfizer.com>
 

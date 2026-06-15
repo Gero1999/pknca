@@ -88,21 +88,21 @@ result_obj <- pk.nca(data_obj)
 as.data.frame(result_obj)
 ```
 
-    ## # A tibble: 12 × 6
-    ##    Subject start   end PPTESTCD            PPORRES exclude
-    ##    <ord>   <dbl> <dbl> <chr>                 <dbl> <chr>  
-    ##  1 1           0   Inf tmax                 1.12   NA     
-    ##  2 1           0   Inf tlast               24.4    NA     
-    ##  3 1           0   Inf lambda.z             0.0485 NA     
-    ##  4 1           0   Inf r.squared            1.000  NA     
-    ##  5 1           0   Inf adj.r.squared        1.000  NA     
-    ##  6 1           0   Inf lambda.z.corrxy     -1.000  NA     
-    ##  7 1           0   Inf lambda.z.time.first  9.05   NA     
-    ##  8 1           0   Inf lambda.z.time.last  24.4    NA     
-    ##  9 1           0   Inf lambda.z.n.points    3      NA     
-    ## 10 1           0   Inf clast.pred           3.28   NA     
-    ## 11 1           0   Inf half.life           14.3    NA     
-    ## 12 1           0   Inf span.ratio           1.07   NA
+    ## # A tibble: 12 × 7
+    ##    Subject start   end PPTESTCD            PPORRES PPANMETH exclude
+    ##    <ord>   <dbl> <dbl> <chr>                 <dbl> <chr>    <chr>  
+    ##  1 1           0   Inf tmax                 1.12   ""       NA     
+    ##  2 1           0   Inf tlast               24.4    ""       NA     
+    ##  3 1           0   Inf lambda.z             0.0485 ""       NA     
+    ##  4 1           0   Inf r.squared            1.000  ""       NA     
+    ##  5 1           0   Inf adj.r.squared        1.000  ""       NA     
+    ##  6 1           0   Inf lambda.z.corrxy     -1.000  ""       NA     
+    ##  7 1           0   Inf lambda.z.time.first  9.05   ""       NA     
+    ##  8 1           0   Inf lambda.z.time.last  24.4    ""       NA     
+    ##  9 1           0   Inf lambda.z.n.points    3      ""       NA     
+    ## 10 1           0   Inf clast.pred           3.28   ""       NA     
+    ## 11 1           0   Inf half.life           14.3    ""       NA     
+    ## 12 1           0   Inf span.ratio           1.07   ""       NA
 
 ## Manual Point Selection
 
@@ -111,6 +111,14 @@ rules apply on a per-interval basis. If all values are `NA`, then no
 inclusion or exclusion is applied (the interval is treated as-is, like
 the argument had not been given). If some values are `NA` for the
 interval, those are treated as `FALSE`.
+
+A column counts as in use for an interval whenever it contains any
+non-`NA` value, even if every value is `FALSE`. Only one of
+`exclude_half.life` and `include_half.life` may be in use for the same
+interval; supplying both raises the error “Cannot both include and
+exclude half-life points for the same interval”. For this reason,
+initialize these columns to `NA` (rather than `FALSE`) when the
+corresponding method is not being used.
 
 ### Exclusion of Specific Points with Curve Stripping
 
@@ -122,7 +130,7 @@ stripping methods described above.
 To exclude specific points but otherwise use curve stripping, use the
 `exclude_half.life` option as the column name in the concentration
 dataset for
-[`PKNCAconc()`](http://humanpred.github.io/pknca/reference/PKNCAconc.md)
+[`PKNCAconc()`](https://humanpred.github.io/pknca/reference/PKNCAconc.md)
 as illustrated below.
 
 ``` r
@@ -154,21 +162,21 @@ result_obj_exclude1 <- pk.nca(data_obj_exclude1)
 as.data.frame(result_obj_exclude1)
 ```
 
-    ## # A tibble: 12 × 6
-    ##    Subject start   end PPTESTCD            PPORRES exclude
-    ##    <ord>   <dbl> <dbl> <chr>                 <dbl> <chr>  
-    ##  1 1           0   Inf tmax                 1.12   NA     
-    ##  2 1           0   Inf tlast               24.4    NA     
-    ##  3 1           0   Inf lambda.z             0.0482 NA     
-    ##  4 1           0   Inf r.squared            1.000  NA     
-    ##  5 1           0   Inf adj.r.squared        0.999  NA     
-    ##  6 1           0   Inf lambda.z.corrxy     -1.000  NA     
-    ##  7 1           0   Inf lambda.z.time.first  5.1    NA     
-    ##  8 1           0   Inf lambda.z.time.last  24.4    NA     
-    ##  9 1           0   Inf lambda.z.n.points    4      NA     
-    ## 10 1           0   Inf clast.pred           3.28   NA     
-    ## 11 1           0   Inf half.life           14.4    NA     
-    ## 12 1           0   Inf span.ratio           1.34   NA
+    ## # A tibble: 12 × 7
+    ##    Subject start   end PPTESTCD            PPORRES PPANMETH exclude
+    ##    <ord>   <dbl> <dbl> <chr>                 <dbl> <chr>    <chr>  
+    ##  1 1           0   Inf tmax                 1.12   ""       NA     
+    ##  2 1           0   Inf tlast               24.4    ""       NA     
+    ##  3 1           0   Inf lambda.z             0.0482 ""       NA     
+    ##  4 1           0   Inf r.squared            1.000  ""       NA     
+    ##  5 1           0   Inf adj.r.squared        0.999  ""       NA     
+    ##  6 1           0   Inf lambda.z.corrxy     -1.000  ""       NA     
+    ##  7 1           0   Inf lambda.z.time.first  5.1    ""       NA     
+    ##  8 1           0   Inf lambda.z.time.last  24.4    ""       NA     
+    ##  9 1           0   Inf lambda.z.n.points    4      ""       NA     
+    ## 10 1           0   Inf clast.pred           3.28   ""       NA     
+    ## 11 1           0   Inf half.life           14.4    ""       NA     
+    ## 12 1           0   Inf span.ratio           1.34   ""       NA
 
 ### Specification of the Exact Points for Analysis
 
@@ -176,19 +184,19 @@ In other cases, the exact points to use for half-life calculation are
 known, and automatic point selection with curve stripping should not be
 performed.
 
-To exclude specific points but otherwise use curve stripping, use the
-`include_half.life` option as the column name in the concentration
+To use only specific points and bypass automatic curve stripping, use
+the `include_half.life` option as the column name in the concentration
 dataset for
-[`PKNCAconc()`](http://humanpred.github.io/pknca/reference/PKNCAconc.md)
+[`PKNCAconc()`](https://humanpred.github.io/pknca/reference/PKNCAconc.md)
 as illustrated below.
 
 ``` r
 
 data_conc$include_hl <- data_conc$Time > 3
-# Confirm that we will be excluding exactly one point
+# Confirm that we will be including exactly six points
 stopifnot(sum(data_conc$include_hl) == 6)
 
-# Drop one point
+# Use only these points for the half-life
 conc_obj_include6 <-
   PKNCAconc(
     data_conc,
@@ -211,18 +219,18 @@ result_obj_include6 <- pk.nca(data_obj_include6)
 as.data.frame(result_obj_include6)
 ```
 
-    ## # A tibble: 12 × 6
-    ##    Subject start   end PPTESTCD            PPORRES exclude
-    ##    <ord>   <dbl> <dbl> <chr>                 <dbl> <chr>  
-    ##  1 1           0   Inf tmax                 1.12   NA     
-    ##  2 1           0   Inf tlast               24.4    NA     
-    ##  3 1           0   Inf lambda.z             0.0475 NA     
-    ##  4 1           0   Inf r.squared            0.999  NA     
-    ##  5 1           0   Inf adj.r.squared        0.998  NA     
-    ##  6 1           0   Inf lambda.z.corrxy     -0.999  NA     
-    ##  7 1           0   Inf lambda.z.time.first  3.82   NA     
-    ##  8 1           0   Inf lambda.z.time.last  24.4    NA     
-    ##  9 1           0   Inf lambda.z.n.points    6      NA     
-    ## 10 1           0   Inf clast.pred           3.30   NA     
-    ## 11 1           0   Inf half.life           14.6    NA     
-    ## 12 1           0   Inf span.ratio           1.41   NA
+    ## # A tibble: 12 × 7
+    ##    Subject start   end PPTESTCD            PPORRES PPANMETH              exclude
+    ##    <ord>   <dbl> <dbl> <chr>                 <dbl> <chr>                 <chr>  
+    ##  1 1           0   Inf tmax                 1.12   ""                    NA     
+    ##  2 1           0   Inf tlast               24.4    ""                    NA     
+    ##  3 1           0   Inf lambda.z             0.0475 "Lambda Z: Manual se… NA     
+    ##  4 1           0   Inf r.squared            0.999  "Lambda Z: Manual se… NA     
+    ##  5 1           0   Inf adj.r.squared        0.998  "Lambda Z: Manual se… NA     
+    ##  6 1           0   Inf lambda.z.corrxy     -0.999  "Lambda Z: Manual se… NA     
+    ##  7 1           0   Inf lambda.z.time.first  3.82   "Lambda Z: Manual se… NA     
+    ##  8 1           0   Inf lambda.z.time.last  24.4    "Lambda Z: Manual se… NA     
+    ##  9 1           0   Inf lambda.z.n.points    6      "Lambda Z: Manual se… NA     
+    ## 10 1           0   Inf clast.pred           3.30   "Lambda Z: Manual se… NA     
+    ## 11 1           0   Inf half.life           14.6    "Lambda Z: Manual se… NA     
+    ## 12 1           0   Inf span.ratio           1.41   "Lambda Z: Manual se… NA

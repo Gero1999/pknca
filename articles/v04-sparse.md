@@ -14,7 +14,7 @@ interval, but no animal has the full profile.
 
 Sparse NCA is setup similarly to how normal, dense PK sampling is setup
 with PKNCA. The only difference are that you give the `sparse` option to
-[`PKNCAconc()`](http://humanpred.github.io/pknca/reference/PKNCAconc.md),
+[`PKNCAconc()`](https://humanpred.github.io/pknca/reference/PKNCAconc.md),
 and in your interval calculations, you will request the sparse variants
 of the parameters. As of the writing of this vignette, the only sparse
 parameter for calculation is `sparse_auclast`. Any of the non-sparse
@@ -65,6 +65,52 @@ sequential numbers and giving that as the subject identifier:
 
 d_sparse$id <- 1:nrow(d_sparse)
 ```
+
+### How Subjects Are Grouped for Sparse Calculations
+
+With dense (normal) PK, every subject has a full concentration-time
+profile, so NCA parameters are calculated one subject at a time. Sparse
+parameters are different: they are calculated from the *pooled* samples
+of every subject that belongs to the same group. Knowing what defines a
+“group” is therefore important.
+
+The groups are taken from the grouping variables on the right of the `|`
+in the
+[`PKNCAconc()`](https://humanpred.github.io/pknca/reference/PKNCAconc.md)
+formula, **with the subject column removed**. Every subject that shares
+the same combination of the remaining (non-subject) grouping variables
+contributes to a single pooled sparse concentration-time profile.
+
+In the simple example above, the formula is `conc~time|id`. Here `id` is
+the subject, and removing it leaves no other grouping variables, so all
+of the data form a single sparse group.
+
+The behavior is easier to see with more grouping variables. Suppose the
+concentration and dose objects are created with the formulas below
+(illustrative code; not run here):
+
+``` r
+
+o_conc_sparse <- PKNCAconc(d_conc, conc~time|matrix+drug+usubjid/analyte, sparse=TRUE)
+o_dose_sparse <- PKNCAdose(d_dose, dose~time|drug+usubjid)
+```
+
+`usubjid` is the subject because, by default, the subject is the last
+grouping variable before any `/` (or the last grouping variable when
+there is no `/`). After dropping the subject, the grouping variables
+that remain are `matrix`, `drug`, and `analyte`. Sparse parameters are
+therefore calculated by combining all subjects within each unique
+combination of `matrix`, `drug`, and `analyte`.
+
+In other words, with that formula PKNCA does **not** keep each `usubjid`
+separate, and it does **not** group by `matrix`, `drug`, or `analyte`
+alone. It pools subjects using the full set of non-subject grouping
+variables together (`matrix` + `drug` + `analyte`).
+
+Because subjects are pooled within a group, all subjects in a group must
+share the same dosing. If subjects in the same group have different
+dosing information (for example, different dose amounts or dose times),
+PKNCA stops with an error identifying the inconsistent group.
 
 ## Calculate!
 
@@ -128,24 +174,24 @@ or individual results are available through the
 as.data.frame(o_nca)
 ```
 
-    ## # A tibble: 18 × 5
-    ##    start   end PPTESTCD            PPORRES exclude                              
-    ##    <dbl> <dbl> <chr>                 <dbl> <chr>                                
-    ##  1     0    24 cmax                  3.05  NA                                   
-    ##  2     0    24 tmax                  6     NA                                   
-    ##  3     0    24 tlast                24     NA                                   
-    ##  4     0    24 clast.obs             0.191 NA                                   
-    ##  5     0    24 lambda.z             NA     Too few points for half-life calcula…
-    ##  6     0    24 r.squared            NA     Too few points for half-life calcula…
-    ##  7     0    24 adj.r.squared        NA     Too few points for half-life calcula…
-    ##  8     0    24 lambda.z.corrxy      NA     Too few points for half-life calcula…
-    ##  9     0    24 lambda.z.time.first  NA     Too few points for half-life calcula…
-    ## 10     0    24 lambda.z.time.last   NA     Too few points for half-life calcula…
-    ## 11     0    24 lambda.z.n.points    NA     Too few points for half-life calcula…
-    ## 12     0    24 clast.pred           NA     Too few points for half-life calcula…
-    ## 13     0    24 half.life            NA     Too few points for half-life calcula…
-    ## 14     0    24 span.ratio           NA     Too few points for half-life calcula…
-    ## 15     0    24 aucinf.obs           NA     Too few points for half-life calcula…
-    ## 16     0    24 sparse_auclast       39.5   NA                                   
-    ## 17     0    24 sparse_auc_se         7.31  NA                                   
-    ## 18     0    24 sparse_auc_df        NA     NA
+    ## # A tibble: 18 × 6
+    ##    start   end PPTESTCD            PPORRES PPANMETH               exclude       
+    ##    <dbl> <dbl> <chr>                 <dbl> <chr>                  <chr>         
+    ##  1     0    24 cmax                  3.05  ""                     NA            
+    ##  2     0    24 tmax                  6     ""                     NA            
+    ##  3     0    24 tlast                24     ""                     NA            
+    ##  4     0    24 clast.obs             0.191 ""                     NA            
+    ##  5     0    24 lambda.z             NA     ""                     Too few point…
+    ##  6     0    24 r.squared            NA     ""                     Too few point…
+    ##  7     0    24 adj.r.squared        NA     ""                     Too few point…
+    ##  8     0    24 lambda.z.corrxy      NA     ""                     Too few point…
+    ##  9     0    24 lambda.z.time.first  NA     ""                     Too few point…
+    ## 10     0    24 lambda.z.time.last   NA     ""                     Too few point…
+    ## 11     0    24 lambda.z.n.points    NA     ""                     Too few point…
+    ## 12     0    24 clast.pred           NA     ""                     Too few point…
+    ## 13     0    24 half.life            NA     ""                     Too few point…
+    ## 14     0    24 span.ratio           NA     ""                     Too few point…
+    ## 15     0    24 aucinf.obs           NA     "AUC: lin up/log down" Too few point…
+    ## 16     0    24 sparse_auclast       39.5   ""                     NA            
+    ## 17     0    24 sparse_auc_se         7.31  ""                     NA            
+    ## 18     0    24 sparse_auc_df        NA     ""                     NA

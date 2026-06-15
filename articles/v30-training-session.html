@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>PKNCA Training Sessions • PKNCA</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="PKNCA Training Sessions">
 </head>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">PKNCA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,6 +57,7 @@
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><a class="nav-link" href="https://humanpred.github.io/pknca-book/">User Guide</a></li>
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
@@ -598,7 +599,7 @@ for each group.</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://humanpred.github.io/pknca/" class="external-link">PKNCA</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pknca.humanpredictions.com/" class="external-link">PKNCA</a></span><span class="op">)</span></span>
 <span><span class="co"># Concentration data setup</span></span>
 <span><span class="va">d_conc</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/Theoph.html" class="external-link">Theoph</a></span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -851,12 +852,13 @@ results.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">o_result</span><span class="op">)</span>,</span>
 <span>  n<span class="op">=</span><span class="fl">3</span></span>
 <span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<table style="width:62%;" class="table">
+<table style="width:94%;" class="table">
 <colgroup>
 <col width="11%">
 <col width="8%">
 <col width="15%">
 <col width="13%">
+<col width="31%">
 <col width="13%">
 </colgroup>
 <thead><tr class="header">
@@ -864,6 +866,7 @@ results.</p>
 <th align="center">end</th>
 <th align="center">PPTESTCD</th>
 <th align="center">PPORRES</th>
+<th align="center">PPANMETH</th>
 <th align="center">exclude</th>
 </tr></thead>
 <tbody>
@@ -872,6 +875,7 @@ results.</p>
 <td align="center">24</td>
 <td align="center">auclast</td>
 <td align="center">92.37</td>
+<td align="center">AUC: lin up/log down</td>
 <td align="center">NA</td>
 </tr>
 <tr class="even">
@@ -879,6 +883,7 @@ results.</p>
 <td align="center">Inf</td>
 <td align="center">cmax</td>
 <td align="center">10.5</td>
+<td align="center"></td>
 <td align="center">NA</td>
 </tr>
 <tr class="odd">
@@ -886,6 +891,7 @@ results.</p>
 <td align="center">Inf</td>
 <td align="center">tmax</td>
 <td align="center">1.12</td>
+<td align="center"></td>
 <td align="center">NA</td>
 </tr>
 </tbody>
@@ -1045,7 +1051,7 @@ differ: <code>PKNCAdose(~time|actarm, data=d_dose)</code>
 merge/join with the groups</li>
 <li>parameters to calculate (<code>TRUE</code> means to calculate it;
 <code>FALSE</code> means don’t). The full list of available parameters
-is in the <a href="http://humanpred.github.io/pknca/articles/Selection-of-Calculation-Intervals.html#parameters-available-for-calculation-in-an-interval-1">selection
+is in the <a href="http://humanpred.github.io/pknca/articles/Selection-of-Calculation-Intervals.html#parameters-available-for-calculation-in-an-interval-1" class="external-link">selection
 of calculation intervals vignette</a>.
 <ul>
 <li>You only have to specify the parameter you want, not all
@@ -1251,7 +1257,7 @@ whale and a beluga whale. (DOI: 10.1638/03-078)</p>
 <h3 id="steady-state-intramuscular-administration-1">Steady-state intramuscular administration<a class="anchor" aria-label="anchor" href="#steady-state-intramuscular-administration-1"></a>
 </h3>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://humanpred.github.io/pknca/" class="external-link">PKNCA</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pknca.humanpredictions.com/" class="external-link">PKNCA</a></span><span class="op">)</span></span>
 <span><span class="co"># Data available from https://github.com/humanpred/pknca/tree/main/data-raw/whale</span></span>
 <span><span class="va">d_conc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"c:/tmp/whale_conc.csv"</span><span class="op">)</span></span>
 <span><span class="va">d_dose</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"c:/tmp/whale_dose.csv"</span><span class="op">)</span></span>
@@ -1481,10 +1487,10 @@ interval and therefore to be omitted from calculations.</li>
 <span><span class="va">o_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PKNCAdata.html">PKNCAdata</a></span><span class="op">(</span><span class="va">o_conc</span>, intervals<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>start<span class="op">=</span><span class="fl">0</span>, end<span class="op">=</span><span class="cn">Inf</span>, cmax<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">o_nca</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/pk.nca.html">pk.nca</a></span><span class="op">(</span><span class="va">o_data</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">o_nca</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 1 × 5</span></span></span>
-<span><span class="co">##   start   end PPTESTCD PPORRES exclude</span></span>
-<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">1</span>     0   <span style="color: #BB0000;">Inf</span> cmax         0.5 <span style="color: #BB0000;">NA</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 1 × 6</span></span></span>
+<span><span class="co">##   start   end PPTESTCD PPORRES PPANMETH exclude</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span>     0   <span style="color: #BB0000;">Inf</span> cmax         0.5 <span style="color: #949494;">""</span>       <span style="color: #BB0000;">NA</span></span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 class="columns-2 smaller" id="pknca-only-calculates-what-is-required-not-every-possible-parameter-2-of-2">PKNCA only calculates what is required,
@@ -1507,23 +1513,23 @@ parameters behind the scenes.</p>
 </p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">o_nca</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 14 × 5</span></span></span>
-<span><span class="co">##    start   end PPTESTCD            PPORRES exclude</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0   <span style="color: #BB0000;">Inf</span> tmax                 0      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0   <span style="color: #BB0000;">Inf</span> tlast                3      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0   <span style="color: #BB0000;">Inf</span> clast.obs            0.062<span style="text-decoration: underline;">5</span> <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z             0.693  <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0   <span style="color: #BB0000;">Inf</span> r.squared            1      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0   <span style="color: #BB0000;">Inf</span> adj.r.squared        1      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.corrxy     -<span style="color: #BB0000;">1</span>      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.time.first  1      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.time.last   3      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.n.points    3      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0   <span style="color: #BB0000;">Inf</span> clast.pred           0.062<span style="text-decoration: underline;">5</span> <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0   <span style="color: #BB0000;">Inf</span> half.life            1      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">13</span>     0   <span style="color: #BB0000;">Inf</span> span.ratio           2      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">14</span>     0   <span style="color: #BB0000;">Inf</span> aucinf.obs           0.721  <span style="color: #BB0000;">NA</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 14 × 6</span></span></span>
+<span><span class="co">##    start   end PPTESTCD            PPORRES PPANMETH               exclude</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0   <span style="color: #BB0000;">Inf</span> tmax                 0      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0   <span style="color: #BB0000;">Inf</span> tlast                3      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0   <span style="color: #BB0000;">Inf</span> clast.obs            0.062<span style="text-decoration: underline;">5</span> <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z             0.693  <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0   <span style="color: #BB0000;">Inf</span> r.squared            1      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0   <span style="color: #BB0000;">Inf</span> adj.r.squared        1      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.corrxy     -<span style="color: #BB0000;">1</span>      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.time.first  1      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.time.last   3      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.n.points    3      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0   <span style="color: #BB0000;">Inf</span> clast.pred           0.062<span style="text-decoration: underline;">5</span> <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0   <span style="color: #BB0000;">Inf</span> half.life            1      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">13</span>     0   <span style="color: #BB0000;">Inf</span> span.ratio           2      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">14</span>     0   <span style="color: #BB0000;">Inf</span> aucinf.obs           0.721  <span style="color: #949494;">"</span>AUC: lin up/log down<span style="color: #949494;">"</span> <span style="color: #BB0000;">NA</span></span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="how-to-select-the-correct-parameters-for-calculations-aka-why-are-there-32-types-of-auc-in-pknca">How to select the correct parameters for calculations (aka, why are
@@ -1534,7 +1540,7 @@ doesn’t tell the interpolation/extrapolation method).</p>
 <p>PKNCA tries to be everything to everyone (in terms of parameters
 calculated), and it simultaneously tries to be precise. That yields many
 parameters.</p>
-<p>See the Selection of Calculation Intervals vignette in the <a href="http://humanpred.github.io/pknca/articles/Selection-of-Calculation-Intervals.html#parameters-available-for-calculation-in-an-interval-1">Parameters
+<p>See the Selection of Calculation Intervals vignette in the <a href="http://humanpred.github.io/pknca/articles/Selection-of-Calculation-Intervals.html#parameters-available-for-calculation-in-an-interval-1" class="external-link">Parameters
 Available for Calculation in an Interval section</a> for all available
 parameters.</p>
 </div>
@@ -1565,22 +1571,22 @@ results to a data.frame and then drop the rows you don’t want:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">o_nca</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">PPTESTCD</span> <span class="op">!=</span> <span class="st">"half.life"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 13 × 5</span></span></span>
-<span><span class="co">##    start   end PPTESTCD            PPORRES exclude</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0   <span style="color: #BB0000;">Inf</span> tmax                 0      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0   <span style="color: #BB0000;">Inf</span> tlast                3      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0   <span style="color: #BB0000;">Inf</span> clast.obs            0.062<span style="text-decoration: underline;">5</span> <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z             0.693  <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0   <span style="color: #BB0000;">Inf</span> r.squared            1      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0   <span style="color: #BB0000;">Inf</span> adj.r.squared        1      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.corrxy     -<span style="color: #BB0000;">1</span>      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.time.first  1      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.time.last   3      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.n.points    3      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0   <span style="color: #BB0000;">Inf</span> clast.pred           0.062<span style="text-decoration: underline;">5</span> <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0   <span style="color: #BB0000;">Inf</span> span.ratio           2      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">13</span>     0   <span style="color: #BB0000;">Inf</span> aucinf.obs           0.721  <span style="color: #BB0000;">NA</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 13 × 6</span></span></span>
+<span><span class="co">##    start   end PPTESTCD            PPORRES PPANMETH               exclude</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0   <span style="color: #BB0000;">Inf</span> tmax                 0      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0   <span style="color: #BB0000;">Inf</span> tlast                3      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0   <span style="color: #BB0000;">Inf</span> clast.obs            0.062<span style="text-decoration: underline;">5</span> <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z             0.693  <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0   <span style="color: #BB0000;">Inf</span> r.squared            1      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0   <span style="color: #BB0000;">Inf</span> adj.r.squared        1      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.corrxy     -<span style="color: #BB0000;">1</span>      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.time.first  1      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.time.last   3      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.n.points    3      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0   <span style="color: #BB0000;">Inf</span> clast.pred           0.062<span style="text-decoration: underline;">5</span> <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0   <span style="color: #BB0000;">Inf</span> span.ratio           2      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">13</span>     0   <span style="color: #BB0000;">Inf</span> aucinf.obs           0.721  <span style="color: #949494;">"</span>AUC: lin up/log down<span style="color: #949494;">"</span> <span style="color: #BB0000;">NA</span></span></span></code></pre>
 <p>But, parameters derived from half-life remain.</p>
 </div>
 <div class="section level3">
@@ -1595,23 +1601,23 @@ dependent on an excluded parameter will be excluded.</p>
 <pre><code><span><span class="co">## Loading required namespace: testthat</span></span></code></pre>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">o_nca_excluded</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 14 × 5</span></span></span>
-<span><span class="co">##    start   end PPTESTCD            PPORRES exclude       </span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0   <span style="color: #BB0000;">Inf</span> tmax                 0      <span style="color: #BB0000;">NA</span>            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0   <span style="color: #BB0000;">Inf</span> tlast                3      <span style="color: #BB0000;">NA</span>            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0   <span style="color: #BB0000;">Inf</span> clast.obs            0.062<span style="text-decoration: underline;">5</span> <span style="color: #BB0000;">NA</span>            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z             0.693  span.ratio &lt; 3</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0   <span style="color: #BB0000;">Inf</span> r.squared            1      span.ratio &lt; 3</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0   <span style="color: #BB0000;">Inf</span> adj.r.squared        1      span.ratio &lt; 3</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.corrxy     -<span style="color: #BB0000;">1</span>      span.ratio &lt; 3</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.time.first  1      span.ratio &lt; 3</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.time.last   3      span.ratio &lt; 3</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.n.points    3      span.ratio &lt; 3</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0   <span style="color: #BB0000;">Inf</span> clast.pred           0.062<span style="text-decoration: underline;">5</span> span.ratio &lt; 3</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0   <span style="color: #BB0000;">Inf</span> half.life            1      span.ratio &lt; 3</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">13</span>     0   <span style="color: #BB0000;">Inf</span> span.ratio           2      span.ratio &lt; 3</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">14</span>     0   <span style="color: #BB0000;">Inf</span> aucinf.obs           0.721  span.ratio &lt; 3</span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 14 × 6</span></span></span>
+<span><span class="co">##    start   end PPTESTCD            PPORRES PPANMETH               exclude       </span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0   <span style="color: #BB0000;">Inf</span> tmax                 0      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>            </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0   <span style="color: #BB0000;">Inf</span> tlast                3      <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>            </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0   <span style="color: #BB0000;">Inf</span> clast.obs            0.062<span style="text-decoration: underline;">5</span> <span style="color: #949494;">""</span>                     <span style="color: #BB0000;">NA</span>            </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z             0.693  <span style="color: #949494;">""</span>                     span.ratio &lt; 3</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0   <span style="color: #BB0000;">Inf</span> r.squared            1      <span style="color: #949494;">""</span>                     span.ratio &lt; 3</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0   <span style="color: #BB0000;">Inf</span> adj.r.squared        1      <span style="color: #949494;">""</span>                     span.ratio &lt; 3</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.corrxy     -<span style="color: #BB0000;">1</span>      <span style="color: #949494;">""</span>                     span.ratio &lt; 3</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.time.first  1      <span style="color: #949494;">""</span>                     span.ratio &lt; 3</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.time.last   3      <span style="color: #949494;">""</span>                     span.ratio &lt; 3</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0   <span style="color: #BB0000;">Inf</span> lambda.z.n.points    3      <span style="color: #949494;">""</span>                     span.ratio &lt; 3</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0   <span style="color: #BB0000;">Inf</span> clast.pred           0.062<span style="text-decoration: underline;">5</span> <span style="color: #949494;">""</span>                     span.ratio &lt; 3</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0   <span style="color: #BB0000;">Inf</span> half.life            1      <span style="color: #949494;">""</span>                     span.ratio &lt; 3</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">13</span>     0   <span style="color: #BB0000;">Inf</span> span.ratio           2      <span style="color: #949494;">""</span>                     span.ratio &lt; 3</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">14</span>     0   <span style="color: #BB0000;">Inf</span> aucinf.obs           0.721  <span style="color: #949494;">"</span>AUC: lin up/log down<span style="color: #949494;">"</span> span.ratio &lt; 3</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 class="smaller" id="excluding-results-the-best-way-22">Excluding results (The best way, 2/2)<a class="anchor" aria-label="anchor" href="#excluding-results-the-best-way-22"></a>
@@ -1763,7 +1769,7 @@ function on the NCA results.</p>
 <h3 id="units-especially-clearance">Units (especially clearance)<a class="anchor" aria-label="anchor" href="#units-especially-clearance"></a>
 </h3>
 <p>PKNCA supports units with the <code><a href="../reference/pknca_units_table.html">pknca_units_table()</a></code>
-function. See the <a href="http://humanpred.github.io/pknca/articles/v07-unit-conversion.html">Unit
+function. See the <a href="http://humanpred.github.io/pknca/articles/v07-unit-conversion.html" class="external-link">Unit
 Assignment and Conversion with PKNCA</a> vignette for more
 information.</p>
 <p>When units are not specified, The most common place where that
@@ -1793,7 +1799,7 @@ bolus dosing need to use different AUC parameters such as
 <div class="section level3">
 <h3 id="combined-multi-subject-data-e-g--sparse-animal-sampling">Combined, multi-subject data (e.g. sparse animal sampling)<a class="anchor" aria-label="anchor" href="#combined-multi-subject-data-e-g--sparse-animal-sampling"></a>
 </h3>
-<p>Sparse NCA calculations are supported in PKNCA. See the <a href="http://humanpred.github.io/pknca/articles/v04-sparse.html">Sparse
+<p>Sparse NCA calculations are supported in PKNCA. See the <a href="http://humanpred.github.io/pknca/articles/v04-sparse.html" class="external-link">Sparse
 NCA Calculations</a> vignette for more information.</p>
 </div>
 </div>
@@ -1812,7 +1818,7 @@ time.</p>
 </h3>
 <p>PKNCA has an extensive testing and validation suite built-in. To run
 the testing and validation suite of tests with a full report generated,
-see the <a href="http://humanpred.github.io/pknca/articles/v60-PKNCA-validation.html">PKNCA
+see the <a href="http://humanpred.github.io/pknca/articles/v60-PKNCA-validation.html" class="external-link">PKNCA
 Validation</a> vignette.</p>
 </div>
 </div>
@@ -1875,26 +1881,36 @@ basic analysis<a class="anchor" aria-label="anchor" href="#single--and-multiple-
 <span><span class="co">## 2     0 Inf   FALSE  FALSE    FALSE   FALSE       FALSE            FALSE</span></span>
 <span><span class="co">## 3     0 120    TRUE  FALSE    FALSE   FALSE       FALSE            FALSE</span></span>
 <span><span class="co">## 4   120 144    TRUE  FALSE    FALSE   FALSE       FALSE            FALSE</span></span>
-<span><span class="co">##   aucint.all aucint.all.dose    c0  cmax  cmin  tmax  tmin tlast tfirst</span></span>
-<span><span class="co">## 1      FALSE           FALSE FALSE FALSE FALSE FALSE FALSE FALSE  FALSE</span></span>
-<span><span class="co">## 2      FALSE           FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE  FALSE</span></span>
-<span><span class="co">## 3      FALSE           FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE  FALSE</span></span>
-<span><span class="co">## 4      FALSE           FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE  FALSE</span></span>
-<span><span class="co">##   clast.obs cl.last cl.all     f mrt.last mrt.iv.last vss.last vss.iv.last</span></span>
-<span><span class="co">## 1     FALSE   FALSE  FALSE FALSE    FALSE       FALSE    FALSE       FALSE</span></span>
-<span><span class="co">## 2     FALSE   FALSE  FALSE FALSE    FALSE       FALSE    FALSE       FALSE</span></span>
-<span><span class="co">## 3     FALSE   FALSE  FALSE FALSE    FALSE       FALSE    FALSE       FALSE</span></span>
-<span><span class="co">## 4     FALSE   FALSE  FALSE FALSE    FALSE       FALSE    FALSE       FALSE</span></span>
-<span><span class="co">##     cav cav.int.last cav.int.all ctrough cstart   ptr  tlag deg.fluc swing</span></span>
-<span><span class="co">## 1 FALSE        FALSE       FALSE   FALSE  FALSE FALSE FALSE    FALSE FALSE</span></span>
-<span><span class="co">## 2 FALSE        FALSE       FALSE   FALSE  FALSE FALSE FALSE    FALSE FALSE</span></span>
-<span><span class="co">## 3 FALSE        FALSE       FALSE   FALSE  FALSE FALSE FALSE    FALSE FALSE</span></span>
-<span><span class="co">## 4 FALSE        FALSE       FALSE   FALSE  FALSE FALSE FALSE    FALSE FALSE</span></span>
-<span><span class="co">##    ceoi aucabove.predose.all aucabove.trough.all count_conc count_conc_measured</span></span>
-<span><span class="co">## 1 FALSE                FALSE               FALSE      FALSE               FALSE</span></span>
-<span><span class="co">## 2 FALSE                FALSE               FALSE      FALSE               FALSE</span></span>
-<span><span class="co">## 3 FALSE                FALSE               FALSE      FALSE               FALSE</span></span>
-<span><span class="co">## 4 FALSE                FALSE               FALSE      FALSE               FALSE</span></span>
+<span><span class="co">##   aucint.all aucint.all.dose aumcint.last aumcint.last.dose aumcint.all</span></span>
+<span><span class="co">## 1      FALSE           FALSE        FALSE             FALSE       FALSE</span></span>
+<span><span class="co">## 2      FALSE           FALSE        FALSE             FALSE       FALSE</span></span>
+<span><span class="co">## 3      FALSE           FALSE        FALSE             FALSE       FALSE</span></span>
+<span><span class="co">## 4      FALSE           FALSE        FALSE             FALSE       FALSE</span></span>
+<span><span class="co">##   aumcint.all.dose    c0  cmax  cmin  tmax  tmin tlast tfirst clast.obs cl.last</span></span>
+<span><span class="co">## 1            FALSE FALSE FALSE FALSE FALSE FALSE FALSE  FALSE     FALSE   FALSE</span></span>
+<span><span class="co">## 2            FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE  FALSE     FALSE   FALSE</span></span>
+<span><span class="co">## 3            FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE  FALSE     FALSE   FALSE</span></span>
+<span><span class="co">## 4            FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE  FALSE     FALSE   FALSE</span></span>
+<span><span class="co">##   cl.all cl.int.all cl.int.last     f mrt.last mrt.all mrt.int.all mrt.int.last</span></span>
+<span><span class="co">## 1  FALSE      FALSE       FALSE FALSE    FALSE   FALSE       FALSE        FALSE</span></span>
+<span><span class="co">## 2  FALSE      FALSE       FALSE FALSE    FALSE   FALSE       FALSE        FALSE</span></span>
+<span><span class="co">## 3  FALSE      FALSE       FALSE FALSE    FALSE   FALSE       FALSE        FALSE</span></span>
+<span><span class="co">## 4  FALSE      FALSE       FALSE FALSE    FALSE   FALSE       FALSE        FALSE</span></span>
+<span><span class="co">##   mrt.iv.last vss.last vss.iv.last vss.all vss.int.all vss.int.last   cav</span></span>
+<span><span class="co">## 1       FALSE    FALSE       FALSE   FALSE       FALSE        FALSE FALSE</span></span>
+<span><span class="co">## 2       FALSE    FALSE       FALSE   FALSE       FALSE        FALSE FALSE</span></span>
+<span><span class="co">## 3       FALSE    FALSE       FALSE   FALSE       FALSE        FALSE FALSE</span></span>
+<span><span class="co">## 4       FALSE    FALSE       FALSE   FALSE       FALSE        FALSE FALSE</span></span>
+<span><span class="co">##   cav.int.last cav.int.all ctrough cstart   ptr  tlag deg.fluc swing  ceoi</span></span>
+<span><span class="co">## 1        FALSE       FALSE   FALSE  FALSE FALSE FALSE    FALSE FALSE FALSE</span></span>
+<span><span class="co">## 2        FALSE       FALSE   FALSE  FALSE FALSE FALSE    FALSE FALSE FALSE</span></span>
+<span><span class="co">## 3        FALSE       FALSE   FALSE  FALSE FALSE FALSE    FALSE FALSE FALSE</span></span>
+<span><span class="co">## 4        FALSE       FALSE   FALSE  FALSE FALSE FALSE    FALSE FALSE FALSE</span></span>
+<span><span class="co">##   aucabove.predose.all aucabove.trough.all count_conc count_conc_measured</span></span>
+<span><span class="co">## 1                FALSE               FALSE      FALSE               FALSE</span></span>
+<span><span class="co">## 2                FALSE               FALSE      FALSE               FALSE</span></span>
+<span><span class="co">## 3                FALSE               FALSE      FALSE               FALSE</span></span>
+<span><span class="co">## 4                FALSE               FALSE      FALSE               FALSE</span></span>
 <span><span class="co">##   totdose volpk    ae clr.last clr.obs clr.pred    fe ertlst ermax ertmax</span></span>
 <span><span class="co">## 1   FALSE FALSE FALSE    FALSE   FALSE    FALSE FALSE  FALSE FALSE  FALSE</span></span>
 <span><span class="co">## 2   FALSE FALSE FALSE    FALSE   FALSE    FALSE FALSE  FALSE FALSE  FALSE</span></span>
@@ -1910,76 +1926,121 @@ basic analysis<a class="anchor" aria-label="anchor" href="#single--and-multiple-
 <span><span class="co">## 2          FALSE      FALSE     FALSE    FALSE         FALSE        FALSE</span></span>
 <span><span class="co">## 3          FALSE      FALSE     FALSE    FALSE         FALSE        FALSE</span></span>
 <span><span class="co">## 4          FALSE      FALSE     FALSE    FALSE         FALSE        FALSE</span></span>
-<span><span class="co">##   aucivpbextlast aucivpbextall aucivpbextint.last aucivpbextint.all half.life</span></span>
-<span><span class="co">## 1          FALSE         FALSE              FALSE             FALSE     FALSE</span></span>
-<span><span class="co">## 2          FALSE         FALSE              FALSE             FALSE      TRUE</span></span>
-<span><span class="co">## 3          FALSE         FALSE              FALSE             FALSE     FALSE</span></span>
-<span><span class="co">## 4          FALSE         FALSE              FALSE             FALSE     FALSE</span></span>
-<span><span class="co">##   r.squared adj.r.squared lambda.z.corrxy lambda.z lambda.z.time.first</span></span>
-<span><span class="co">## 1     FALSE         FALSE           FALSE    FALSE               FALSE</span></span>
-<span><span class="co">## 2     FALSE         FALSE           FALSE    FALSE               FALSE</span></span>
-<span><span class="co">## 3     FALSE         FALSE           FALSE    FALSE               FALSE</span></span>
-<span><span class="co">## 4     FALSE         FALSE           FALSE    FALSE               FALSE</span></span>
-<span><span class="co">##   lambda.z.time.last lambda.z.n.points clast.pred span.ratio tobit_residual</span></span>
-<span><span class="co">## 1              FALSE             FALSE      FALSE      FALSE          FALSE</span></span>
-<span><span class="co">## 2              FALSE             FALSE      FALSE      FALSE          FALSE</span></span>
-<span><span class="co">## 3              FALSE             FALSE      FALSE      FALSE          FALSE</span></span>
-<span><span class="co">## 4              FALSE             FALSE      FALSE      FALSE          FALSE</span></span>
-<span><span class="co">##   adj_tobit_residual lambda.z.n.points_blq thalf.eff.last thalf.eff.iv.last</span></span>
-<span><span class="co">## 1              FALSE                 FALSE          FALSE             FALSE</span></span>
-<span><span class="co">## 2              FALSE                 FALSE          FALSE             FALSE</span></span>
-<span><span class="co">## 3              FALSE                 FALSE          FALSE             FALSE</span></span>
-<span><span class="co">## 4              FALSE                 FALSE          FALSE             FALSE</span></span>
-<span><span class="co">##   kel.last kel.iv.last cl.sparse.last mrt.sparse.last vss.sparse.last</span></span>
-<span><span class="co">## 1    FALSE       FALSE          FALSE           FALSE           FALSE</span></span>
-<span><span class="co">## 2    FALSE       FALSE          FALSE           FALSE           FALSE</span></span>
-<span><span class="co">## 3    FALSE       FALSE          FALSE           FALSE           FALSE</span></span>
-<span><span class="co">## 4    FALSE       FALSE          FALSE           FALSE           FALSE</span></span>
-<span><span class="co">##   aucinf.obs aucinf.pred aumcinf.obs aumcinf.pred aucint.inf.obs</span></span>
-<span><span class="co">## 1      FALSE       FALSE       FALSE        FALSE          FALSE</span></span>
-<span><span class="co">## 2       TRUE       FALSE       FALSE        FALSE          FALSE</span></span>
-<span><span class="co">## 3      FALSE       FALSE       FALSE        FALSE          FALSE</span></span>
-<span><span class="co">## 4      FALSE       FALSE       FALSE        FALSE          FALSE</span></span>
-<span><span class="co">##   aucint.inf.obs.dose aucint.inf.pred aucint.inf.pred.dose aucivinf.obs</span></span>
-<span><span class="co">## 1               FALSE           FALSE                FALSE        FALSE</span></span>
-<span><span class="co">## 2               FALSE           FALSE                FALSE        FALSE</span></span>
-<span><span class="co">## 3               FALSE           FALSE                FALSE        FALSE</span></span>
-<span><span class="co">## 4               FALSE           FALSE                FALSE        FALSE</span></span>
-<span><span class="co">##   aucivinf.pred aucivpbextinf.obs aucivpbextinf.pred aucpext.obs aucpext.pred</span></span>
-<span><span class="co">## 1         FALSE             FALSE              FALSE       FALSE        FALSE</span></span>
-<span><span class="co">## 2         FALSE             FALSE              FALSE       FALSE        FALSE</span></span>
-<span><span class="co">## 3         FALSE             FALSE              FALSE       FALSE        FALSE</span></span>
-<span><span class="co">## 4         FALSE             FALSE              FALSE       FALSE        FALSE</span></span>
-<span><span class="co">##   kel.sparse.last cl.obs cl.pred mrt.obs mrt.pred mrt.iv.obs mrt.iv.pred</span></span>
-<span><span class="co">## 1           FALSE  FALSE   FALSE   FALSE    FALSE      FALSE       FALSE</span></span>
-<span><span class="co">## 2           FALSE  FALSE   FALSE   FALSE    FALSE      FALSE       FALSE</span></span>
-<span><span class="co">## 3           FALSE  FALSE   FALSE   FALSE    FALSE      FALSE       FALSE</span></span>
-<span><span class="co">## 4           FALSE  FALSE   FALSE   FALSE    FALSE      FALSE       FALSE</span></span>
-<span><span class="co">##   mrt.md.obs mrt.md.pred vz.obs vz.pred vz.sparse.last vss.obs vss.pred</span></span>
-<span><span class="co">## 1      FALSE       FALSE  FALSE   FALSE          FALSE   FALSE    FALSE</span></span>
-<span><span class="co">## 2      FALSE       FALSE  FALSE   FALSE          FALSE   FALSE    FALSE</span></span>
-<span><span class="co">## 3      FALSE       FALSE  FALSE   FALSE          FALSE   FALSE    FALSE</span></span>
-<span><span class="co">## 4      FALSE       FALSE  FALSE   FALSE          FALSE   FALSE    FALSE</span></span>
-<span><span class="co">##   vss.iv.obs vss.iv.pred vss.md.obs vss.md.pred cav.int.inf.obs</span></span>
+<span><span class="co">##   aucivpbextlast aucivpbextall aucivpbextint.last aucivpbextint.all aumcivlast</span></span>
+<span><span class="co">## 1          FALSE         FALSE              FALSE             FALSE      FALSE</span></span>
+<span><span class="co">## 2          FALSE         FALSE              FALSE             FALSE      FALSE</span></span>
+<span><span class="co">## 3          FALSE         FALSE              FALSE             FALSE      FALSE</span></span>
+<span><span class="co">## 4          FALSE         FALSE              FALSE             FALSE      FALSE</span></span>
+<span><span class="co">##   aumcivall aumcivint.last aumcivint.all half.life r.squared adj.r.squared</span></span>
+<span><span class="co">## 1     FALSE          FALSE         FALSE     FALSE     FALSE         FALSE</span></span>
+<span><span class="co">## 2     FALSE          FALSE         FALSE      TRUE     FALSE         FALSE</span></span>
+<span><span class="co">## 3     FALSE          FALSE         FALSE     FALSE     FALSE         FALSE</span></span>
+<span><span class="co">## 4     FALSE          FALSE         FALSE     FALSE     FALSE         FALSE</span></span>
+<span><span class="co">##   lambda.z.corrxy lambda.z lambda.z.time.first lambda.z.time.last</span></span>
+<span><span class="co">## 1           FALSE    FALSE               FALSE              FALSE</span></span>
+<span><span class="co">## 2           FALSE    FALSE               FALSE              FALSE</span></span>
+<span><span class="co">## 3           FALSE    FALSE               FALSE              FALSE</span></span>
+<span><span class="co">## 4           FALSE    FALSE               FALSE              FALSE</span></span>
+<span><span class="co">##   lambda.z.n.points clast.pred span.ratio tobit_residual adj_tobit_residual</span></span>
+<span><span class="co">## 1             FALSE      FALSE      FALSE          FALSE              FALSE</span></span>
+<span><span class="co">## 2             FALSE      FALSE      FALSE          FALSE              FALSE</span></span>
+<span><span class="co">## 3             FALSE      FALSE      FALSE          FALSE              FALSE</span></span>
+<span><span class="co">## 4             FALSE      FALSE      FALSE          FALSE              FALSE</span></span>
+<span><span class="co">##   lambda.z.n.points_blq thalf.eff.last thalf.eff.iv.last kel.last kel.iv.last</span></span>
+<span><span class="co">## 1                 FALSE          FALSE             FALSE    FALSE       FALSE</span></span>
+<span><span class="co">## 2                 FALSE          FALSE             FALSE    FALSE       FALSE</span></span>
+<span><span class="co">## 3                 FALSE          FALSE             FALSE    FALSE       FALSE</span></span>
+<span><span class="co">## 4                 FALSE          FALSE             FALSE    FALSE       FALSE</span></span>
+<span><span class="co">##   kel.all kel.int.all kel.int.last cl.iv.all cl.iv.last cl.ivint.all</span></span>
+<span><span class="co">## 1   FALSE       FALSE        FALSE     FALSE      FALSE        FALSE</span></span>
+<span><span class="co">## 2   FALSE       FALSE        FALSE     FALSE      FALSE        FALSE</span></span>
+<span><span class="co">## 3   FALSE       FALSE        FALSE     FALSE      FALSE        FALSE</span></span>
+<span><span class="co">## 4   FALSE       FALSE        FALSE     FALSE      FALSE        FALSE</span></span>
+<span><span class="co">##   cl.ivint.last cl.sparse.last mrt.sparse.last mrt.iv.all mrt.ivint.all</span></span>
+<span><span class="co">## 1         FALSE          FALSE           FALSE      FALSE         FALSE</span></span>
+<span><span class="co">## 2         FALSE          FALSE           FALSE      FALSE         FALSE</span></span>
+<span><span class="co">## 3         FALSE          FALSE           FALSE      FALSE         FALSE</span></span>
+<span><span class="co">## 4         FALSE          FALSE           FALSE      FALSE         FALSE</span></span>
+<span><span class="co">##   mrt.ivint.last vz.all vz.int.all vz.int.last vz.iv.all vz.iv.last</span></span>
+<span><span class="co">## 1          FALSE  FALSE      FALSE       FALSE     FALSE      FALSE</span></span>
+<span><span class="co">## 2          FALSE  FALSE      FALSE       FALSE     FALSE      FALSE</span></span>
+<span><span class="co">## 3          FALSE  FALSE      FALSE       FALSE     FALSE      FALSE</span></span>
+<span><span class="co">## 4          FALSE  FALSE      FALSE       FALSE     FALSE      FALSE</span></span>
+<span><span class="co">##   vz.ivint.all vz.ivint.last vz.last vss.iv.all vss.ivint.all vss.ivint.last</span></span>
+<span><span class="co">## 1        FALSE         FALSE   FALSE      FALSE         FALSE          FALSE</span></span>
+<span><span class="co">## 2        FALSE         FALSE   FALSE      FALSE         FALSE          FALSE</span></span>
+<span><span class="co">## 3        FALSE         FALSE   FALSE      FALSE         FALSE          FALSE</span></span>
+<span><span class="co">## 4        FALSE         FALSE   FALSE      FALSE         FALSE          FALSE</span></span>
+<span><span class="co">##   vss.sparse.last aucinf.obs aucinf.pred aumcinf.obs aumcinf.pred</span></span>
+<span><span class="co">## 1           FALSE      FALSE       FALSE       FALSE        FALSE</span></span>
+<span><span class="co">## 2           FALSE       TRUE       FALSE       FALSE        FALSE</span></span>
+<span><span class="co">## 3           FALSE      FALSE       FALSE       FALSE        FALSE</span></span>
+<span><span class="co">## 4           FALSE      FALSE       FALSE       FALSE        FALSE</span></span>
+<span><span class="co">##   aucint.inf.obs aucint.inf.obs.dose aucint.inf.pred aucint.inf.pred.dose</span></span>
+<span><span class="co">## 1          FALSE               FALSE           FALSE                FALSE</span></span>
+<span><span class="co">## 2          FALSE               FALSE           FALSE                FALSE</span></span>
+<span><span class="co">## 3          FALSE               FALSE           FALSE                FALSE</span></span>
+<span><span class="co">## 4          FALSE               FALSE           FALSE                FALSE</span></span>
+<span><span class="co">##   aumcint.inf.obs aumcint.inf.obs.dose aumcint.inf.pred aumcint.inf.pred.dose</span></span>
+<span><span class="co">## 1           FALSE                FALSE            FALSE                 FALSE</span></span>
+<span><span class="co">## 2           FALSE                FALSE            FALSE                 FALSE</span></span>
+<span><span class="co">## 3           FALSE                FALSE            FALSE                 FALSE</span></span>
+<span><span class="co">## 4           FALSE                FALSE            FALSE                 FALSE</span></span>
+<span><span class="co">##   aucivinf.obs aucivinf.pred aucivpbextinf.obs aucivpbextinf.pred aumcivinf.obs</span></span>
+<span><span class="co">## 1        FALSE         FALSE             FALSE              FALSE         FALSE</span></span>
+<span><span class="co">## 2        FALSE         FALSE             FALSE              FALSE         FALSE</span></span>
+<span><span class="co">## 3        FALSE         FALSE             FALSE              FALSE         FALSE</span></span>
+<span><span class="co">## 4        FALSE         FALSE             FALSE              FALSE         FALSE</span></span>
+<span><span class="co">##   aumcivinf.pred aucpext.obs aucpext.pred kel.iv.all kel.ivint.all</span></span>
+<span><span class="co">## 1          FALSE       FALSE        FALSE      FALSE         FALSE</span></span>
+<span><span class="co">## 2          FALSE       FALSE        FALSE      FALSE         FALSE</span></span>
+<span><span class="co">## 3          FALSE       FALSE        FALSE      FALSE         FALSE</span></span>
+<span><span class="co">## 4          FALSE       FALSE        FALSE      FALSE         FALSE</span></span>
+<span><span class="co">##   kel.ivint.last kel.sparse.last cl.obs cl.pred cl.int.inf.obs cl.int.inf.pred</span></span>
+<span><span class="co">## 1          FALSE           FALSE  FALSE   FALSE          FALSE           FALSE</span></span>
+<span><span class="co">## 2          FALSE           FALSE  FALSE   FALSE          FALSE           FALSE</span></span>
+<span><span class="co">## 3          FALSE           FALSE  FALSE   FALSE          FALSE           FALSE</span></span>
+<span><span class="co">## 4          FALSE           FALSE  FALSE   FALSE          FALSE           FALSE</span></span>
+<span><span class="co">##   cl.iv.obs cl.iv.pred mrt.obs mrt.pred mrt.int.inf.obs mrt.int.inf.pred</span></span>
+<span><span class="co">## 1     FALSE      FALSE   FALSE    FALSE           FALSE            FALSE</span></span>
+<span><span class="co">## 2     FALSE      FALSE   FALSE    FALSE           FALSE            FALSE</span></span>
+<span><span class="co">## 3     FALSE      FALSE   FALSE    FALSE           FALSE            FALSE</span></span>
+<span><span class="co">## 4     FALSE      FALSE   FALSE    FALSE           FALSE            FALSE</span></span>
+<span><span class="co">##   mrt.iv.obs mrt.iv.pred mrt.md.obs mrt.md.pred vz.obs vz.pred vz.int.inf.obs</span></span>
+<span><span class="co">## 1      FALSE       FALSE      FALSE       FALSE  FALSE   FALSE          FALSE</span></span>
+<span><span class="co">## 2      FALSE       FALSE      FALSE       FALSE  FALSE   FALSE          FALSE</span></span>
+<span><span class="co">## 3      FALSE       FALSE      FALSE       FALSE  FALSE   FALSE          FALSE</span></span>
+<span><span class="co">## 4      FALSE       FALSE      FALSE       FALSE  FALSE   FALSE          FALSE</span></span>
+<span><span class="co">##   vz.int.inf.pred vz.iv.obs vz.iv.pred vz.sparse.last vss.obs vss.pred</span></span>
+<span><span class="co">## 1           FALSE     FALSE      FALSE          FALSE   FALSE    FALSE</span></span>
+<span><span class="co">## 2           FALSE     FALSE      FALSE          FALSE   FALSE    FALSE</span></span>
+<span><span class="co">## 3           FALSE     FALSE      FALSE          FALSE   FALSE    FALSE</span></span>
+<span><span class="co">## 4           FALSE     FALSE      FALSE          FALSE   FALSE    FALSE</span></span>
+<span><span class="co">##   vss.iv.obs vss.iv.pred vss.md.obs vss.md.pred vss.int.inf.obs</span></span>
 <span><span class="co">## 1      FALSE       FALSE      FALSE       FALSE           FALSE</span></span>
 <span><span class="co">## 2      FALSE       FALSE      FALSE       FALSE           FALSE</span></span>
 <span><span class="co">## 3      FALSE       FALSE      FALSE       FALSE           FALSE</span></span>
 <span><span class="co">## 4      FALSE       FALSE      FALSE       FALSE           FALSE</span></span>
-<span><span class="co">##   cav.int.inf.pred thalf.eff.obs thalf.eff.pred thalf.eff.iv.obs</span></span>
-<span><span class="co">## 1            FALSE         FALSE          FALSE            FALSE</span></span>
-<span><span class="co">## 2            FALSE         FALSE          FALSE            FALSE</span></span>
-<span><span class="co">## 3            FALSE         FALSE          FALSE            FALSE</span></span>
-<span><span class="co">## 4            FALSE         FALSE          FALSE            FALSE</span></span>
-<span><span class="co">##   thalf.eff.iv.pred kel.obs kel.pred kel.iv.obs kel.iv.pred auclast.dn</span></span>
-<span><span class="co">## 1             FALSE   FALSE    FALSE      FALSE       FALSE      FALSE</span></span>
-<span><span class="co">## 2             FALSE   FALSE    FALSE      FALSE       FALSE      FALSE</span></span>
-<span><span class="co">## 3             FALSE   FALSE    FALSE      FALSE       FALSE      FALSE</span></span>
-<span><span class="co">## 4             FALSE   FALSE    FALSE      FALSE       FALSE      FALSE</span></span>
-<span><span class="co">##   aucall.dn aucinf.obs.dn aucinf.pred.dn aumclast.dn aumcall.dn aumcinf.obs.dn</span></span>
-<span><span class="co">## 1     FALSE         FALSE          FALSE       FALSE      FALSE          FALSE</span></span>
-<span><span class="co">## 2     FALSE         FALSE          FALSE       FALSE      FALSE          FALSE</span></span>
-<span><span class="co">## 3     FALSE         FALSE          FALSE       FALSE      FALSE          FALSE</span></span>
-<span><span class="co">## 4     FALSE         FALSE          FALSE       FALSE      FALSE          FALSE</span></span>
+<span><span class="co">##   vss.int.inf.pred cav.int.inf.obs cav.int.inf.pred thalf.eff.obs</span></span>
+<span><span class="co">## 1            FALSE           FALSE            FALSE         FALSE</span></span>
+<span><span class="co">## 2            FALSE           FALSE            FALSE         FALSE</span></span>
+<span><span class="co">## 3            FALSE           FALSE            FALSE         FALSE</span></span>
+<span><span class="co">## 4            FALSE           FALSE            FALSE         FALSE</span></span>
+<span><span class="co">##   thalf.eff.pred thalf.eff.iv.obs thalf.eff.iv.pred kel.obs kel.pred kel.iv.obs</span></span>
+<span><span class="co">## 1          FALSE            FALSE             FALSE   FALSE    FALSE      FALSE</span></span>
+<span><span class="co">## 2          FALSE            FALSE             FALSE   FALSE    FALSE      FALSE</span></span>
+<span><span class="co">## 3          FALSE            FALSE             FALSE   FALSE    FALSE      FALSE</span></span>
+<span><span class="co">## 4          FALSE            FALSE             FALSE   FALSE    FALSE      FALSE</span></span>
+<span><span class="co">##   kel.iv.pred kel.int.inf.obs kel.int.inf.pred auclast.dn aucall.dn</span></span>
+<span><span class="co">## 1       FALSE           FALSE            FALSE      FALSE     FALSE</span></span>
+<span><span class="co">## 2       FALSE           FALSE            FALSE      FALSE     FALSE</span></span>
+<span><span class="co">## 3       FALSE           FALSE            FALSE      FALSE     FALSE</span></span>
+<span><span class="co">## 4       FALSE           FALSE            FALSE      FALSE     FALSE</span></span>
+<span><span class="co">##   aucinf.obs.dn aucinf.pred.dn aumclast.dn aumcall.dn aumcinf.obs.dn</span></span>
+<span><span class="co">## 1         FALSE          FALSE       FALSE      FALSE          FALSE</span></span>
+<span><span class="co">## 2         FALSE          FALSE       FALSE      FALSE          FALSE</span></span>
+<span><span class="co">## 3         FALSE          FALSE       FALSE      FALSE          FALSE</span></span>
+<span><span class="co">## 4         FALSE          FALSE       FALSE      FALSE          FALSE</span></span>
 <span><span class="co">##   aumcinf.pred.dn cmax.dn cmin.dn clast.obs.dn clast.pred.dn cav.dn ctrough.dn</span></span>
 <span><span class="co">## 1           FALSE   FALSE   FALSE        FALSE         FALSE  FALSE      FALSE</span></span>
 <span><span class="co">## 2           FALSE   FALSE   FALSE        FALSE         FALSE  FALSE      FALSE</span></span>

@@ -11,17 +11,17 @@ suppressPackageStartupMessages(
 
 PKNCA can assign and convert units for reporting. There are two ways to
 provide units to PKNCA: via the `units` argument to
-[`PKNCAdata()`](http://humanpred.github.io/pknca/reference/PKNCAdata.md)
+[`PKNCAdata()`](https://humanpred.github.io/pknca/reference/PKNCAdata.md)
 or by specifying units with
-[`PKNCAconc()`](http://humanpred.github.io/pknca/reference/PKNCAconc.md)
+[`PKNCAconc()`](https://humanpred.github.io/pknca/reference/PKNCAconc.md)
 and/or
-[`PKNCAdose()`](http://humanpred.github.io/pknca/reference/PKNCAdose.md).
+[`PKNCAdose()`](https://humanpred.github.io/pknca/reference/PKNCAdose.md).
 If you provide the units argument to
-[`PKNCAdata()`](http://humanpred.github.io/pknca/reference/PKNCAdata.md),
+[`PKNCAdata()`](https://humanpred.github.io/pknca/reference/PKNCAdata.md),
 units given to
-[`PKNCAconc()`](http://humanpred.github.io/pknca/reference/PKNCAconc.md)
+[`PKNCAconc()`](https://humanpred.github.io/pknca/reference/PKNCAconc.md)
 or
-[`PKNCAdose()`](http://humanpred.github.io/pknca/reference/PKNCAdose.md)
+[`PKNCAdose()`](https://humanpred.github.io/pknca/reference/PKNCAdose.md)
 are ignored.
 
 ## Examples of each way to add units
@@ -30,13 +30,13 @@ are ignored.
 
 For more details on parts of this NCA calculation example unrelated to
 units, see the [theophylline example
-vignette](http://humanpred.github.io/pknca/articles/v02-example-theophylline.md).
+vignette](https://humanpred.github.io/pknca/articles/v02-example-theophylline.md).
 
 Provide the units for concentration (`concu`), time (`timeu`), and
 amount (`amountu`) to the
-[`PKNCAconc()`](http://humanpred.github.io/pknca/reference/PKNCAconc.md)
+[`PKNCAconc()`](https://humanpred.github.io/pknca/reference/PKNCAconc.md)
 function and for dose (`doseu`) to the
-[`PKNCAdose()`](http://humanpred.github.io/pknca/reference/PKNCAdose.md)
+[`PKNCAdose()`](https://humanpred.github.io/pknca/reference/PKNCAdose.md)
 function.
 
 ``` r
@@ -118,7 +118,7 @@ summary(o_nca)
 
 For more details on parts of this NCA calculation example unrelated to
 units, see the [theophylline example
-vignette](http://humanpred.github.io/pknca/articles/v02-example-theophylline.md).
+vignette](https://humanpred.github.io/pknca/articles/v02-example-theophylline.md).
 
 ``` r
 
@@ -133,7 +133,7 @@ argument.
 
 Since no urine or other similar collection is performed, the `amountu`
 argument is omitted for
-[`pknca_units_table()`](http://humanpred.github.io/pknca/reference/pknca_units_table.md).
+[`pknca_units_table()`](https://humanpred.github.io/pknca/reference/pknca_units_table.md).
 
 ``` r
 
@@ -166,7 +166,7 @@ summary(o_nca)
 
 A unit assignment and conversion table can be generated as a data.frame
 to use with the
-[`pknca_units_table()`](http://humanpred.github.io/pknca/reference/pknca_units_table.md)
+[`pknca_units_table()`](https://humanpred.github.io/pknca/reference/pknca_units_table.md)
 function or manually.
 
 The simplest method each of the types of units for inputs and
@@ -179,9 +179,9 @@ d_units_auto <- pknca_units_table(concu="ng/mL", doseu="mg", amountu="mg", timeu
 d_units_auto[d_units_auto$PPTESTCD %in% c("cmax", "tmax", "auclast", "cl.obs", "vd.obs"), ]
 #>          PPORRESU PPTESTCD
 #> 27             hr     tmax
-#> 62          ng/mL     cmax
-#> 96       hr*ng/mL  auclast
-#> 136 mg/(hr*ng/mL)   cl.obs
+#> 78          ng/mL     cmax
+#> 132      hr*ng/mL  auclast
+#> 192 mg/(hr*ng/mL)   cl.obs
 ```
 
 As you see above, the default units table has a column for the
@@ -213,10 +213,10 @@ d_units_clean <-
 d_units_clean[d_units_clean$PPTESTCD %in% c("cmax", "tmax", "auclast", "cl.obs", "vd.obs", "fe"), ]
 #>          PPORRESU PPTESTCD PPSTRESU conversion_factor
 #> 27             hr     tmax      day      4.166667e-02
-#> 62          ng/mL     cmax    ng/mL      1.000000e+00
-#> 75          ng/mg       fe fraction      1.000000e-06
-#> 96       hr*ng/mL  auclast hr*ng/mL      1.000000e+00
-#> 136 mg/(hr*ng/mL)   cl.obs     L/hr      1.000000e+03
+#> 78          ng/mL     cmax    ng/mL      1.000000e+00
+#> 91          ng/mg       fe fraction      1.000000e-06
+#> 132      hr*ng/mL  auclast hr*ng/mL      1.000000e+00
+#> 192 mg/(hr*ng/mL)   cl.obs     L/hr      1.000000e+03
 ```
 
 Now, the units are much cleaner to look at.
@@ -246,9 +246,9 @@ d_units_clean_manual <-
 d_units_clean_manual[d_units_clean_manual$PPTESTCD %in% c("cmax", "tmax", "auclast", "cl.obs", "vd.obs"), ]
 #>          PPORRESU PPTESTCD PPSTRESU conversion_factor
 #> 27             hr     tmax      day      4.166667e-02
-#> 62          ng/mL     cmax   nmol/L      8.130081e+00
-#> 96       hr*ng/mL  auclast hr*ng/mL      1.000000e+00
-#> 136 mg/(hr*ng/mL)   cl.obs     L/hr      1.000000e+03
+#> 78          ng/mL     cmax   nmol/L      8.130081e+00
+#> 132      hr*ng/mL  auclast hr*ng/mL      1.000000e+00
+#> 192 mg/(hr*ng/mL)   cl.obs     L/hr      1.000000e+03
 ```
 
 ## How do I add different unit conversions for different analytes?

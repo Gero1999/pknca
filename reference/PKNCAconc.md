@@ -24,6 +24,7 @@ PKNCAconc(
   volume,
   exclude_half.life,
   include_half.life,
+  lloq,
   sparse = FALSE,
   ...,
   concu = NULL,
@@ -93,12 +94,30 @@ PKNCAconc(
 
 - exclude_half.life, include_half.life:
 
-  A character scalar for the column name in the dataset of the points to
-  exclude from the half-life calculation (still using normal
-  curve-stripping selection rules for the other points) or to include
-  for the half-life (using specifically those points and bypassing
-  automatic curve-stripping point selection). See the "Half-Life
-  Calculation" vignette for more details on the use of these arguments.
+  Manual half-life point selection, given as a logical value per
+  concentration measurement (or, in `PKNCAconc()`, the name of such a
+  column in the data). `exclude_half.life` drops the flagged points;
+  automatic curve-stripping point selection is still performed on the
+  remaining (non-excluded) points and is not bypassed.
+  `include_half.life` names the exact points to use, bypassing automatic
+  curve-stripping point selection. Each value is `TRUE`, `FALSE`, or
+  `NA` (undefined); the column/vector is treated as "in use" for an
+  interval unless it is entirely `NA` (so an all-`FALSE` column still
+  counts as in use), so leave it `NA` (rather than `FALSE`) where the
+  mechanism should not apply. Only one of `exclude_half.life` and
+  `include_half.life` may be in use for a given interval. See the
+  "Half-Life Calculation" vignette for more details on the use of these
+  arguments.
+
+- lloq:
+
+  (optional) The lower limit of quantification used by the Tobit
+  half-life method (`hl_method = "tobit"`). Either the name of a column
+  in `data` giving the per-observation LLOQ or a numeric scalar applied
+  to all observations. When provided, it is passed through to
+  [`pk.calc.half.life()`](https://humanpred.github.io/pknca/reference/pk.calc.half.life.md).
+  See the "Half-Life Calculation with Tobit Regression" vignette for
+  more details.
 
 - sparse:
 
@@ -122,6 +141,6 @@ A PKNCAconc object that can be used for automated NCA.
 ## See also
 
 Other PKNCA objects:
-[`PKNCAdata()`](http://humanpred.github.io/pknca/reference/PKNCAdata.md),
-[`PKNCAdose()`](http://humanpred.github.io/pknca/reference/PKNCAdose.md),
-[`PKNCAresults()`](http://humanpred.github.io/pknca/reference/PKNCAresults.md)
+[`PKNCAdata()`](https://humanpred.github.io/pknca/reference/PKNCAdata.md),
+[`PKNCAdose()`](https://humanpred.github.io/pknca/reference/PKNCAdose.md),
+[`PKNCAresults()`](https://humanpred.github.io/pknca/reference/PKNCAresults.md)

@@ -57,13 +57,13 @@ table.” - Hadley Wickham (<https://doi.org/10.18637/jss.v059.i10>)
 CDISC has NCA tidied, and PKNCA follows that model:
 
 - concentration-time is a dataset (PC domain;
-  [`PKNCAconc()`](http://humanpred.github.io/pknca/reference/PKNCAconc.md)
+  [`PKNCAconc()`](https://humanpred.github.io/pknca/reference/PKNCAconc.md)
   object)
 - dose-time is a dataset (EX/EC domains;
-  [`PKNCAdose()`](http://humanpred.github.io/pknca/reference/PKNCAdose.md)
+  [`PKNCAdose()`](https://humanpred.github.io/pknca/reference/PKNCAdose.md)
   object)
 - NCA results are a dataset (PP domain;
-  [`pk.nca()`](http://humanpred.github.io/pknca/reference/pk.nca.md)
+  [`pk.nca()`](https://humanpred.github.io/pknca/reference/pk.nca.md)
   output)
 
 ### Dataset Basics: Minimum data
@@ -76,20 +76,20 @@ calculate.
 ### Dataset Basics: What columns are needed?
 
 Column names are provided by the input to
-[`PKNCAconc()`](http://humanpred.github.io/pknca/reference/PKNCAconc.md)
+[`PKNCAconc()`](https://humanpred.github.io/pknca/reference/PKNCAconc.md)
 and
-[`PKNCAdose()`](http://humanpred.github.io/pknca/reference/PKNCAdose.md);
+[`PKNCAdose()`](https://humanpred.github.io/pknca/reference/PKNCAdose.md);
 they are not hard-coded.
 
 Columns that can be used include:
 
-- [`PKNCAconc()`](http://humanpred.github.io/pknca/reference/PKNCAconc.md):
+- [`PKNCAconc()`](https://humanpred.github.io/pknca/reference/PKNCAconc.md):
   concentration, time, groups; data exclusions; half-life inclusion and
   exclusion
-- [`PKNCAdose()`](http://humanpred.github.io/pknca/reference/PKNCAdose.md):
+- [`PKNCAdose()`](https://humanpred.github.io/pknca/reference/PKNCAdose.md):
   dose, time, groups; route, rate/duration of infusion; data exclusions
 - intervals given to
-  [`PKNCAdata()`](http://humanpred.github.io/pknca/reference/PKNCAdata.md):
+  [`PKNCAdata()`](https://humanpred.github.io/pknca/reference/PKNCAdata.md):
   groups, start, end, and any NCA parameters to calculate
 
 ### Dataset Basics: Example data
@@ -183,24 +183,24 @@ o_result <- suppressMessages(pk.nca(o_data))
 
 ### What functions are the most used?
 
-- [`PKNCAconc()`](http://humanpred.github.io/pknca/reference/PKNCAconc.md):
+- [`PKNCAconc()`](https://humanpred.github.io/pknca/reference/PKNCAconc.md):
   define a concentration-time `PKNCAconc` object
   - All information about concentration data are given: concentration,
     time
   - Optional information includes: grouping information (usually given),
     data to exclude, half-life inclusion and exclusion columns
-- [`PKNCAdose()`](http://humanpred.github.io/pknca/reference/PKNCAdose.md):
+- [`PKNCAdose()`](https://humanpred.github.io/pknca/reference/PKNCAdose.md):
   define a dose-time `PKNCAdose` object (optional)
   - dose amount and time are both optional
   - Optional information includes: rate or duration of infusion, data to
     exclude
-- [`PKNCAdata()`](http://humanpred.github.io/pknca/reference/PKNCAdata.md):
+- [`PKNCAdata()`](https://humanpred.github.io/pknca/reference/PKNCAdata.md):
   combine `PKNCAconc`, optionally `PKNCAdose`, and optionally
   `intervals` into a `PKNCAdata` object
   - the `PKNCAconc` object must be given; the `PKNCAdose` object is
     optional; interval definitions are usually given; calculation
     options may be given
-- [`pk.nca()`](http://humanpred.github.io/pknca/reference/pk.nca.md):
+- [`pk.nca()`](https://humanpred.github.io/pknca/reference/pk.nca.md):
   calculate the NCA parameters from a data object into a `PKNCAresult`
   object
 
@@ -333,11 +333,11 @@ pander::pander(head(
 ))
 ```
 
-| start | end | PPTESTCD | PPORRES | exclude |
-|:-----:|:---:|:--------:|:-------:|:-------:|
-|   0   | 24  | auclast  |  92.37  |   NA    |
-|   0   | Inf |   cmax   |  10.5   |   NA    |
-|   0   | Inf |   tmax   |  1.12   |   NA    |
+| start | end | PPTESTCD | PPORRES |       PPANMETH       | exclude |
+|:-----:|:---:|:--------:|:-------:|:--------------------:|:-------:|
+|   0   | 24  | auclast  |  92.37  | AUC: lin up/log down |   NA    |
+|   0   | Inf |   cmax   |  10.5   |                      |   NA    |
+|   0   | Inf |   tmax   |  1.12   |                      |   NA    |
 
 ## PKNCA datasets
 
@@ -636,9 +636,9 @@ indicate “no” or any other text to indicate “yes”.
 ### Exclude data points overall
 
 Use the `exclude` argument for
-[`PKNCAconc()`](http://humanpred.github.io/pknca/reference/PKNCAconc.md)
+[`PKNCAconc()`](https://humanpred.github.io/pknca/reference/PKNCAconc.md)
 or
-[`PKNCAdose()`](http://humanpred.github.io/pknca/reference/PKNCAdose.md).
+[`PKNCAdose()`](https://humanpred.github.io/pknca/reference/PKNCAdose.md).
 
 When you use `exclude`, this is how you give your data to PKNCA:
 
@@ -718,7 +718,7 @@ quality of the half-life fit is usually low in this scenario.
 ### λz control (manual exclusions and inclusions of data points)
 
 Use the `exclude_half.life` or `include_half.life` argument for
-[`PKNCAconc()`](http://humanpred.github.io/pknca/reference/PKNCAconc.md).
+[`PKNCAconc()`](https://humanpred.github.io/pknca/reference/PKNCAconc.md).
 The two arguments behave very differently in how points are selected for
 half-life.
 
@@ -780,10 +780,10 @@ o_nca <- suppressMessages(pk.nca(o_data))
 as.data.frame(o_nca)
 ```
 
-    ## # A tibble: 1 × 5
-    ##   start   end PPTESTCD PPORRES exclude
-    ##   <dbl> <dbl> <chr>      <dbl> <chr>  
-    ## 1     0   Inf cmax         0.5 NA
+    ## # A tibble: 1 × 6
+    ##   start   end PPTESTCD PPORRES PPANMETH exclude
+    ##   <dbl> <dbl> <chr>      <dbl> <chr>    <chr>  
+    ## 1     0   Inf cmax         0.5 ""       NA
 
 ### PKNCA only calculates what is required, not every possible parameter (2 of 2)
 
@@ -809,23 +809,23 @@ o_nca <- suppressMessages(pk.nca(o_data))
 as.data.frame(o_nca)
 ```
 
-    ## # A tibble: 14 × 5
-    ##    start   end PPTESTCD            PPORRES exclude
-    ##    <dbl> <dbl> <chr>                 <dbl> <chr>  
-    ##  1     0   Inf tmax                 0      NA     
-    ##  2     0   Inf tlast                3      NA     
-    ##  3     0   Inf clast.obs            0.0625 NA     
-    ##  4     0   Inf lambda.z             0.693  NA     
-    ##  5     0   Inf r.squared            1      NA     
-    ##  6     0   Inf adj.r.squared        1      NA     
-    ##  7     0   Inf lambda.z.corrxy     -1      NA     
-    ##  8     0   Inf lambda.z.time.first  1      NA     
-    ##  9     0   Inf lambda.z.time.last   3      NA     
-    ## 10     0   Inf lambda.z.n.points    3      NA     
-    ## 11     0   Inf clast.pred           0.0625 NA     
-    ## 12     0   Inf half.life            1      NA     
-    ## 13     0   Inf span.ratio           2      NA     
-    ## 14     0   Inf aucinf.obs           0.721  NA
+    ## # A tibble: 14 × 6
+    ##    start   end PPTESTCD            PPORRES PPANMETH               exclude
+    ##    <dbl> <dbl> <chr>                 <dbl> <chr>                  <chr>  
+    ##  1     0   Inf tmax                 0      ""                     NA     
+    ##  2     0   Inf tlast                3      ""                     NA     
+    ##  3     0   Inf clast.obs            0.0625 ""                     NA     
+    ##  4     0   Inf lambda.z             0.693  ""                     NA     
+    ##  5     0   Inf r.squared            1      ""                     NA     
+    ##  6     0   Inf adj.r.squared        1      ""                     NA     
+    ##  7     0   Inf lambda.z.corrxy     -1      ""                     NA     
+    ##  8     0   Inf lambda.z.time.first  1      ""                     NA     
+    ##  9     0   Inf lambda.z.time.last   3      ""                     NA     
+    ## 10     0   Inf lambda.z.n.points    3      ""                     NA     
+    ## 11     0   Inf clast.pred           0.0625 ""                     NA     
+    ## 12     0   Inf half.life            1      ""                     NA     
+    ## 13     0   Inf span.ratio           2      ""                     NA     
+    ## 14     0   Inf aucinf.obs           0.721  "AUC: lin up/log down" NA
 
 ### How to select the correct parameters for calculations (aka, why are there 32 types of AUC in PKNCA?)
 
@@ -869,29 +869,29 @@ as.data.frame(o_nca) %>%
   filter(PPTESTCD != "half.life")
 ```
 
-    ## # A tibble: 13 × 5
-    ##    start   end PPTESTCD            PPORRES exclude
-    ##    <dbl> <dbl> <chr>                 <dbl> <chr>  
-    ##  1     0   Inf tmax                 0      NA     
-    ##  2     0   Inf tlast                3      NA     
-    ##  3     0   Inf clast.obs            0.0625 NA     
-    ##  4     0   Inf lambda.z             0.693  NA     
-    ##  5     0   Inf r.squared            1      NA     
-    ##  6     0   Inf adj.r.squared        1      NA     
-    ##  7     0   Inf lambda.z.corrxy     -1      NA     
-    ##  8     0   Inf lambda.z.time.first  1      NA     
-    ##  9     0   Inf lambda.z.time.last   3      NA     
-    ## 10     0   Inf lambda.z.n.points    3      NA     
-    ## 11     0   Inf clast.pred           0.0625 NA     
-    ## 12     0   Inf span.ratio           2      NA     
-    ## 13     0   Inf aucinf.obs           0.721  NA
+    ## # A tibble: 13 × 6
+    ##    start   end PPTESTCD            PPORRES PPANMETH               exclude
+    ##    <dbl> <dbl> <chr>                 <dbl> <chr>                  <chr>  
+    ##  1     0   Inf tmax                 0      ""                     NA     
+    ##  2     0   Inf tlast                3      ""                     NA     
+    ##  3     0   Inf clast.obs            0.0625 ""                     NA     
+    ##  4     0   Inf lambda.z             0.693  ""                     NA     
+    ##  5     0   Inf r.squared            1      ""                     NA     
+    ##  6     0   Inf adj.r.squared        1      ""                     NA     
+    ##  7     0   Inf lambda.z.corrxy     -1      ""                     NA     
+    ##  8     0   Inf lambda.z.time.first  1      ""                     NA     
+    ##  9     0   Inf lambda.z.time.last   3      ""                     NA     
+    ## 10     0   Inf lambda.z.n.points    3      ""                     NA     
+    ## 11     0   Inf clast.pred           0.0625 ""                     NA     
+    ## 12     0   Inf span.ratio           2      ""                     NA     
+    ## 13     0   Inf aucinf.obs           0.721  "AUC: lin up/log down" NA
 
 But, parameters derived from half-life remain.
 
 ### Excluding results (The best way, 1/2)
 
 When you use the
-[`exclude()`](http://humanpred.github.io/pknca/reference/exclude.md)
+[`exclude()`](https://humanpred.github.io/pknca/reference/exclude.md)
 function, parameters that are dependent on an excluded parameter will be
 excluded.
 
@@ -909,23 +909,23 @@ o_nca_excluded <-
 as.data.frame(o_nca_excluded)
 ```
 
-    ## # A tibble: 14 × 5
-    ##    start   end PPTESTCD            PPORRES exclude       
-    ##    <dbl> <dbl> <chr>                 <dbl> <chr>         
-    ##  1     0   Inf tmax                 0      NA            
-    ##  2     0   Inf tlast                3      NA            
-    ##  3     0   Inf clast.obs            0.0625 NA            
-    ##  4     0   Inf lambda.z             0.693  span.ratio < 3
-    ##  5     0   Inf r.squared            1      span.ratio < 3
-    ##  6     0   Inf adj.r.squared        1      span.ratio < 3
-    ##  7     0   Inf lambda.z.corrxy     -1      span.ratio < 3
-    ##  8     0   Inf lambda.z.time.first  1      span.ratio < 3
-    ##  9     0   Inf lambda.z.time.last   3      span.ratio < 3
-    ## 10     0   Inf lambda.z.n.points    3      span.ratio < 3
-    ## 11     0   Inf clast.pred           0.0625 span.ratio < 3
-    ## 12     0   Inf half.life            1      span.ratio < 3
-    ## 13     0   Inf span.ratio           2      span.ratio < 3
-    ## 14     0   Inf aucinf.obs           0.721  span.ratio < 3
+    ## # A tibble: 14 × 6
+    ##    start   end PPTESTCD            PPORRES PPANMETH               exclude       
+    ##    <dbl> <dbl> <chr>                 <dbl> <chr>                  <chr>         
+    ##  1     0   Inf tmax                 0      ""                     NA            
+    ##  2     0   Inf tlast                3      ""                     NA            
+    ##  3     0   Inf clast.obs            0.0625 ""                     NA            
+    ##  4     0   Inf lambda.z             0.693  ""                     span.ratio < 3
+    ##  5     0   Inf r.squared            1      ""                     span.ratio < 3
+    ##  6     0   Inf adj.r.squared        1      ""                     span.ratio < 3
+    ##  7     0   Inf lambda.z.corrxy     -1      ""                     span.ratio < 3
+    ##  8     0   Inf lambda.z.time.first  1      ""                     span.ratio < 3
+    ##  9     0   Inf lambda.z.time.last   3      ""                     span.ratio < 3
+    ## 10     0   Inf lambda.z.n.points    3      ""                     span.ratio < 3
+    ## 11     0   Inf clast.pred           0.0625 ""                     span.ratio < 3
+    ## 12     0   Inf half.life            1      ""                     span.ratio < 3
+    ## 13     0   Inf span.ratio           2      ""                     span.ratio < 3
+    ## 14     0   Inf aucinf.obs           0.721  "AUC: lin up/log down" span.ratio < 3
 
 ### Excluding results (The best way, 2/2)
 
@@ -1081,7 +1081,7 @@ pander::pander(as.data.frame(o_nca))
 ### Units (especially clearance)
 
 PKNCA supports units with the
-[`pknca_units_table()`](http://humanpred.github.io/pknca/reference/pknca_units_table.md)
+[`pknca_units_table()`](https://humanpred.github.io/pknca/reference/pknca_units_table.md)
 function. See the [Unit Assignment and Conversion with
 PKNCA](http://humanpred.github.io/pknca/articles/v07-unit-conversion.md)
 vignette for more information.
@@ -1188,26 +1188,36 @@ o_data$intervals %>% select(-Subject) %>% unique() %>% as.data.frame()
     ## 2     0 Inf   FALSE  FALSE    FALSE   FALSE       FALSE            FALSE
     ## 3     0 120    TRUE  FALSE    FALSE   FALSE       FALSE            FALSE
     ## 4   120 144    TRUE  FALSE    FALSE   FALSE       FALSE            FALSE
-    ##   aucint.all aucint.all.dose    c0  cmax  cmin  tmax  tmin tlast tfirst
-    ## 1      FALSE           FALSE FALSE FALSE FALSE FALSE FALSE FALSE  FALSE
-    ## 2      FALSE           FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE  FALSE
-    ## 3      FALSE           FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE  FALSE
-    ## 4      FALSE           FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE  FALSE
-    ##   clast.obs cl.last cl.all     f mrt.last mrt.iv.last vss.last vss.iv.last
-    ## 1     FALSE   FALSE  FALSE FALSE    FALSE       FALSE    FALSE       FALSE
-    ## 2     FALSE   FALSE  FALSE FALSE    FALSE       FALSE    FALSE       FALSE
-    ## 3     FALSE   FALSE  FALSE FALSE    FALSE       FALSE    FALSE       FALSE
-    ## 4     FALSE   FALSE  FALSE FALSE    FALSE       FALSE    FALSE       FALSE
-    ##     cav cav.int.last cav.int.all ctrough cstart   ptr  tlag deg.fluc swing
-    ## 1 FALSE        FALSE       FALSE   FALSE  FALSE FALSE FALSE    FALSE FALSE
-    ## 2 FALSE        FALSE       FALSE   FALSE  FALSE FALSE FALSE    FALSE FALSE
-    ## 3 FALSE        FALSE       FALSE   FALSE  FALSE FALSE FALSE    FALSE FALSE
-    ## 4 FALSE        FALSE       FALSE   FALSE  FALSE FALSE FALSE    FALSE FALSE
-    ##    ceoi aucabove.predose.all aucabove.trough.all count_conc count_conc_measured
-    ## 1 FALSE                FALSE               FALSE      FALSE               FALSE
-    ## 2 FALSE                FALSE               FALSE      FALSE               FALSE
-    ## 3 FALSE                FALSE               FALSE      FALSE               FALSE
-    ## 4 FALSE                FALSE               FALSE      FALSE               FALSE
+    ##   aucint.all aucint.all.dose aumcint.last aumcint.last.dose aumcint.all
+    ## 1      FALSE           FALSE        FALSE             FALSE       FALSE
+    ## 2      FALSE           FALSE        FALSE             FALSE       FALSE
+    ## 3      FALSE           FALSE        FALSE             FALSE       FALSE
+    ## 4      FALSE           FALSE        FALSE             FALSE       FALSE
+    ##   aumcint.all.dose    c0  cmax  cmin  tmax  tmin tlast tfirst clast.obs cl.last
+    ## 1            FALSE FALSE FALSE FALSE FALSE FALSE FALSE  FALSE     FALSE   FALSE
+    ## 2            FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE  FALSE     FALSE   FALSE
+    ## 3            FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE  FALSE     FALSE   FALSE
+    ## 4            FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE  FALSE     FALSE   FALSE
+    ##   cl.all cl.int.all cl.int.last     f mrt.last mrt.all mrt.int.all mrt.int.last
+    ## 1  FALSE      FALSE       FALSE FALSE    FALSE   FALSE       FALSE        FALSE
+    ## 2  FALSE      FALSE       FALSE FALSE    FALSE   FALSE       FALSE        FALSE
+    ## 3  FALSE      FALSE       FALSE FALSE    FALSE   FALSE       FALSE        FALSE
+    ## 4  FALSE      FALSE       FALSE FALSE    FALSE   FALSE       FALSE        FALSE
+    ##   mrt.iv.last vss.last vss.iv.last vss.all vss.int.all vss.int.last   cav
+    ## 1       FALSE    FALSE       FALSE   FALSE       FALSE        FALSE FALSE
+    ## 2       FALSE    FALSE       FALSE   FALSE       FALSE        FALSE FALSE
+    ## 3       FALSE    FALSE       FALSE   FALSE       FALSE        FALSE FALSE
+    ## 4       FALSE    FALSE       FALSE   FALSE       FALSE        FALSE FALSE
+    ##   cav.int.last cav.int.all ctrough cstart   ptr  tlag deg.fluc swing  ceoi
+    ## 1        FALSE       FALSE   FALSE  FALSE FALSE FALSE    FALSE FALSE FALSE
+    ## 2        FALSE       FALSE   FALSE  FALSE FALSE FALSE    FALSE FALSE FALSE
+    ## 3        FALSE       FALSE   FALSE  FALSE FALSE FALSE    FALSE FALSE FALSE
+    ## 4        FALSE       FALSE   FALSE  FALSE FALSE FALSE    FALSE FALSE FALSE
+    ##   aucabove.predose.all aucabove.trough.all count_conc count_conc_measured
+    ## 1                FALSE               FALSE      FALSE               FALSE
+    ## 2                FALSE               FALSE      FALSE               FALSE
+    ## 3                FALSE               FALSE      FALSE               FALSE
+    ## 4                FALSE               FALSE      FALSE               FALSE
     ##   totdose volpk    ae clr.last clr.obs clr.pred    fe ertlst ermax ertmax
     ## 1   FALSE FALSE FALSE    FALSE   FALSE    FALSE FALSE  FALSE FALSE  FALSE
     ## 2   FALSE FALSE FALSE    FALSE   FALSE    FALSE FALSE  FALSE FALSE  FALSE
@@ -1223,76 +1233,121 @@ o_data$intervals %>% select(-Subject) %>% unique() %>% as.data.frame()
     ## 2          FALSE      FALSE     FALSE    FALSE         FALSE        FALSE
     ## 3          FALSE      FALSE     FALSE    FALSE         FALSE        FALSE
     ## 4          FALSE      FALSE     FALSE    FALSE         FALSE        FALSE
-    ##   aucivpbextlast aucivpbextall aucivpbextint.last aucivpbextint.all half.life
-    ## 1          FALSE         FALSE              FALSE             FALSE     FALSE
-    ## 2          FALSE         FALSE              FALSE             FALSE      TRUE
-    ## 3          FALSE         FALSE              FALSE             FALSE     FALSE
-    ## 4          FALSE         FALSE              FALSE             FALSE     FALSE
-    ##   r.squared adj.r.squared lambda.z.corrxy lambda.z lambda.z.time.first
-    ## 1     FALSE         FALSE           FALSE    FALSE               FALSE
-    ## 2     FALSE         FALSE           FALSE    FALSE               FALSE
-    ## 3     FALSE         FALSE           FALSE    FALSE               FALSE
-    ## 4     FALSE         FALSE           FALSE    FALSE               FALSE
-    ##   lambda.z.time.last lambda.z.n.points clast.pred span.ratio tobit_residual
-    ## 1              FALSE             FALSE      FALSE      FALSE          FALSE
-    ## 2              FALSE             FALSE      FALSE      FALSE          FALSE
-    ## 3              FALSE             FALSE      FALSE      FALSE          FALSE
-    ## 4              FALSE             FALSE      FALSE      FALSE          FALSE
-    ##   adj_tobit_residual lambda.z.n.points_blq thalf.eff.last thalf.eff.iv.last
-    ## 1              FALSE                 FALSE          FALSE             FALSE
-    ## 2              FALSE                 FALSE          FALSE             FALSE
-    ## 3              FALSE                 FALSE          FALSE             FALSE
-    ## 4              FALSE                 FALSE          FALSE             FALSE
-    ##   kel.last kel.iv.last cl.sparse.last mrt.sparse.last vss.sparse.last
-    ## 1    FALSE       FALSE          FALSE           FALSE           FALSE
-    ## 2    FALSE       FALSE          FALSE           FALSE           FALSE
-    ## 3    FALSE       FALSE          FALSE           FALSE           FALSE
-    ## 4    FALSE       FALSE          FALSE           FALSE           FALSE
-    ##   aucinf.obs aucinf.pred aumcinf.obs aumcinf.pred aucint.inf.obs
-    ## 1      FALSE       FALSE       FALSE        FALSE          FALSE
-    ## 2       TRUE       FALSE       FALSE        FALSE          FALSE
-    ## 3      FALSE       FALSE       FALSE        FALSE          FALSE
-    ## 4      FALSE       FALSE       FALSE        FALSE          FALSE
-    ##   aucint.inf.obs.dose aucint.inf.pred aucint.inf.pred.dose aucivinf.obs
-    ## 1               FALSE           FALSE                FALSE        FALSE
-    ## 2               FALSE           FALSE                FALSE        FALSE
-    ## 3               FALSE           FALSE                FALSE        FALSE
-    ## 4               FALSE           FALSE                FALSE        FALSE
-    ##   aucivinf.pred aucivpbextinf.obs aucivpbextinf.pred aucpext.obs aucpext.pred
-    ## 1         FALSE             FALSE              FALSE       FALSE        FALSE
-    ## 2         FALSE             FALSE              FALSE       FALSE        FALSE
-    ## 3         FALSE             FALSE              FALSE       FALSE        FALSE
-    ## 4         FALSE             FALSE              FALSE       FALSE        FALSE
-    ##   kel.sparse.last cl.obs cl.pred mrt.obs mrt.pred mrt.iv.obs mrt.iv.pred
-    ## 1           FALSE  FALSE   FALSE   FALSE    FALSE      FALSE       FALSE
-    ## 2           FALSE  FALSE   FALSE   FALSE    FALSE      FALSE       FALSE
-    ## 3           FALSE  FALSE   FALSE   FALSE    FALSE      FALSE       FALSE
-    ## 4           FALSE  FALSE   FALSE   FALSE    FALSE      FALSE       FALSE
-    ##   mrt.md.obs mrt.md.pred vz.obs vz.pred vz.sparse.last vss.obs vss.pred
-    ## 1      FALSE       FALSE  FALSE   FALSE          FALSE   FALSE    FALSE
-    ## 2      FALSE       FALSE  FALSE   FALSE          FALSE   FALSE    FALSE
-    ## 3      FALSE       FALSE  FALSE   FALSE          FALSE   FALSE    FALSE
-    ## 4      FALSE       FALSE  FALSE   FALSE          FALSE   FALSE    FALSE
-    ##   vss.iv.obs vss.iv.pred vss.md.obs vss.md.pred cav.int.inf.obs
+    ##   aucivpbextlast aucivpbextall aucivpbextint.last aucivpbextint.all aumcivlast
+    ## 1          FALSE         FALSE              FALSE             FALSE      FALSE
+    ## 2          FALSE         FALSE              FALSE             FALSE      FALSE
+    ## 3          FALSE         FALSE              FALSE             FALSE      FALSE
+    ## 4          FALSE         FALSE              FALSE             FALSE      FALSE
+    ##   aumcivall aumcivint.last aumcivint.all half.life r.squared adj.r.squared
+    ## 1     FALSE          FALSE         FALSE     FALSE     FALSE         FALSE
+    ## 2     FALSE          FALSE         FALSE      TRUE     FALSE         FALSE
+    ## 3     FALSE          FALSE         FALSE     FALSE     FALSE         FALSE
+    ## 4     FALSE          FALSE         FALSE     FALSE     FALSE         FALSE
+    ##   lambda.z.corrxy lambda.z lambda.z.time.first lambda.z.time.last
+    ## 1           FALSE    FALSE               FALSE              FALSE
+    ## 2           FALSE    FALSE               FALSE              FALSE
+    ## 3           FALSE    FALSE               FALSE              FALSE
+    ## 4           FALSE    FALSE               FALSE              FALSE
+    ##   lambda.z.n.points clast.pred span.ratio tobit_residual adj_tobit_residual
+    ## 1             FALSE      FALSE      FALSE          FALSE              FALSE
+    ## 2             FALSE      FALSE      FALSE          FALSE              FALSE
+    ## 3             FALSE      FALSE      FALSE          FALSE              FALSE
+    ## 4             FALSE      FALSE      FALSE          FALSE              FALSE
+    ##   lambda.z.n.points_blq thalf.eff.last thalf.eff.iv.last kel.last kel.iv.last
+    ## 1                 FALSE          FALSE             FALSE    FALSE       FALSE
+    ## 2                 FALSE          FALSE             FALSE    FALSE       FALSE
+    ## 3                 FALSE          FALSE             FALSE    FALSE       FALSE
+    ## 4                 FALSE          FALSE             FALSE    FALSE       FALSE
+    ##   kel.all kel.int.all kel.int.last cl.iv.all cl.iv.last cl.ivint.all
+    ## 1   FALSE       FALSE        FALSE     FALSE      FALSE        FALSE
+    ## 2   FALSE       FALSE        FALSE     FALSE      FALSE        FALSE
+    ## 3   FALSE       FALSE        FALSE     FALSE      FALSE        FALSE
+    ## 4   FALSE       FALSE        FALSE     FALSE      FALSE        FALSE
+    ##   cl.ivint.last cl.sparse.last mrt.sparse.last mrt.iv.all mrt.ivint.all
+    ## 1         FALSE          FALSE           FALSE      FALSE         FALSE
+    ## 2         FALSE          FALSE           FALSE      FALSE         FALSE
+    ## 3         FALSE          FALSE           FALSE      FALSE         FALSE
+    ## 4         FALSE          FALSE           FALSE      FALSE         FALSE
+    ##   mrt.ivint.last vz.all vz.int.all vz.int.last vz.iv.all vz.iv.last
+    ## 1          FALSE  FALSE      FALSE       FALSE     FALSE      FALSE
+    ## 2          FALSE  FALSE      FALSE       FALSE     FALSE      FALSE
+    ## 3          FALSE  FALSE      FALSE       FALSE     FALSE      FALSE
+    ## 4          FALSE  FALSE      FALSE       FALSE     FALSE      FALSE
+    ##   vz.ivint.all vz.ivint.last vz.last vss.iv.all vss.ivint.all vss.ivint.last
+    ## 1        FALSE         FALSE   FALSE      FALSE         FALSE          FALSE
+    ## 2        FALSE         FALSE   FALSE      FALSE         FALSE          FALSE
+    ## 3        FALSE         FALSE   FALSE      FALSE         FALSE          FALSE
+    ## 4        FALSE         FALSE   FALSE      FALSE         FALSE          FALSE
+    ##   vss.sparse.last aucinf.obs aucinf.pred aumcinf.obs aumcinf.pred
+    ## 1           FALSE      FALSE       FALSE       FALSE        FALSE
+    ## 2           FALSE       TRUE       FALSE       FALSE        FALSE
+    ## 3           FALSE      FALSE       FALSE       FALSE        FALSE
+    ## 4           FALSE      FALSE       FALSE       FALSE        FALSE
+    ##   aucint.inf.obs aucint.inf.obs.dose aucint.inf.pred aucint.inf.pred.dose
+    ## 1          FALSE               FALSE           FALSE                FALSE
+    ## 2          FALSE               FALSE           FALSE                FALSE
+    ## 3          FALSE               FALSE           FALSE                FALSE
+    ## 4          FALSE               FALSE           FALSE                FALSE
+    ##   aumcint.inf.obs aumcint.inf.obs.dose aumcint.inf.pred aumcint.inf.pred.dose
+    ## 1           FALSE                FALSE            FALSE                 FALSE
+    ## 2           FALSE                FALSE            FALSE                 FALSE
+    ## 3           FALSE                FALSE            FALSE                 FALSE
+    ## 4           FALSE                FALSE            FALSE                 FALSE
+    ##   aucivinf.obs aucivinf.pred aucivpbextinf.obs aucivpbextinf.pred aumcivinf.obs
+    ## 1        FALSE         FALSE             FALSE              FALSE         FALSE
+    ## 2        FALSE         FALSE             FALSE              FALSE         FALSE
+    ## 3        FALSE         FALSE             FALSE              FALSE         FALSE
+    ## 4        FALSE         FALSE             FALSE              FALSE         FALSE
+    ##   aumcivinf.pred aucpext.obs aucpext.pred kel.iv.all kel.ivint.all
+    ## 1          FALSE       FALSE        FALSE      FALSE         FALSE
+    ## 2          FALSE       FALSE        FALSE      FALSE         FALSE
+    ## 3          FALSE       FALSE        FALSE      FALSE         FALSE
+    ## 4          FALSE       FALSE        FALSE      FALSE         FALSE
+    ##   kel.ivint.last kel.sparse.last cl.obs cl.pred cl.int.inf.obs cl.int.inf.pred
+    ## 1          FALSE           FALSE  FALSE   FALSE          FALSE           FALSE
+    ## 2          FALSE           FALSE  FALSE   FALSE          FALSE           FALSE
+    ## 3          FALSE           FALSE  FALSE   FALSE          FALSE           FALSE
+    ## 4          FALSE           FALSE  FALSE   FALSE          FALSE           FALSE
+    ##   cl.iv.obs cl.iv.pred mrt.obs mrt.pred mrt.int.inf.obs mrt.int.inf.pred
+    ## 1     FALSE      FALSE   FALSE    FALSE           FALSE            FALSE
+    ## 2     FALSE      FALSE   FALSE    FALSE           FALSE            FALSE
+    ## 3     FALSE      FALSE   FALSE    FALSE           FALSE            FALSE
+    ## 4     FALSE      FALSE   FALSE    FALSE           FALSE            FALSE
+    ##   mrt.iv.obs mrt.iv.pred mrt.md.obs mrt.md.pred vz.obs vz.pred vz.int.inf.obs
+    ## 1      FALSE       FALSE      FALSE       FALSE  FALSE   FALSE          FALSE
+    ## 2      FALSE       FALSE      FALSE       FALSE  FALSE   FALSE          FALSE
+    ## 3      FALSE       FALSE      FALSE       FALSE  FALSE   FALSE          FALSE
+    ## 4      FALSE       FALSE      FALSE       FALSE  FALSE   FALSE          FALSE
+    ##   vz.int.inf.pred vz.iv.obs vz.iv.pred vz.sparse.last vss.obs vss.pred
+    ## 1           FALSE     FALSE      FALSE          FALSE   FALSE    FALSE
+    ## 2           FALSE     FALSE      FALSE          FALSE   FALSE    FALSE
+    ## 3           FALSE     FALSE      FALSE          FALSE   FALSE    FALSE
+    ## 4           FALSE     FALSE      FALSE          FALSE   FALSE    FALSE
+    ##   vss.iv.obs vss.iv.pred vss.md.obs vss.md.pred vss.int.inf.obs
     ## 1      FALSE       FALSE      FALSE       FALSE           FALSE
     ## 2      FALSE       FALSE      FALSE       FALSE           FALSE
     ## 3      FALSE       FALSE      FALSE       FALSE           FALSE
     ## 4      FALSE       FALSE      FALSE       FALSE           FALSE
-    ##   cav.int.inf.pred thalf.eff.obs thalf.eff.pred thalf.eff.iv.obs
-    ## 1            FALSE         FALSE          FALSE            FALSE
-    ## 2            FALSE         FALSE          FALSE            FALSE
-    ## 3            FALSE         FALSE          FALSE            FALSE
-    ## 4            FALSE         FALSE          FALSE            FALSE
-    ##   thalf.eff.iv.pred kel.obs kel.pred kel.iv.obs kel.iv.pred auclast.dn
-    ## 1             FALSE   FALSE    FALSE      FALSE       FALSE      FALSE
-    ## 2             FALSE   FALSE    FALSE      FALSE       FALSE      FALSE
-    ## 3             FALSE   FALSE    FALSE      FALSE       FALSE      FALSE
-    ## 4             FALSE   FALSE    FALSE      FALSE       FALSE      FALSE
-    ##   aucall.dn aucinf.obs.dn aucinf.pred.dn aumclast.dn aumcall.dn aumcinf.obs.dn
-    ## 1     FALSE         FALSE          FALSE       FALSE      FALSE          FALSE
-    ## 2     FALSE         FALSE          FALSE       FALSE      FALSE          FALSE
-    ## 3     FALSE         FALSE          FALSE       FALSE      FALSE          FALSE
-    ## 4     FALSE         FALSE          FALSE       FALSE      FALSE          FALSE
+    ##   vss.int.inf.pred cav.int.inf.obs cav.int.inf.pred thalf.eff.obs
+    ## 1            FALSE           FALSE            FALSE         FALSE
+    ## 2            FALSE           FALSE            FALSE         FALSE
+    ## 3            FALSE           FALSE            FALSE         FALSE
+    ## 4            FALSE           FALSE            FALSE         FALSE
+    ##   thalf.eff.pred thalf.eff.iv.obs thalf.eff.iv.pred kel.obs kel.pred kel.iv.obs
+    ## 1          FALSE            FALSE             FALSE   FALSE    FALSE      FALSE
+    ## 2          FALSE            FALSE             FALSE   FALSE    FALSE      FALSE
+    ## 3          FALSE            FALSE             FALSE   FALSE    FALSE      FALSE
+    ## 4          FALSE            FALSE             FALSE   FALSE    FALSE      FALSE
+    ##   kel.iv.pred kel.int.inf.obs kel.int.inf.pred auclast.dn aucall.dn
+    ## 1       FALSE           FALSE            FALSE      FALSE     FALSE
+    ## 2       FALSE           FALSE            FALSE      FALSE     FALSE
+    ## 3       FALSE           FALSE            FALSE      FALSE     FALSE
+    ## 4       FALSE           FALSE            FALSE      FALSE     FALSE
+    ##   aucinf.obs.dn aucinf.pred.dn aumclast.dn aumcall.dn aumcinf.obs.dn
+    ## 1         FALSE          FALSE       FALSE      FALSE          FALSE
+    ## 2         FALSE          FALSE       FALSE      FALSE          FALSE
+    ## 3         FALSE          FALSE       FALSE      FALSE          FALSE
+    ## 4         FALSE          FALSE       FALSE      FALSE          FALSE
     ##   aumcinf.pred.dn cmax.dn cmin.dn clast.obs.dn clast.pred.dn cav.dn ctrough.dn
     ## 1           FALSE   FALSE   FALSE        FALSE         FALSE  FALSE      FALSE
     ## 2           FALSE   FALSE   FALSE        FALSE         FALSE  FALSE      FALSE

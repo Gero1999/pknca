@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>AUC Calculation with PKNCA • PKNCA</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="AUC Calculation with PKNCA">
 </head>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">PKNCA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,6 +57,7 @@
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><a class="nav-link" href="https://humanpred.github.io/pknca-book/">User Guide</a></li>
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
@@ -95,7 +96,7 @@ calculate it.</p>
 <p>For the below examples, the following data will be used.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="op">{</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://humanpred.github.io/pknca/" class="external-link">PKNCA</a></span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pknca.humanpredictions.com/" class="external-link">PKNCA</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/" class="external-link">cowplot</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/" class="external-link">knitr</a></span><span class="op">)</span></span>
@@ -138,13 +139,23 @@ parameters.</p>
 <pre><code><span><span class="co">## No dose information provided, calculations requiring dose will return NA.</span></span></code></pre>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">results_obj</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="10%">
+<col width="7%">
+<col width="5%">
+<col width="25%">
+<col width="14%">
+<col width="26%">
+<col width="10%">
+</colgroup>
 <thead><tr class="header">
 <th align="right">subject</th>
 <th align="right">start</th>
 <th align="right">end</th>
 <th align="left">PPTESTCD</th>
 <th align="right">PPORRES</th>
+<th align="left">PPANMETH</th>
 <th align="left">exclude</th>
 </tr></thead>
 <tbody>
@@ -154,6 +165,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">auclast</td>
 <td align="right">12.9965842</td>
+<td align="left">AUC: lin up/log down</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
@@ -162,6 +174,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">aucall</td>
 <td align="right">15.1965842</td>
+<td align="left">AUC: lin up/log down</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
@@ -170,6 +183,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">tmax</td>
 <td align="right">2.0000000</td>
+<td align="left"></td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
@@ -178,6 +192,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">tlast</td>
 <td align="right">8.0000000</td>
+<td align="left"></td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
@@ -186,6 +201,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">clast.obs</td>
 <td align="right">1.1000000</td>
+<td align="left"></td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
@@ -194,6 +210,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">lambda.z</td>
 <td align="right">0.1075592</td>
+<td align="left"></td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
@@ -202,6 +219,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">r.squared</td>
 <td align="right">0.7580245</td>
+<td align="left"></td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
@@ -210,6 +228,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">adj.r.squared</td>
 <td align="right">0.6370368</td>
+<td align="left"></td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
@@ -218,6 +237,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">lambda.z.corrxy</td>
 <td align="right">-0.8706460</td>
+<td align="left"></td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
@@ -226,6 +246,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">lambda.z.time.first</td>
 <td align="right">3.0000000</td>
+<td align="left"></td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
@@ -234,6 +255,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">lambda.z.time.last</td>
 <td align="right">8.0000000</td>
+<td align="left"></td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
@@ -242,6 +264,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">lambda.z.n.points</td>
 <td align="right">4.0000000</td>
+<td align="left"></td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
@@ -250,6 +273,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">clast.pred</td>
 <td align="right">1.0216136</td>
+<td align="left"></td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
@@ -258,6 +282,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">half.life</td>
 <td align="right">6.4443313</td>
+<td align="left"></td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
@@ -266,6 +291,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">span.ratio</td>
 <td align="right">0.7758757</td>
+<td align="left"></td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
@@ -274,6 +300,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">aucinf.obs</td>
 <td align="right">23.2235095</td>
+<td align="left">AUC: lin up/log down</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
@@ -282,6 +309,7 @@ parameters.</p>
 <td align="right">24</td>
 <td align="left">aucinf.pred</td>
 <td align="right">22.4947355</td>
+<td align="left">AUC: lin up/log down</td>
 <td align="left">NA</td>
 </tr>
 </tbody>
@@ -467,6 +495,7 @@ as illustrated below.</p>
 <th align="right">end</th>
 <th align="left">PPTESTCD</th>
 <th align="right">PPORRES</th>
+<th align="left">PPANMETH</th>
 <th align="left">exclude</th>
 </tr></thead>
 <tbody><tr class="odd">
@@ -475,6 +504,7 @@ as illustrated below.</p>
 <td align="right">2</td>
 <td align="left">auclast</td>
 <td align="right">4</td>
+<td align="left">AUC: lin up/log down</td>
 <td align="left">NA</td>
 </tr></tbody>
 </table>
@@ -647,10 +677,10 @@ illustrated below.</p>
 <pre><code><span><span class="co">## No dose information provided, calculations requiring dose will return NA.</span></span></code></pre>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">results_interp</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 1 × 6</span></span></span>
-<span><span class="co">##   subject start   end PPTESTCD PPORRES exclude</span></span>
-<span><span class="co">##     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">1</span>       1     0   1.5 auclast     2.56 <span style="color: #BB0000;">NA</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 1 × 7</span></span></span>
+<span><span class="co">##   subject start   end PPTESTCD PPORRES PPANMETH             exclude</span></span>
+<span><span class="co">##     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span>       1     0   1.5 auclast     2.56 AUC: lin up/log down <span style="color: #BB0000;">NA</span></span></span></code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
